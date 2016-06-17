@@ -1,0 +1,17 @@
+@font-face {
+    font-family: "Great Vibes";
+    font-style: normal;
+    font-weight: normal;
+    src: url(../fonts/GreatVibes-Regular.ttf);    
+}
+
+#cabecera{
+    background: url(../img/cabecera.jpg);
+    background-size: 100% 100%;
+    background-repeat:no-repeat;
+    margin:0;
+    padding: 0.5% 0.5%;
+    font-family: "Great Vibes";
+    font-size:50px;
+    color: #000;
+}
