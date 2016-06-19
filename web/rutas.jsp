@@ -527,7 +527,7 @@
         
         <script type="text/javascript" language="javascript" class="init">
             $(document).ready(function() {
-                $('#example').DataTable( {
+                $('#example').DataTable({
                     "language": {
                         "url": "js/Spanish.json"
                     }
