@@ -34,8 +34,8 @@
                 <h1>Rutas</h1> 
             </div>
         </div>
-        <div class="container-fluid">
-            <table id="example" class="display" cellspacing="0" width="100%">
+        <div class="table-responsive">
+            <table id="example" class="table nowrap" width="100%">
                 <thead>
                     <tr>
                         <th>Nombre de la ruta</th>
@@ -72,7 +72,7 @@
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/Bootstrap/bootstrap.min.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/dataTables/jquery.dataTables.min.js" charset="utf-8"></script>
-        
+        <script type="text/javascript" src="js/Stacktable/stacktable.min.js" charset="utf-8"></script>
         <script type="text/javascript" language="javascript" class="init">
             $(document).ready(function() {
                 $('#example').DataTable({
@@ -82,6 +82,7 @@
                         "url": "rutas",
                         "type": "POST"
                     },
+                    "deferRender": true,
                     "columns": [
                         {"data": "Nombre de la ruta"},
                         {"data": "Descripcion"},
@@ -97,8 +98,10 @@
                         "url": "js/Spanish.json"
                     }
                 });
-            } );
+                $('#example').stackable();
+            });
 	</script>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>
+        
     </body>
 </html>
