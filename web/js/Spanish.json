@@ -2,7 +2,7 @@
     "sProcessing":     "Procesando...",
     "sLengthMenu":     "Mostrar _MENU_ resultados",
     "sZeroRecords":    "No se encontraron resultados",
-    "sEmptyTable":     "Ningún dato disponible en esta tabla",
+    "sEmptyTable":     "Ningún dato disponible",
     "sInfo":           "Mostrando resultados del _START_ al _END_ de un total de _TOTAL_ resultados",
     "sInfoEmpty":      "Mostrando resultados del 0 al 0 de un total de 0 resultados",
     "sInfoFiltered":   "(filtrado de un total de _MAX_ resultados)",

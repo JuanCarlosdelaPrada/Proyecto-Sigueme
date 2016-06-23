@@ -16,9 +16,15 @@
 
         <!--Importaciones .css-->
         <link href="css/bootstrap.min.css" rel="stylesheet">
-        <link href="css/bootstrap-theme.min.css" rel="stylesheet">
+        <link href="css/bootstrap-theme.min.css" rel="stylesheet"> 
         <link href="css/font-awesome.min.css" rel="stylesheet">
-        <link href="css/jquery.dataTables.min.css" rel="stylesheet">
+        <!-- 
+                    CON ESTA LÍNEA NO SE MEZCLAN LOS ESTILOS
+        <link href="css/jquery.dataTables.min.css" rel="stylesheet"> 
+        -->
+        <!-- <link href="css/responsive.dataTables.min.css" rel="stylesheet">-->
+        <link href="css/dataTables.bootstrap.min.css" rel="stylesheet">
+        <link href="css/responsive.bootstrap.min.css" rel="stylesheet">
         <link href="css/cabecera.css" rel="stylesheet">
         <link href="css/login.css" rel="stylesheet">
     </head>
@@ -30,39 +36,42 @@
         <%@include file="WEB-INF/jspf/menu.jspf"%>
               
         <div class="page-header">
-            <div class="col-sm-offset-1">
+            <div class="col-xs-offset-1">
                 <h1>Rutas</h1> 
             </div>
         </div>
-        <div class="table-responsive">
-            <table id="example" class="table nowrap" width="100%">
-                <thead>
-                    <tr>
-                        <th>Nombre de la ruta</th>
-                        <th>Descripcion</th>
-                        <th>Distancia</th>
-                        <th>Dificultad</th>
-                        <th>ficheroGPX</th>
-                        <th>minlatitud</th>
-                        <th>minlongitud</th>
-                        <th>maxlatitud</th>
-                        <th>maxlongitud</th>
-                    </tr>
-                </thead>
-                <tfoot>
-                    <tr>
-                        <th>Nombre de la ruta</th>
-                        <th>Descripcion</th>
-                        <th>Distancia</th>
-                        <th>Dificultad</th>
-                        <th>ficheroGPX</th>
-                        <th>minlatitud</th>
-                        <th>minlongitud</th>
-                        <th>maxlatitud</th>
-                        <th>maxlongitud</th>
-                    </tr>
-                </tfoot>
-            </table>
+        
+        <div class="container-fluid">   <!--table-bordered-->
+            <div class="col-xs-offset-1 col-xs-10">
+                <table id="example" class="table table-striped dt-responsive" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Nombre de la ruta</th>
+                            <th>Descripcion</th>
+                            <th>Distancia</th>
+                            <th>Dificultad</th>
+                            <th>ficheroGPX</th>
+                            <th>minlatitud</th>
+                            <th>minlongitud</th>
+                            <th>maxlatitud</th>
+                            <th>maxlongitud</th>
+                        </tr>
+                    </thead>
+                    <tfoot>
+                        <tr>
+                            <th>Nombre de la ruta</th>
+                            <th>Descripcion</th>
+                            <th>Distancia</th>
+                            <th>Dificultad</th>
+                            <th>ficheroGPX</th>
+                            <th>minlatitud</th>
+                            <th>minlongitud</th>
+                            <th>maxlatitud</th>
+                            <th>maxlongitud</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
         </div>
         
         <!--Pie-->
@@ -72,33 +81,38 @@
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/Bootstrap/bootstrap.min.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/dataTables/jquery.dataTables.min.js" charset="utf-8"></script>
-        <script type="text/javascript" src="js/Stacktable/stacktable.min.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/dataTables/dataTables.responsive.min.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/dataTables/dataTables.bootstrap.min.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/dataTables/responsive.bootstrap.min.js" charset="utf-8"></script>
         <script type="text/javascript" language="javascript" class="init">
             $(document).ready(function() {
-                $('#example').DataTable({
-                    "processing": true,
-                    "serverSide": true,
-                    "ajax": {
-                        "url": "rutas",
-                        "type": "POST"
-                    },
-                    "deferRender": true,
-                    "columns": [
-                        {"data": "Nombre de la ruta"},
-                        {"data": "Descripcion"},
-                        {"data": "Distancia"},
-                        {"data": "Dificultad"},
-                        {"data": "ficheroGPX"},
-                        {"data": "minlatitud"},
-                        {"data": "minlongitud"},
-                        {"data": "maxlatitud"},
-                        {"data": "maxlongitud"}
-                    ],
-                    "language": {
-                        "url": "js/Spanish.json"
-                    }
-                });
-                $('#example').stackable();
+                $('#example')
+                    //.addClass('nowrap')
+                    .DataTable({
+                        responsive: true,
+                        "dom": "<'row'<'col-sm-6'l><'col-sm-6'f>>"+"<'row'<'col-sm-12'tr>>"+"<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                        "processing": true,
+                        "serverSide": true,
+                        "ajax": {
+                            "url": "rutas",
+                            "type": "POST"
+                        },
+                        "deferRender": true,
+                        "columns": [
+                            {"data": "Nombre de la ruta"},
+                            {"data": "Descripcion"},
+                            {"data": "Distancia"},
+                            {"data": "Dificultad"},
+                            {"data": "ficheroGPX"},
+                            {"data": "minlatitud"},
+                            {"data": "minlongitud"},
+                            {"data": "maxlatitud"},
+                            {"data": "maxlongitud"}
+                        ],
+                        "language": {
+                            "url": "js/Spanish.json"
+                        }
+                    });
             });
 	</script>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>
