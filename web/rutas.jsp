@@ -47,7 +47,7 @@
                     <thead>
                         <tr>
                             <th>Nombre de la ruta</th>
-                            <th>Descripcion</th>
+                            <th>Descripción</th>
                             <th>Distancia</th>
                             <th>Dificultad</th>
                             <th>ficheroGPX</th>
@@ -55,12 +55,17 @@
                             <th>minlongitud</th>
                             <th>maxlatitud</th>
                             <th>maxlongitud</th>
+                            <th>Más información</th>
+                            <c:if test="${sessionScope.permiso}">
+                                <th>Editar</th>
+                                <th>Borrar</th>
+                            </c:if>
                         </tr>
                     </thead>
                     <tfoot>
                         <tr>
                             <th>Nombre de la ruta</th>
-                            <th>Descripcion</th>
+                            <th>Descripción</th>
                             <th>Distancia</th>
                             <th>Dificultad</th>
                             <th>ficheroGPX</th>
@@ -68,12 +73,19 @@
                             <th>minlongitud</th>
                             <th>maxlatitud</th>
                             <th>maxlongitud</th>
+                            <th>Más información</th>
+                            <c:if test="${sessionScope.permiso}">
+                                <th>Editar</th>
+                                <th>Borrar</th>
+                            </c:if>
                         </tr>
                     </tfoot>
                 </table>
             </div>
         </div>
-        
+        <div class="row">
+            </br>   
+        </div>
         <!--Pie-->
         <%@include file="WEB-INF/jspf/pie.jspf"%>
 
@@ -86,8 +98,8 @@
         <script type="text/javascript" src="js/dataTables/responsive.bootstrap.min.js" charset="utf-8"></script>
         <script type="text/javascript" language="javascript" class="init">
             $(document).ready(function() {
-                $('#example')
-                    //.addClass('nowrap')
+               var tabla =  $('#example')
+                    .addClass('nowrap')
                     .DataTable({
                         responsive: true,
                         "dom": "<'row'<'col-sm-6'l><'col-sm-6'f>>"+"<'row'<'col-sm-12'tr>>"+"<'row'<'col-sm-5'i><'col-sm-7'p>>",
@@ -99,15 +111,20 @@
                         },
                         "deferRender": true,
                         "columns": [
-                            {"data": "Nombre de la ruta"},
-                            {"data": "Descripcion"},
-                            {"data": "Distancia"},
-                            {"data": "Dificultad"},
-                            {"data": "ficheroGPX"},
-                            {"data": "minlatitud"},
-                            {"data": "minlongitud"},
-                            {"data": "maxlatitud"},
-                            {"data": "maxlongitud"}
+                            {"data": "Nombre de la ruta"}
+                            ,{"data": "Descripcion"}
+                            ,{"data": "Distancia"}
+                            ,{"data": "Dificultad"}
+                            ,{"data": "ficheroGPX"}
+                            ,{"data": "minlatitud"}
+                            ,{"data": "minlongitud"}
+                            ,{"data": "maxlatitud"}
+                            ,{"data": "maxlongitud"}
+                            ,{"data": "Mas informacion"}
+                            <c:if test="${sessionScope.permiso}"> 
+                                ,{"data": "Editar"}
+                                ,{"data": "Borrar"}
+                            </c:if>
                         ],
                         "language": {
                             "url": "js/Spanish.json"
