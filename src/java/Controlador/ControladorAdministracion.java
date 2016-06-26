@@ -92,11 +92,15 @@ public class ControladorAdministracion extends HttpServlet {
         String accion;
         String vista;
         
+        request.setCharacterEncoding("UTF-8");
+        
         accion = request.getServletPath();
         session = request.getSession();
         
         TypedQuery<Usuario> consultaUsuarios;
+        ParserGPX parseador;
         Usuario usuario;
+        Ruta ruta;
         
         String ruta_id,
                descripcion, 
@@ -208,7 +212,7 @@ public class ControladorAdministracion extends HttpServlet {
                     }
                 }         
                 
-                ParserGPX parseador = new ParserGPX(archivo);
+                parseador = new ParserGPX(archivo);
                 Vector<Double> latitudes = parseador.getLatitudes();
                 Vector<Double> longitudes = parseador.getLongitudes();
                 double minlatitud = parseador.getMinlat();
@@ -241,8 +245,8 @@ public class ControladorAdministracion extends HttpServlet {
                 
                 //String rutaId, String dificultad, BigDecimal distancia, String ficheroGpx, BigDecimal latMin, BigDecimal latMax, BigDecimal longMin, BigDecimal longMax
                 //Creo la nueva ruta.
-                Ruta ruta = new Ruta(ruta_id, dificultad, new BigDecimal(distancia), destino + File.separator + ruta_id + ".gpx",
-                        new BigDecimal(minlatitud), new BigDecimal(maxlatitud), new BigDecimal(minlongitud), new BigDecimal(maxlongitud));
+                ruta = new Ruta(ruta_id, dificultad, new BigDecimal(distancia), destino + File.separator + ruta_id + ".gpx",
+                       new BigDecimal(minlatitud), new BigDecimal(maxlatitud), new BigDecimal(minlongitud), new BigDecimal(maxlongitud));
                 ruta.setDescripcion(descripcion);
                 if(em.find(JPA_Entidades.Ruta.class, ruta_id) == null) {
                     persist(ruta);
@@ -431,6 +435,15 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 break;
             case "/ruta":
+                ruta_id = request.getParameter("ruta_id");
+                ruta = em.find(Ruta.class, ruta_id);
+                if (ruta != null) {
+                    File ficheroGpx = new File(ruta.getFicheroGpx());
+                    parseador = new ParserGPX(ficheroGpx);
+                    JsonArray latlng = parseador.gpxToJson();
+                    request.setAttribute("ruta", ruta);
+                    request.setAttribute("latlng", latlng);
+                }
                 vista = "ruta.jsp";
                 break;
             default:

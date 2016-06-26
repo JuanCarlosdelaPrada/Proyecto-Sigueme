@@ -56,7 +56,7 @@
                     <div class="col-lg-3">
                         <div class="radio">
                             <label>
-                                <input type="radio" name="dificultad" value="facil" required checked>
+                                <input type="radio" name="dificultad" value="fácil" required checked>
                                 Fácil
                             </label>
                         </div>
@@ -68,19 +68,19 @@
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" name="dificultad" value="dificil" required>
+                                <input type="radio" name="dificultad" value="difícil" required>
                                 Difícil
                             </label>
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" name="dificultad" value="muy dificil" required>
+                                <input type="radio" name="dificultad" value="muy difícil" required>
                                 Muy difícil
                             </label>
                         </div>
                         <div class="radio">
                             <label>
-                                <input type="radio" name="dificultad" value="solo expertos" required>
+                                <input type="radio" name="dificultad" value="sólo expertos" required>
                                 Sólo expertos
                             </label>
                         </div>

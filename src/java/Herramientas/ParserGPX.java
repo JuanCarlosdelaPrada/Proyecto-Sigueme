@@ -1,5 +1,8 @@
 package Herramientas;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import java.io.File;
 import java.io.IOException;
 
@@ -96,6 +99,17 @@ public class ParserGPX {
         }
     }
 
+    public JsonArray gpxToJson() {
+        JsonArray path = new JsonArray();
+        for (int i = 0; i < latitudes.size(); i++) {
+            JsonObject coord = new JsonObject();
+            coord.add("lat", new JsonPrimitive(this.latitudes.get(i)));
+            coord.add("lng", new JsonPrimitive(this.longitudes.get(i)));
+            path.add(coord);
+        }
+        return path;
+    }
+    
     public double getMinlat() {
         return minlat;
     }
@@ -127,10 +141,6 @@ public class ParserGPX {
         //File archivoGPX = new File("track.gpx");
         File archivoGPX = new File("transpirinenca-cap-de-creus-hondarribia-la-transpirenaica.gpx");
         ParserGPX GPXparser = new ParserGPX(archivoGPX);
-        System.out.println(GPXparser.getMinlat());
-        System.out.println(GPXparser.getMinlon());
-        System.out.println(GPXparser.getMaxlat());
-        System.out.println(GPXparser.getMaxlon());
-        System.out.println(DistanciaDeHaversine.getDistancia(GPXparser.getLatitudes(), GPXparser.getLatitudes()));
+        System.out.println(GPXparser.gpxToJson());
     }   
 }
