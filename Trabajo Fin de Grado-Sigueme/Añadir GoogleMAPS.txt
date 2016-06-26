@@ -1,0 +1,6 @@
+Incluir en el html etiqueta script con el enlace oportuno para incluir:
+ - Las librerias oportunas(libraries).
+ - La clave de la API.
+ - Añadir la función de callback.
+ - Incluir el logging (sign_in) o no del usuario.
+   

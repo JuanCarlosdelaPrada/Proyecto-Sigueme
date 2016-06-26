@@ -20,7 +20,6 @@
         <link href="css/font-awesome.min.css" rel="stylesheet">
         <link href="css/cabecera.css" rel="stylesheet">
         <link href="css/login.css" rel="stylesheet">
-    <script src="https://www.google.com/jsapi"></script>
     </head>
     <body onresize="initMap()">
         <!--Cabecera-->       
@@ -35,9 +34,9 @@
             </div>
         </div>
         
-        <div class="row">
-            <div class="col-xs-offset-1 col-xs-4">
-                <div id="map-canvas" style="width:100%;height:400px"></div>
+        <div class="container-fluid">
+            <div id="map-canvas" class="col-xs-offset-1 col-xs-4">
+                <div id="map" style="width:100%;height:400px"></div>
             </div>
         </div>
         <div class="row"></br></div>
@@ -47,11 +46,12 @@
         <!--Importaciones .js-->
         <script>
             function initMap() {
+                if (window.innerWidth <= 767) alert("que cabron");
                 // camino
                 var path = ${requestScope.latlng};
 
                 // mapa
-                var map = new google.maps.Map(document.getElementById('map-canvas'), {
+                var map = new google.maps.Map(document.getElementById('map'), {
                     zoom: 8,
                     center: path[1],
                     mapTypeId: 'terrain'

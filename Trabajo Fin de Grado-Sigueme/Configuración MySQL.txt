@@ -1,0 +1,10 @@
+1. Type and Networking
+config type: development machine
+TCP/IP
+Open Firewall port for network access
+Port Number: 3306
+2. Account and Roles
+MySQL Root Password: TFG_Seguimiento_Trayectoria
+Usuario->JCarlosdelaPrada
+3. Windows Service
+Windows Service Name: MySQL57

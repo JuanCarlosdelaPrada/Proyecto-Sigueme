@@ -1,0 +1,5 @@
+Incluir en los ficheros JSP los siguientes taglib:
+ - Para el core de JSTL:
+	<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+ - Para trabajar con acceso a bases de datos desde JSTL:
+	<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
