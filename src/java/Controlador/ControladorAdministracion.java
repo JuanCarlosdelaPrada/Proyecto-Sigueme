@@ -62,7 +62,11 @@ import javax.sql.DataSource;
     "/subirRuta",
     "/crearPrueba",
     "/rutas",
-    "/ruta"
+    "/ruta",
+    "/pruebas", //--
+    "/prueba", //--
+    "/usuarios",
+    "/usuario" //--
 })
 @MultipartConfig
 
@@ -98,13 +102,29 @@ public class ControladorAdministracion extends HttpServlet {
         session = request.getSession();
         
         TypedQuery<Usuario> consultaUsuarios;
+        JsonObject resultado;
         ParserGPX parseador;
         Usuario usuario;
+        JsonArray array;
         Ruta ruta;
+        
+        int cantidad,
+            comienzo,
+            idraw,
+            num_atributos,
+            total;
         
         String ruta_id,
                descripcion, 
-               dificultad;
+               dificultad,
+               tabla,
+               dir,
+               sStart, 
+               sAmount, 
+               draw, 
+               sCol, 
+               sdir,
+               nombreAtributo;
         
         vista = "";
         switch(accion) {
@@ -264,20 +284,20 @@ public class ControladorAdministracion extends HttpServlet {
             case "/rutas":
                 String[] columnas = {"Nombre de la ruta", "Descripcion", "Distancia", "Dificultad", "ficheroGPX", "minlatitud", "minlongitud", "maxlatitud", "maxlongitud", "Mas informacion", "Editar", "Borrar"};
                 String[] atributos = {"ruta_id", "descripcion", "distancia", "dificultad", "fichero_gpx", "lat_min", "lat_max", "long_min", "long_max"};
-                String tabla = "ruta";
-                JsonObject resultado = new JsonObject();
-                JsonArray array = new JsonArray();
-                int cantidad = 10,
-                    comienzo = 0,
-                    idraw = 0,
-                    num_atributos = 0;
+                tabla = "ruta";
+                resultado = new JsonObject();
+                array = new JsonArray();
+                cantidad = 10;
+                comienzo = 0;
+                idraw = 0;
+                num_atributos = 0;
                 
-                String dir = "asc",
-                       sStart = request.getParameter("start"), 
-                       sAmount = request.getParameter("length"), 
-                       draw = request.getParameter("draw"), 
-                       sCol = request.getParameter("order[0][column]"), 
-                       sdir = request.getParameter("order[0][dir]"); 
+                dir = "asc";
+                sStart = request.getParameter("start");
+                sAmount = request.getParameter("length"); 
+                draw = request.getParameter("draw");
+                sCol = request.getParameter("order[0][column]"); 
+                sdir = request.getParameter("order[0][dir]"); 
                 
                 /*
                 String sdistancia = request.getParameter("columns[2][search][value]"),
@@ -351,8 +371,8 @@ public class ControladorAdministracion extends HttpServlet {
                     if (!sdir.equals("asc"))
                         dir = "desc";
                 }
-                String nombreAtributo = atributos[num_atributos];
-                int total = 0;
+                nombreAtributo = atributos[num_atributos];
+                total = 0;
                 
                 try (Connection conn = myDatasource.getConnection()) {
                     String sql = "SELECT count(*) FROM " + tabla;
@@ -445,6 +465,120 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("latlng", latlng);
                 }
                 vista = "ruta.jsp";
+                break;
+            case "/usuarios":
+                String[] columnasU = {"Nombre de la ruta", "Descripcion", "Distancia", "Dificultad", "ficheroGPX", "minlatitud", "minlongitud", "maxlatitud", "maxlongitud", "Mas informacion", "Editar", "Borrar"};
+                String[] atributosU = {"ruta_id", "descripcion", "distancia", "dificultad", "fichero_gpx", "lat_min", "lat_max", "long_min", "long_max"};
+                tabla = "usuario";
+                resultado = new JsonObject();
+                array = new JsonArray();
+                cantidad = 10;
+                comienzo = 0;
+                idraw = 0;
+                num_atributos = 0;
+                
+                dir = "asc";
+                sStart = request.getParameter("start"); 
+                sAmount = request.getParameter("length"); 
+                draw = request.getParameter("draw");
+                sCol = request.getParameter("order[0][column]"); 
+                sdir = request.getParameter("order[0][dir]"); 
+                
+                if (sStart != null) {
+                    comienzo = Integer.parseInt(sStart);
+                    if (comienzo < 0)
+                        comienzo = 0;
+                }
+                if (sAmount != null) {
+                    cantidad = Integer.parseInt(sAmount);
+                    if (cantidad < 10 || cantidad > 100)
+                        cantidad = 10;
+                }
+                if (draw != null) {
+                    idraw = Integer.parseInt(draw);
+                }
+                if (sCol != null) {
+                    num_atributos = Integer.parseInt(sCol);
+                    if (num_atributos < 0 || num_atributos > 9)
+                        num_atributos = 0;
+                }
+                if (sdir != null) {
+                    if (!sdir.equals("asc"))
+                        dir = "desc";
+                }
+                nombreAtributo = atributosU[num_atributos];
+                total = 0;
+                
+                try (Connection conn = myDatasource.getConnection()) {
+                    String sql = "SELECT count(*) FROM " + tabla;
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    ResultSet rs = ps.executeQuery();
+                    if(rs.next()){
+                        total = rs.getInt("count(*)");
+                    }
+                    int totalAfterFilter = total;
+                    String searchSQL = "",
+                            searchTerm = request.getParameter("search[value]"), 
+                            globeSearch = " where (ruta_id like '%" + searchTerm +"%'"
+                            + " or descripcion like '%" + searchTerm +"%'"
+                            + " or distancia like '%" + searchTerm +"%'"
+                            + " or dificultad like '%" + searchTerm +"%'"
+                            + " or fichero_gpx like '%" + searchTerm +"%'"
+                            + " or lat_min like '%" + searchTerm +"%'"
+                            + " or lat_max like '%" + searchTerm +"%'"
+                            + " or long_min like '%" + searchTerm +"%'"
+                            + " or long_max like '%" + searchTerm + "%')";
+                    sql = "SELECT * FROM " + tabla;
+                    
+                    if(!"".equals(searchTerm)){
+                        searchSQL = globeSearch;
+                    }
+                    sql += searchSQL;
+                    sql += " order by " + nombreAtributo + " " + dir;
+                    sql += " limit " + comienzo + ", " + cantidad;
+                    System.out.println(sql);
+                    ps = conn.prepareStatement(sql);
+                    rs = ps.executeQuery();
+                    while (rs.next()) {
+                        JsonObject ja = new JsonObject();
+                        for (int i = 0; i < atributosU.length; i++) {
+                            ja.add(columnasU[i], new JsonPrimitive(rs.getString(atributosU[i])));                            
+                        }
+                        ja.add(columnasU[atributosU.length], new JsonPrimitive("<a href='ruta?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                        
+                        Boolean permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
+                        if (permiso == true) {
+                            ja.add(columnasU[atributosU.length + 1], new JsonPrimitive("<a href='editar-ruta?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
+                            ja.add(columnasU[atributosU.length + 2], new JsonPrimitive("<a href='eliminar-ruta?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>")); 
+                        }
+                        array.add(ja);
+                    }
+                    
+                    String sql2 = "SELECT count(*) FROM " + tabla;
+                    if (searchTerm != null) {
+                        sql2 += searchSQL;
+                        PreparedStatement ps2 = conn.prepareStatement(sql2);
+                        ResultSet rs2 = ps2.executeQuery();
+                        if (rs2.next()) {
+                            totalAfterFilter = rs2.getInt("count(*)");
+                        }
+                    }
+                    resultado.add("draw", new JsonPrimitive(idraw));
+                    resultado.add("recordsTotal", new JsonPrimitive(total));
+                    resultado.add("recordsFiltered", new JsonPrimitive(totalAfterFilter));
+                    resultado.add("data", array);
+                    System.out.println(resultado);
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setHeader("Cache-Control", "no-store");
+                    PrintWriter out = response.getWriter();
+                    out.print(resultado);
+                    out.flush();
+                    conn.close();
+                    return;
+                } catch (SQLException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 break;
             default:
                 vista = "inicio.jsp";

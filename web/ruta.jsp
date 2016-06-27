@@ -46,7 +46,13 @@
         <!--Importaciones .js-->
         <script>
             function initMap() {
-                if (window.innerWidth <= 767) alert("que cabron");
+                var width = $("#map").width();
+                $("#map").height($("#map").width());
+                if (window.innerWidth <= 767) 
+                    $("#map-canvas").removeClass("col-xs-offset-1 col-xs-4").addClass("col-xs-12");
+                else
+                    $("#map-canvas").removeClass("col-xs-12").addClass("col-xs-offset-1 col-xs-4");
+                
                 // camino
                 var path = ${requestScope.latlng};
 
