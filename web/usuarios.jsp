@@ -57,6 +57,7 @@
                             <th>Teléfono</th>
                             <th>Sexo</th>
                             <th>Club</th>
+                            <th>Federado</th>
                             <th>Más información</th>
                             <c:if test="${sessionScope.permiso}">
                                 <th>Editar</th>
@@ -77,6 +78,7 @@
                             <th>Teléfono</th>
                             <th>Sexo</th>
                             <th>Club</th>
+                            <th>Federado</th>
                             <th>Más información</th>
                             <c:if test="${sessionScope.permiso}">
                                 <th>Editar</th>

@@ -467,8 +467,8 @@ public class ControladorAdministracion extends HttpServlet {
                 vista = "ruta.jsp";
                 break;
             case "/usuarios":
-                String[] columnasU = {"Nombre de la ruta", "Descripcion", "Distancia", "Dificultad", "ficheroGPX", "minlatitud", "minlongitud", "maxlatitud", "maxlongitud", "Mas informacion", "Editar", "Borrar"};
-                String[] atributosU = {"ruta_id", "descripcion", "distancia", "dificultad", "fichero_gpx", "lat_min", "lat_max", "long_min", "long_max"};
+                String[] columnasU = {"Correo", "Contrasena", "Rol", "Nombre", "Apellidos", "DNI", "Direccion", "Fecha Nacimiento", "Telefono", "Sexo", "Club", "Federado", "Mas informacion", "Editar", "Borrar"};
+                String[] atributosU = {"usuario_id", "contrasena", "rol", "nombre", "apellidos", "dni", "direccion", "fecha_nacimiento", "telefono", "sexo", "club", "federado"};
                 tabla = "usuario";
                 resultado = new JsonObject();
                 array = new JsonArray();
@@ -483,7 +483,6 @@ public class ControladorAdministracion extends HttpServlet {
                 draw = request.getParameter("draw");
                 sCol = request.getParameter("order[0][column]"); 
                 sdir = request.getParameter("order[0][dir]"); 
-                
                 if (sStart != null) {
                     comienzo = Integer.parseInt(sStart);
                     if (comienzo < 0)
@@ -508,7 +507,6 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 nombreAtributo = atributosU[num_atributos];
                 total = 0;
-                
                 try (Connection conn = myDatasource.getConnection()) {
                     String sql = "SELECT count(*) FROM " + tabla;
                     PreparedStatement ps = conn.prepareStatement(sql);
@@ -519,15 +517,18 @@ public class ControladorAdministracion extends HttpServlet {
                     int totalAfterFilter = total;
                     String searchSQL = "",
                             searchTerm = request.getParameter("search[value]"), 
-                            globeSearch = " where (ruta_id like '%" + searchTerm +"%'"
-                            + " or descripcion like '%" + searchTerm +"%'"
-                            + " or distancia like '%" + searchTerm +"%'"
-                            + " or dificultad like '%" + searchTerm +"%'"
-                            + " or fichero_gpx like '%" + searchTerm +"%'"
-                            + " or lat_min like '%" + searchTerm +"%'"
-                            + " or lat_max like '%" + searchTerm +"%'"
-                            + " or long_min like '%" + searchTerm +"%'"
-                            + " or long_max like '%" + searchTerm + "%')";
+                            globeSearch = " where (usuario_id like '%" + searchTerm +"%'"
+                            + " or contrasena like '%" + searchTerm +"%'"
+                            + " or rol like '%" + searchTerm +"%'"
+                            + " or nombre like '%" + searchTerm +"%'"
+                            + " or apellidos like '%" + searchTerm +"%'"
+                            + " or dni like '%" + searchTerm +"%'"
+                            + " or direccion like '%" + searchTerm +"%'"
+                            + " or fecha_nacimiento like '%" + searchTerm +"%'"
+                            + " or telefono like '%" + searchTerm +"%'"
+                            + " or sexo like '%" + searchTerm +"%'"
+                            + " or club like '%" + searchTerm +"%'"
+                            + " or federado like '%" + searchTerm + "%')";
                     sql = "SELECT * FROM " + tabla;
                     
                     if(!"".equals(searchTerm)){
@@ -536,24 +537,33 @@ public class ControladorAdministracion extends HttpServlet {
                     sql += searchSQL;
                     sql += " order by " + nombreAtributo + " " + dir;
                     sql += " limit " + comienzo + ", " + cantidad;
-                    System.out.println(sql);
                     ps = conn.prepareStatement(sql);
                     rs = ps.executeQuery();
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
-                        for (int i = 0; i < atributosU.length; i++) {
-                            ja.add(columnasU[i], new JsonPrimitive(rs.getString(atributosU[i])));                            
+                        for (int i = 0; i < atributosU.length; i++) { 
+                            String u; 
+                            if (!columnasU[i].equals("Federado") && !columnasU[i].equals("Rol")) {
+                                u = rs.getString(atributosU[i]);
+                            }
+                            else if (columnasU[i].equals("Federado")) {
+                                u = rs.getString(atributosU[i]).equals("1")? "Sí": "No";
+                            }
+                            else {
+                                u = rs.getString(atributosU[i]).equals("1")? "Administrador": "Usuario";
+                            }
+                            ja.add(columnasU[i], new JsonPrimitive(u != null? u: ""));
+                           
                         }
-                        ja.add(columnasU[atributosU.length], new JsonPrimitive("<a href='ruta?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                        ja.add(columnasU[atributosU.length], new JsonPrimitive("<a href='usuario?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
                         
                         Boolean permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
                         if (permiso == true) {
-                            ja.add(columnasU[atributosU.length + 1], new JsonPrimitive("<a href='editar-ruta?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
-                            ja.add(columnasU[atributosU.length + 2], new JsonPrimitive("<a href='eliminar-ruta?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>")); 
+                            ja.add(columnasU[atributosU.length + 1], new JsonPrimitive("<a href='editar-usuario?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
+                            ja.add(columnasU[atributosU.length + 2], new JsonPrimitive("<a href='eliminar-usuario?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>")); 
                         }
                         array.add(ja);
                     }
-                    
                     String sql2 = "SELECT count(*) FROM " + tabla;
                     if (searchTerm != null) {
                         sql2 += searchSQL;
