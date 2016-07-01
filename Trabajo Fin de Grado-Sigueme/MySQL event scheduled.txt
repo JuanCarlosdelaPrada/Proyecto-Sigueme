@@ -1,0 +1,9 @@
+https://www.sitepoint.com/how-to-create-mysql-events/
+
+http://stackoverflow.com/questions/28460533/creating-a-event-in-mysql-throu-java-jdbc
+
+http://stackoverflow.com/questions/26576330/using-mysql-event-scheduler-with-java
+
+https://techfuzionwithsam.wordpress.com/2014/01/07/mysql-event-scheduler/
+
+https://developers.google.com/maps/documentation/javascript/tutorials/custom-markers#try_it_out

@@ -38,6 +38,11 @@
             <div id="map-canvas" class="col-xs-offset-1 col-xs-4">
                 <div id="map" style="width:100%;height:400px"></div>
             </div>
+            <div id="intro"></div>
+            <div id="descripcion" class="panel panel-default col-xs-6" style="padding:0">
+                <div class="panel-heading">Descripción</div>
+                <div class="panel-body">${requestScope.ruta.descripcion}</div>
+            </div>
         </div>
         <div class="row"></br></div>
         <!--Pie-->
@@ -46,12 +51,21 @@
         <!--Importaciones .js-->
         <script>
             function initMap() {
-                if (window.innerWidth <= 767) 
+                if (window.innerWidth <= 767) {
                     $("#map-canvas").removeClass("col-xs-offset-1 col-xs-4").addClass("col-xs-12");
-                else
+                    $("#descripcion").removeClass("col-xs-6").addClass("col-xs-12");
+                    $("#descripcion").css("marginLeft", $("#map-canvas").offset().left);
+                    $("#descripcion").width($("#map-canvas").width() - 2);
+                    $("#intro").html("&nbsp");
+                }
+                else {
                     $("#map-canvas").removeClass("col-xs-12").addClass("col-xs-offset-1 col-xs-4");
+                    $("#descripcion").removeClass("col-xs-12").addClass("col-xs-6");
+                    $("#descripcion").css("marginLeft", "initial");
+                    $("#descripcion").width("");
+                    $("#intro").html("");
+                }
                 
-                var width = $("#map").width();
                 $("#map").height($("#map").width());
                 
                 // camino
