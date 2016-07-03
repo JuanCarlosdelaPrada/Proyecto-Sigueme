@@ -49,3 +49,6 @@ http://www.w3schools.com/jsref/event_onresize.asp
 TAMAÑO VENTANA PARA OPTIMIZAR RESOLUCION DE GOOGLE MAPS 
 
 http://acesoft.eu/blog/como-mostrar-el-tamano-de-la-ventana-con-javascript/
+
+STRING TO DATE
+http://muchocodigo.com/convertir-de-string-a-date-con-java/

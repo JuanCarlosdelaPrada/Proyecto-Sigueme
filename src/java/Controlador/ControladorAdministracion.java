@@ -8,6 +8,7 @@ package Controlador;
 
 import Herramientas.DistanciaDeHaversine;
 import Herramientas.ParserGPX;
+import JPA_Entidades.Prueba;
 import JPA_Entidades.Ruta;
 import JPA_Entidades.Usuario;
 import com.google.gson.JsonArray;
@@ -22,11 +23,14 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Date;
+import java.util.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -102,6 +106,7 @@ public class ControladorAdministracion extends HttpServlet {
         session = request.getSession();
         
         TypedQuery<Usuario> consultaUsuarios;
+        SimpleDateFormat formato;
         JsonObject resultado;
         ParserGPX parseador;
         Usuario usuario;
@@ -114,8 +119,15 @@ public class ControladorAdministracion extends HttpServlet {
             num_atributos,
             total;
         
-        String ruta_id,
+        String prueba_id,
+               ruta_id,
                descripcion, 
+               lugar,
+               fecha_cel,
+               hora_cel,
+               fecha_inscrip_min,
+               fecha_inscrip_max,
+               maximo_inscritos,
                dificultad,
                tabla,
                dir,
@@ -178,10 +190,15 @@ public class ControladorAdministracion extends HttpServlet {
                 byte[] b = string.getBytes(Charset.forName("UTF-8"));
                 byte[] b = string.getBytes(StandardCharsets.UTF_8); // Java 7+ only
                 */
-                
+                formato = new SimpleDateFormat("yyyy-MM-dd");
                 byte[] contrasena_tratada = contrasena.getBytes(),
                        _contrasena_tratada = _contrasena.getBytes();
-                Date fecha_nacimiento_tratada = Date.valueOf(fecha_nacimiento);
+                Date fecha_nacimiento_tratada = null;
+                try {
+                    fecha_nacimiento_tratada = formato.parse(fecha_nacimiento);
+                } catch (ParseException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
                 boolean federado_tratado = federado.equals("s");
                 String _club = club.equals("")? null : club;
                 usuario = new Usuario(usuario_id, contrasena_tratada, false, nombre, apellidos, dni, direccion, fecha_nacimiento_tratada, telefono, sexo, federado_tratado);
@@ -279,6 +296,40 @@ public class ControladorAdministracion extends HttpServlet {
                             insercion2.executeUpdate();
 
                 }*/
+                vista = "inicio.jsp";
+                break;
+            case "/crearPrueba":
+                prueba_id = request.getParameter("prueba_id");
+                ruta_id = request.getParameter("ruta_id");
+                descripcion = request.getParameter("descripcion");
+                lugar = request.getParameter("lugar");
+                fecha_cel = request.getParameter("fecha_cel");
+                hora_cel = request.getParameter("hora_cel");
+                fecha_inscrip_min = request.getParameter("fecha_inscrip_min");
+                fecha_inscrip_max = request.getParameter("fecha_inscrip_max");
+                maximo_inscritos = request.getParameter("maximo_inscritos");
+                formato = new SimpleDateFormat("yyyy-MM-dd");
+                Date fecha_cel_tratada = null,
+                     fecha_inscrip_min_tratada = null,
+                     fecha_inscrip_max_tratada = null,
+                     hora_cel_tratada = null;
+                try {
+                    fecha_cel_tratada = formato.parse(fecha_cel);
+                    fecha_inscrip_min_tratada = formato.parse(fecha_inscrip_min);
+                    fecha_inscrip_max_tratada = formato.parse(fecha_inscrip_max);
+                    formato = new SimpleDateFormat("hh:mm");
+                    hora_cel_tratada = formato.parse(hora_cel);
+                } catch (ParseException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                int maximo_inscritos_tratada = Integer.parseInt(maximo_inscritos);
+                Prueba prueba = new Prueba(prueba_id, lugar, fecha_cel_tratada, hora_cel_tratada, fecha_inscrip_min_tratada, fecha_inscrip_max_tratada, maximo_inscritos_tratada, false);
+                ruta = em.find(JPA_Entidades.Ruta.class, ruta_id);
+                prueba.setRutaId(ruta);
+                prueba.setDescripcion(descripcion);
+                if (em.find(JPA_Entidades.Prueba.class, prueba_id) == null) {
+                    persist(prueba);
+                }
                 vista = "inicio.jsp";
                 break;
             case "/rutas":

@@ -3,8 +3,8 @@
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
 <sql:setDataSource dataSource="myDatasource"></sql:setDataSource>
-<sql:query var="tracks">
-    select * from tracks
+<sql:query var="rutas">
+    select * from ruta
 </sql:query>
 <% synchronized(session){
     if(session.isNew()){
@@ -44,7 +44,7 @@
                 <br>
             </div>
             <c:choose>
-                <c:when test="${!empty tracks.rows}">
+                <c:when test="${!empty rutas.rows}">
                     <form class="form-horizontal" role="form" method="POST" action="crearPrueba">
                         <div class="form-group">
                             <label for="prueba_id" class="col-lg-offset-1 col-lg-2 control-label">Nombre de la prueba:</label>
@@ -61,29 +61,41 @@
                         <div class="form-group">
                             <label class="col-lg-offset-1 col-lg-2 control-label">Selecciona la ruta:</label>
                             <div class="col-lg-3">
-                                <select id="track_id" name="track_id">
-                                    <c:forEach var="track" items="${tracks.rows}">
-                                        <option value="${track.track_id}">${track.track_id}</option>
+                                <select id="ruta_id" name="ruta_id">
+                                    <c:forEach var="ruta" items="${rutas.rows}">
+                                        <option value="${ruta.ruta_id}">${ruta.ruta_id}</option>
                                     </c:forEach>
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="direccion" class="col-lg-offset-1 col-lg-2 control-label">Dirección donde comienza la prueba:</label>
+                            <label for="lugar" class="col-lg-offset-1 col-lg-2 control-label">Lugar donde comienza la prueba:</label>
                             <div class="col-lg-3">
-                                <input type="text" id="direccion" name="direccion" class="form-control" placeholder="Dirección donde comienza la prueba" maxlength="45" required>
+                                <input type="text" id="lugar" name="lugar" class="form-control" placeholder="Lugar donde comienza la prueba" maxlength="45" required>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="fecha_celebracion" class="col-lg-offset-1 col-lg-2 control-label">Fecha de celebración:</label>
+                            <label for="fecha_cel" class="col-lg-offset-1 col-lg-2 control-label">Fecha de celebración:</label>
                             <div class="col-lg-3">
-                                <input type="date" id="fecha_celebracion" name="fecha_celebracion" class="form-control" required> 
+                                <input type="date" id="fecha_cel" name="fecha_cel" class="form-control" required> 
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="hora_comienzo" class="col-lg-offset-1 col-lg-2 control-label">Hora de comienzo:</label>
+                            <label for="hora_cel" class="col-lg-offset-1 col-lg-2 control-label">Hora de celebración:</label>
                             <div class="col-lg-3">
-                                <input type="time" id="hora_comienzo" name="hora_comienzo" class="form-control" required>
+                                <input type="time" id="hora_cel" name="hora_cel" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_inscrip_min" class="col-lg-offset-1 col-lg-2 control-label">Fecha apertura inscripción:</label>
+                            <div class="col-lg-3">
+                                <input type="date" id="fecha_inscrip_min" name="fecha_inscrip_min" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="fecha_inscrip_max" class="col-lg-offset-1 col-lg-2 control-label">Fecha límite inscripción:</label>
+                            <div class="col-lg-3">
+                                <input type="date" id="fecha_inscrip_max" name="fecha_inscrip_max" class="form-control" required>
                             </div>
                         </div>
                         <div class="form-group">
