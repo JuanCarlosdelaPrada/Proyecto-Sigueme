@@ -52,3 +52,7 @@ http://acesoft.eu/blog/como-mostrar-el-tamano-de-la-ventana-con-javascript/
 
 STRING TO DATE
 http://muchocodigo.com/convertir-de-string-a-date-con-java/
+
+https://examples.javacodegeeks.com/core-java/util/date/java-util-date-example-how-to-use-date/
+
+https://docs.oracle.com/javase/7/docs/api/java/text/SimpleDateFormat.html

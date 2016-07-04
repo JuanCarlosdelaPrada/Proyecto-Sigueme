@@ -7,3 +7,5 @@ http://stackoverflow.com/questions/26576330/using-mysql-event-scheduler-with-jav
 https://techfuzionwithsam.wordpress.com/2014/01/07/mysql-event-scheduler/
 
 https://developers.google.com/maps/documentation/javascript/tutorials/custom-markers#try_it_out
+
+http://stackoverflow.com/questions/13679252/mysql-event-doesnt-work

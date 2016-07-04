@@ -69,6 +69,7 @@ import javax.sql.DataSource;
     "/ruta",
     "/pruebas", //--
     "/prueba", //--
+    "/seguimientoPruebas",
     "/usuarios",
     "/usuario" //--
 })
@@ -183,13 +184,6 @@ public class ControladorAdministracion extends HttpServlet {
                        sexo = request.getParameter("sexo"),
                        club = request.getParameter("club"),
                        federado = request.getParameter("federado");
-                /*
-                String string = new String(byte[] bytes, Charset charset);
-                //Arrays.toString(bytes);
-                byte[] b = string.getBytes();
-                byte[] b = string.getBytes(Charset.forName("UTF-8"));
-                byte[] b = string.getBytes(StandardCharsets.UTF_8); // Java 7+ only
-                */
                 formato = new SimpleDateFormat("yyyy-MM-dd");
                 byte[] contrasena_tratada = contrasena.getBytes(),
                        _contrasena_tratada = _contrasena.getBytes();
@@ -257,30 +251,8 @@ public class ControladorAdministracion extends HttpServlet {
                 double maxlatitud = parseador.getMaxlat();
                 double maxlongitud = parseador.getMaxlon();
                 
-                /*
-                    //Creo la tabla correspondiente a las latitudes y longitudes de la ruta.
-                    if(!latitudes.isEmpty() && !longitudes.isEmpty() && latitudes.size() == longitudes.size()){
-                        try (Connection conn = myDatasource.getConnection()) {
-                            Statement st = conn.createStatement();
-                            st.execute("CREATE TABLE `"+track_id+"`("
-                                    +  "latitud DECIMAL(10, 8) NOT NULL,"
-                                    +  "longitud DECIMAL(11, 8) NOT NULL);"
-                            );
-                            PreparedStatement insercion = conn.prepareStatement("INSERT INTO `"+track_id+"` VALUES (?,?)");
-                            for(int i = 0; i < latitudes.size(); i++) {
-                                insercion.setDouble(1, latitudes.get(i));
-                                insercion.setDouble(2, longitudes.get(i));
-                                insercion.executeUpdate();
-                            }
-                        } catch (SQLException ex) {
-                            Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-                */
-                
                 double distancia = DistanciaDeHaversine.getDistancia(latitudes, longitudes);
                 
-                //String rutaId, String dificultad, BigDecimal distancia, String ficheroGpx, BigDecimal latMin, BigDecimal latMax, BigDecimal longMin, BigDecimal longMax
                 //Creo la nueva ruta.
                 ruta = new Ruta(ruta_id, dificultad, new BigDecimal(distancia), destino + File.separator + ruta_id + ".gpx",
                        new BigDecimal(minlatitud), new BigDecimal(maxlatitud), new BigDecimal(minlongitud), new BigDecimal(maxlongitud));
@@ -288,14 +260,6 @@ public class ControladorAdministracion extends HttpServlet {
                 if(em.find(JPA_Entidades.Ruta.class, ruta_id) == null) {
                     persist(ruta);
                 }
-                /*
-                        for (int i = 0; i < track.length(); i++) {
-                            JSONObject punto = track.getJSONObject(i);
-                            insercion2.setDouble(1, punto.getDouble("lat"));
-                            insercion2.setDouble(2, punto.getDouble("lng"));
-                            insercion2.executeUpdate();
-
-                }*/
                 vista = "inicio.jsp";
                 break;
             case "/crearPrueba":
@@ -329,6 +293,15 @@ public class ControladorAdministracion extends HttpServlet {
                 prueba.setDescripcion(descripcion);
                 if (em.find(JPA_Entidades.Prueba.class, prueba_id) == null) {
                     persist(prueba);
+                }
+                try (Connection conn = myDatasource.getConnection()) {
+                    PreparedStatement stm = conn.prepareStatement("CREATE EVENT " + prueba_id + " ON SCHEDULE AT ? DO UPDATE seguimiento_trayectoria.prueba SET activa = 1 WHERE prueba_id = ?");
+                    stm.setString(1, fecha_cel + " " + hora_cel);
+                    stm.setString(2, prueba_id);
+                    System.out.println(stm.toString());
+                    stm.execute();
+                } catch (SQLException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 vista = "inicio.jsp";
                 break;
@@ -517,6 +490,129 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 vista = "ruta.jsp";
                 break;
+            case "/pruebas":
+                String[] columnasP = {"Nombre de la prueba", "Descripcion", "Ruta", "Lugar", "Fecha celebracion", "Hora celebracion", "Fecha apertura inscripcion", "Fecha limite inscripcion", "Nº Maximo inscritos", "Inscribirse", "Mas informacion", "Editar", "Borrar", "Ver inscripciones"};
+                String[] atributosP = {"prueba_id", "descripcion", "ruta_id", "lugar", "fecha_cel", "hora_cel", "fecha_inscrip_min", "fecha_inscrip_max", "maximo_inscritos"};
+                tabla = "prueba";
+                resultado = new JsonObject();
+                array = new JsonArray();
+                cantidad = 10;
+                comienzo = 0;
+                idraw = 0;
+                num_atributos = 0;
+                
+                dir = "asc";
+                sStart = request.getParameter("start"); 
+                sAmount = request.getParameter("length"); 
+                draw = request.getParameter("draw");
+                sCol = request.getParameter("order[0][column]"); 
+                sdir = request.getParameter("order[0][dir]"); 
+                if (sStart != null) {
+                    comienzo = Integer.parseInt(sStart);
+                    if (comienzo < 0)
+                        comienzo = 0;
+                }
+                if (sAmount != null) {
+                    cantidad = Integer.parseInt(sAmount);
+                    if (cantidad < 10 || cantidad > 100)
+                        cantidad = 10;
+                }
+                if (draw != null) {
+                    idraw = Integer.parseInt(draw);
+                }
+                if (sCol != null) {
+                    num_atributos = Integer.parseInt(sCol);
+                    if (num_atributos < 0 || num_atributos > 9)
+                        num_atributos = 0;
+                }
+                if (sdir != null) {
+                    if (!sdir.equals("asc"))
+                        dir = "desc";
+                }
+                nombreAtributo = atributosP[num_atributos];
+                total = 0;
+                try (Connection conn = myDatasource.getConnection()) {
+                    String sql = "SELECT count(*) FROM " + tabla;
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    ResultSet rs = ps.executeQuery();
+                    if(rs.next()){
+                        total = rs.getInt("count(*)");
+                    }
+                    int totalAfterFilter = total;
+                    String searchSQL = "",
+                            searchTerm = request.getParameter("search[value]"), 
+                            globeSearch = " where (usuario_id like '%" + searchTerm +"%'"
+                            + " or contrasena like '%" + searchTerm +"%'"
+                            + " or rol like '%" + searchTerm +"%'"
+                            + " or nombre like '%" + searchTerm +"%'"
+                            + " or apellidos like '%" + searchTerm +"%'"
+                            + " or dni like '%" + searchTerm +"%'"
+                            + " or direccion like '%" + searchTerm +"%'"
+                            + " or fecha_nacimiento like '%" + searchTerm +"%'"
+                            + " or telefono like '%" + searchTerm +"%'"
+                            + " or sexo like '%" + searchTerm +"%'"
+                            + " or club like '%" + searchTerm +"%'"
+                            + " or federado like '%" + searchTerm + "%')";
+                    sql = "SELECT * FROM " + tabla;
+                    
+                    if(!"".equals(searchTerm)){
+                        searchSQL = globeSearch;
+                    }
+                    sql += searchSQL;
+                    sql += " order by " + nombreAtributo + " " + dir;
+                    sql += " limit " + comienzo + ", " + cantidad;
+                    ps = conn.prepareStatement(sql);
+                    rs = ps.executeQuery();
+                    Boolean permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso"),
+                            user = session.getAttribute("usuario") != null;
+                    while (rs.next()) {
+                        JsonObject ja = new JsonObject();
+                        for (int i = 0; i < atributosP.length; i++) {
+                            ja.add(columnasP[i], new JsonPrimitive(rs.getString(atributosP[i])));
+                        }
+                        if (!permiso) {
+                            if (user) {
+                                ja.add(columnasP[atributosP.length], new JsonPrimitive("<a href='inscribirse?"+atributosP[0]+"="+ja.get(columnasP[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                            }
+                            else {
+                                ja.add(columnasP[atributosP.length], new JsonPrimitive("<a href='crearUsuario.jsp'>Registrate ya!</a>"));
+                            }
+                        }
+                        ja.add(columnasP[atributosP.length + 1], new JsonPrimitive("<a href='prueba?"+atributosP[0]+"="+ja.get(columnasP[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                        
+                        if (permiso) {
+                            ja.add(columnasP[atributosP.length + 2], new JsonPrimitive("<a href='editar-prueba?"+atributosP[0]+"="+ja.get(columnasP[0]).getAsString()+"'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
+                            ja.add(columnasP[atributosP.length + 3], new JsonPrimitive("<a href='eliminar-prueba?"+atributosP[0]+"="+ja.get(columnasP[0]).getAsString()+"'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>")); 
+                            ja.add(columnasP[atributosP.length + 4], new JsonPrimitive("<a href='inscripciones?"+atributosP[0]+"="+ja.get(columnasP[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                        }
+                        array.add(ja);
+                    }
+                    String sql2 = "SELECT count(*) FROM " + tabla;
+                    if (searchTerm != null) {
+                        sql2 += searchSQL;
+                        PreparedStatement ps2 = conn.prepareStatement(sql2);
+                        ResultSet rs2 = ps2.executeQuery();
+                        if (rs2.next()) {
+                            totalAfterFilter = rs2.getInt("count(*)");
+                        }
+                    }
+                    resultado.add("draw", new JsonPrimitive(idraw));
+                    resultado.add("recordsTotal", new JsonPrimitive(total));
+                    resultado.add("recordsFiltered", new JsonPrimitive(totalAfterFilter));
+                    resultado.add("data", array);
+                    System.out.println(resultado);
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setHeader("Cache-Control", "no-store");
+                    PrintWriter out = response.getWriter();
+                    out.print(resultado);
+                    out.flush();
+                    conn.close();
+                    return;
+                } catch (SQLException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
             case "/usuarios":
                 String[] columnasU = {"Correo", "Contrasena", "Rol", "Nombre", "Apellidos", "DNI", "Direccion", "Fecha Nacimiento", "Telefono", "Sexo", "Club", "Federado", "Mas informacion", "Editar", "Borrar"};
                 String[] atributosU = {"usuario_id", "contrasena", "rol", "nombre", "apellidos", "dni", "direccion", "fecha_nacimiento", "telefono", "sexo", "club", "federado"};
@@ -590,6 +686,7 @@ public class ControladorAdministracion extends HttpServlet {
                     sql += " limit " + comienzo + ", " + cantidad;
                     ps = conn.prepareStatement(sql);
                     rs = ps.executeQuery();
+                    Boolean permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
                         for (int i = 0; i < atributosU.length; i++) { 
@@ -608,10 +705,136 @@ public class ControladorAdministracion extends HttpServlet {
                         }
                         ja.add(columnasU[atributosU.length], new JsonPrimitive("<a href='usuario?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
                         
-                        Boolean permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
-                        if (permiso == true) {
+                        if (permiso) {
                             ja.add(columnasU[atributosU.length + 1], new JsonPrimitive("<a href='editar-usuario?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
                             ja.add(columnasU[atributosU.length + 2], new JsonPrimitive("<a href='eliminar-usuario?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>")); 
+                        }
+                        array.add(ja);
+                    }
+                    String sql2 = "SELECT count(*) FROM " + tabla;
+                    if (searchTerm != null) {
+                        sql2 += searchSQL;
+                        PreparedStatement ps2 = conn.prepareStatement(sql2);
+                        ResultSet rs2 = ps2.executeQuery();
+                        if (rs2.next()) {
+                            totalAfterFilter = rs2.getInt("count(*)");
+                        }
+                    }
+                    resultado.add("draw", new JsonPrimitive(idraw));
+                    resultado.add("recordsTotal", new JsonPrimitive(total));
+                    resultado.add("recordsFiltered", new JsonPrimitive(totalAfterFilter));
+                    resultado.add("data", array);
+                    System.out.println(resultado);
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setHeader("Cache-Control", "no-store");
+                    PrintWriter out = response.getWriter();
+                    out.print(resultado);
+                    out.flush();
+                    conn.close();
+                    return;
+                } catch (SQLException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
+                 case "/seguimientoPruebas":
+                String[] columnasS = {"Nombre de la prueba", "Descripcion", "Ruta", "Lugar", "Fecha celebracion", "Hora celebracion", "Fecha apertura inscripcion", "Fecha limite inscripcion", "Nº Maximo inscritos", "Inscribirse", "Ver", "Editar", "Borrar", "Ver inscripciones"};
+                String[] atributosS = {"prueba_id", "descripcion", "ruta_id", "lugar", "fecha_cel", "hora_cel", "fecha_inscrip_min", "fecha_inscrip_max", "maximo_inscritos"};
+                tabla = "prueba";
+                resultado = new JsonObject();
+                array = new JsonArray();
+                cantidad = 10;
+                comienzo = 0;
+                idraw = 0;
+                num_atributos = 0;
+                
+                dir = "asc";
+                sStart = request.getParameter("start"); 
+                sAmount = request.getParameter("length"); 
+                draw = request.getParameter("draw");
+                sCol = request.getParameter("order[0][column]"); 
+                sdir = request.getParameter("order[0][dir]"); 
+                if (sStart != null) {
+                    comienzo = Integer.parseInt(sStart);
+                    if (comienzo < 0)
+                        comienzo = 0;
+                }
+                if (sAmount != null) {
+                    cantidad = Integer.parseInt(sAmount);
+                    if (cantidad < 10 || cantidad > 100)
+                        cantidad = 10;
+                }
+                if (draw != null) {
+                    idraw = Integer.parseInt(draw);
+                }
+                if (sCol != null) {
+                    num_atributos = Integer.parseInt(sCol);
+                    if (num_atributos < 0 || num_atributos > 9)
+                        num_atributos = 0;
+                }
+                if (sdir != null) {
+                    if (!sdir.equals("asc"))
+                        dir = "desc";
+                }
+                nombreAtributo = atributosS[num_atributos];
+                total = 0;
+                try (Connection conn = myDatasource.getConnection()) {
+                    String sql = "SELECT count(*) FROM " + tabla;
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    ResultSet rs = ps.executeQuery();
+                    if(rs.next()){
+                        total = rs.getInt("count(*)");
+                    }
+                    int totalAfterFilter = total;
+                    String searchSQL = "",
+                            searchTerm = request.getParameter("search[value]"), 
+                            globeSearch = " where (usuario_id like '%" + searchTerm +"%'"
+                            + " or contrasena like '%" + searchTerm +"%'"
+                            + " or rol like '%" + searchTerm +"%'"
+                            + " or nombre like '%" + searchTerm +"%'"
+                            + " or apellidos like '%" + searchTerm +"%'"
+                            + " or dni like '%" + searchTerm +"%'"
+                            + " or direccion like '%" + searchTerm +"%'"
+                            + " or fecha_nacimiento like '%" + searchTerm +"%'"
+                            + " or telefono like '%" + searchTerm +"%'"
+                            + " or sexo like '%" + searchTerm +"%'"
+                            + " or club like '%" + searchTerm +"%'"
+                            + " or federado like '%" + searchTerm + "%'"
+                            + " and activa = 1)";
+                    sql = "SELECT * FROM " + tabla;
+                    if (!"".equals(searchTerm)){
+                        searchSQL = globeSearch;
+                    }
+                    else {
+                        searchSQL = " where activa = 1";
+                    }
+                    sql += searchSQL;
+                    sql += " order by " + nombreAtributo + " " + dir;
+                    sql += " limit " + comienzo + ", " + cantidad;
+                    System.out.println(sql);
+                    ps = conn.prepareStatement(sql);
+                    rs = ps.executeQuery();
+                    Boolean permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso"),
+                            user = session.getAttribute("usuario") != null;
+                    while (rs.next()) {
+                        JsonObject ja = new JsonObject();
+                        for (int i = 0; i < atributosS.length; i++) {
+                            ja.add(columnasS[i], new JsonPrimitive(rs.getString(atributosS[i])));
+                        }
+                        if (!permiso) {
+                            if (user) {
+                                ja.add(columnasS[atributosS.length], new JsonPrimitive("<a href='inscribirse?"+atributosS[0]+"="+ja.get(columnasS[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                            }
+                            else {
+                                ja.add(columnasS[atributosS.length], new JsonPrimitive("<a href='crearUsuario.jsp'>Registrate ya!</a>"));
+                            }
+                        }
+                        ja.add(columnasS[atributosS.length + 1], new JsonPrimitive("<a href='seguir-prueba?"+atributosS[0]+"="+ja.get(columnasS[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                        
+                        if (permiso) {
+                            ja.add(columnasS[atributosS.length + 2], new JsonPrimitive("<a href='editar-prueba?"+atributosS[0]+"="+ja.get(columnasS[0]).getAsString()+"'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
+                            ja.add(columnasS[atributosS.length + 3], new JsonPrimitive("<a href='eliminar-prueba?"+atributosS[0]+"="+ja.get(columnasS[0]).getAsString()+"'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>")); 
+                            ja.add(columnasS[atributosS.length + 4], new JsonPrimitive("<a href='inscripciones?"+atributosS[0]+"="+ja.get(columnasS[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
                         }
                         array.add(ja);
                     }

@@ -20,7 +20,7 @@
                 </c:if>
             </ul>
             <c:choose>
-                <c:when test="${sessionScope.usuario == null}">
+                <c:when test="${empty sessionScope.usuario}">
                     <ul class="nav navbar-nav navbar-right">  
                         <li><p class="navbar-text">¿Ya tienes una cuenta?</p></li>
                         <li class="dropdown">
