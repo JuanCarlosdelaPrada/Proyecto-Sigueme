@@ -8,6 +8,8 @@ package Controlador;
 
 import Herramientas.DistanciaDeHaversine;
 import Herramientas.ParserGPX;
+import JPA_Entidades.Inscrito;
+import JPA_Entidades.InscritoPK;
 import JPA_Entidades.Prueba;
 import JPA_Entidades.Ruta;
 import JPA_Entidades.Usuario;
@@ -65,13 +67,14 @@ import javax.sql.DataSource;
     "/logout",
     "/subirRuta",
     "/crearPrueba",
-    "/rutas",
+    "/rutas", //modificar (SQL)
     "/ruta",
-    "/pruebas", //--
+    "/pruebas", //modificar (SQL)
     "/prueba", //--
-    "/seguimientoPruebas",
+    "/seguimientoPruebas", //modificar (SQL)
     "/usuarios",
-    "/usuario" //--
+    "/usuario", //--
+    "/inscribirse"
 })
 @MultipartConfig
 
@@ -106,12 +109,15 @@ public class ControladorAdministracion extends HttpServlet {
         accion = request.getServletPath();
         session = request.getSession();
         
+        TypedQuery<Inscrito> consultaInscritos;
         TypedQuery<Usuario> consultaUsuarios;
         SimpleDateFormat formato;
         JsonObject resultado;
         ParserGPX parseador;
-        Usuario usuario;
+        Inscrito inscrito;
         JsonArray array;
+        Usuario usuario;
+        Prueba prueba;
         Ruta ruta;
         
         int cantidad,
@@ -150,6 +156,7 @@ public class ControladorAdministracion extends HttpServlet {
                 try { 
                     usuario = consultaUsuarios.getSingleResult();
                     if(Arrays.equals(usuario.getContrasena(), _contrasena_login)) {
+                        session.setAttribute("correo", usuario.getUsuarioId());
                         session.setAttribute("usuario", usuario.getNombre());
                         session.setAttribute("permiso", usuario.getRol());
                         System.out.println(usuario.getNombre());
@@ -166,6 +173,7 @@ public class ControladorAdministracion extends HttpServlet {
                 vista= "inicio.jsp";
                 break;
             case "/logout":
+                session.setAttribute("correo", null);
                 session.setAttribute("usuario", null);
                 session.setAttribute("permiso", null);
                 session.invalidate();
@@ -287,7 +295,7 @@ public class ControladorAdministracion extends HttpServlet {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 int maximo_inscritos_tratada = Integer.parseInt(maximo_inscritos);
-                Prueba prueba = new Prueba(prueba_id, lugar, fecha_cel_tratada, hora_cel_tratada, fecha_inscrip_min_tratada, fecha_inscrip_max_tratada, maximo_inscritos_tratada, false);
+                prueba = new Prueba(prueba_id, lugar, fecha_cel_tratada, hora_cel_tratada, fecha_inscrip_min_tratada, fecha_inscrip_max_tratada, maximo_inscritos_tratada, false);
                 ruta = em.find(JPA_Entidades.Ruta.class, ruta_id);
                 prueba.setRutaId(ruta);
                 prueba.setDescripcion(descripcion);
@@ -623,34 +631,38 @@ public class ControladorAdministracion extends HttpServlet {
                 comienzo = 0;
                 idraw = 0;
                 num_atributos = 0;
-                
+
                 dir = "asc";
-                sStart = request.getParameter("start"); 
-                sAmount = request.getParameter("length"); 
+                sStart = request.getParameter("start");
+                sAmount = request.getParameter("length");
                 draw = request.getParameter("draw");
-                sCol = request.getParameter("order[0][column]"); 
-                sdir = request.getParameter("order[0][dir]"); 
+                sCol = request.getParameter("order[0][column]");
+                sdir = request.getParameter("order[0][dir]");
                 if (sStart != null) {
                     comienzo = Integer.parseInt(sStart);
-                    if (comienzo < 0)
+                    if (comienzo < 0) {
                         comienzo = 0;
+                    }
                 }
                 if (sAmount != null) {
                     cantidad = Integer.parseInt(sAmount);
-                    if (cantidad < 10 || cantidad > 100)
+                    if (cantidad < 10 || cantidad > 100) {
                         cantidad = 10;
+                    }
                 }
                 if (draw != null) {
                     idraw = Integer.parseInt(draw);
                 }
                 if (sCol != null) {
                     num_atributos = Integer.parseInt(sCol);
-                    if (num_atributos < 0 || num_atributos > 9)
+                    if (num_atributos < 0 || num_atributos > 9) {
                         num_atributos = 0;
+                    }
                 }
                 if (sdir != null) {
-                    if (!sdir.equals("asc"))
+                    if (!sdir.equals("asc")) {
                         dir = "desc";
+                    }
                 }
                 nombreAtributo = atributosU[num_atributos];
                 total = 0;
@@ -658,27 +670,27 @@ public class ControladorAdministracion extends HttpServlet {
                     String sql = "SELECT count(*) FROM " + tabla;
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ResultSet rs = ps.executeQuery();
-                    if(rs.next()){
+                    if (rs.next()) {
                         total = rs.getInt("count(*)");
                     }
                     int totalAfterFilter = total;
                     String searchSQL = "",
-                            searchTerm = request.getParameter("search[value]"), 
-                            globeSearch = " where (usuario_id like '%" + searchTerm +"%'"
-                            + " or contrasena like '%" + searchTerm +"%'"
-                            + " or rol like '%" + searchTerm +"%'"
-                            + " or nombre like '%" + searchTerm +"%'"
-                            + " or apellidos like '%" + searchTerm +"%'"
-                            + " or dni like '%" + searchTerm +"%'"
-                            + " or direccion like '%" + searchTerm +"%'"
-                            + " or fecha_nacimiento like '%" + searchTerm +"%'"
-                            + " or telefono like '%" + searchTerm +"%'"
-                            + " or sexo like '%" + searchTerm +"%'"
-                            + " or club like '%" + searchTerm +"%'"
+                            searchTerm = request.getParameter("search[value]"),
+                            globeSearch = " where (usuario_id like '%" + searchTerm + "%'"
+                            + " or contrasena like '%" + searchTerm + "%'"
+                            + " or rol like '%" + searchTerm + "%'"
+                            + " or nombre like '%" + searchTerm + "%'"
+                            + " or apellidos like '%" + searchTerm + "%'"
+                            + " or dni like '%" + searchTerm + "%'"
+                            + " or direccion like '%" + searchTerm + "%'"
+                            + " or fecha_nacimiento like '%" + searchTerm + "%'"
+                            + " or telefono like '%" + searchTerm + "%'"
+                            + " or sexo like '%" + searchTerm + "%'"
+                            + " or club like '%" + searchTerm + "%'"
                             + " or federado like '%" + searchTerm + "%')";
                     sql = "SELECT * FROM " + tabla;
-                    
-                    if(!"".equals(searchTerm)){
+
+                    if (!"".equals(searchTerm)) {
                         searchSQL = globeSearch;
                     }
                     sql += searchSQL;
@@ -686,28 +698,26 @@ public class ControladorAdministracion extends HttpServlet {
                     sql += " limit " + comienzo + ", " + cantidad;
                     ps = conn.prepareStatement(sql);
                     rs = ps.executeQuery();
-                    Boolean permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
+                    Boolean permiso = session.getAttribute("permiso") == null ? false : (boolean) session.getAttribute("permiso");
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
-                        for (int i = 0; i < atributosU.length; i++) { 
-                            String u; 
+                        for (int i = 0; i < atributosU.length; i++) {
+                            String u;
                             if (!columnasU[i].equals("Federado") && !columnasU[i].equals("Rol")) {
                                 u = rs.getString(atributosU[i]);
+                            } else if (columnasU[i].equals("Federado")) {
+                                u = rs.getString(atributosU[i]).equals("1") ? "Sí" : "No";
+                            } else {
+                                u = rs.getString(atributosU[i]).equals("1") ? "Administrador" : "Usuario";
                             }
-                            else if (columnasU[i].equals("Federado")) {
-                                u = rs.getString(atributosU[i]).equals("1")? "Sí": "No";
-                            }
-                            else {
-                                u = rs.getString(atributosU[i]).equals("1")? "Administrador": "Usuario";
-                            }
-                            ja.add(columnasU[i], new JsonPrimitive(u != null? u: ""));
-                           
+                            ja.add(columnasU[i], new JsonPrimitive(u != null ? u : ""));
+
                         }
-                        ja.add(columnasU[atributosU.length], new JsonPrimitive("<a href='usuario?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
-                        
+                        ja.add(columnasU[atributosU.length], new JsonPrimitive("<a href='usuario?" + atributosU[0] + "=" + ja.get(columnasU[0]).getAsString() + "'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+
                         if (permiso) {
-                            ja.add(columnasU[atributosU.length + 1], new JsonPrimitive("<a href='editar-usuario?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
-                            ja.add(columnasU[atributosU.length + 2], new JsonPrimitive("<a href='eliminar-usuario?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>")); 
+                            ja.add(columnasU[atributosU.length + 1], new JsonPrimitive("<a href='editar-usuario?" + atributosU[0] + "=" + ja.get(columnasU[0]).getAsString() + "'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
+                            ja.add(columnasU[atributosU.length + 2], new JsonPrimitive("<a href='eliminar-usuario?" + atributosU[0] + "=" + ja.get(columnasU[0]).getAsString() + "'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>"));
                         }
                         array.add(ja);
                     }
@@ -737,7 +747,7 @@ public class ControladorAdministracion extends HttpServlet {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
-                 case "/seguimientoPruebas":
+            case "/seguimientoPruebas":
                 String[] columnasS = {"Nombre de la prueba", "Descripcion", "Ruta", "Lugar", "Fecha celebracion", "Hora celebracion", "Fecha apertura inscripcion", "Fecha limite inscripcion", "Nº Maximo inscritos", "Inscribirse", "Ver", "Editar", "Borrar", "Ver inscripciones"};
                 String[] atributosS = {"prueba_id", "descripcion", "ruta_id", "lugar", "fecha_cel", "hora_cel", "fecha_inscrip_min", "fecha_inscrip_max", "maximo_inscritos"};
                 tabla = "prueba";
@@ -747,34 +757,38 @@ public class ControladorAdministracion extends HttpServlet {
                 comienzo = 0;
                 idraw = 0;
                 num_atributos = 0;
-                
+
                 dir = "asc";
-                sStart = request.getParameter("start"); 
-                sAmount = request.getParameter("length"); 
+                sStart = request.getParameter("start");
+                sAmount = request.getParameter("length");
                 draw = request.getParameter("draw");
-                sCol = request.getParameter("order[0][column]"); 
-                sdir = request.getParameter("order[0][dir]"); 
+                sCol = request.getParameter("order[0][column]");
+                sdir = request.getParameter("order[0][dir]");
                 if (sStart != null) {
                     comienzo = Integer.parseInt(sStart);
-                    if (comienzo < 0)
+                    if (comienzo < 0) {
                         comienzo = 0;
+                    }
                 }
                 if (sAmount != null) {
                     cantidad = Integer.parseInt(sAmount);
-                    if (cantidad < 10 || cantidad > 100)
+                    if (cantidad < 10 || cantidad > 100) {
                         cantidad = 10;
+                    }
                 }
                 if (draw != null) {
                     idraw = Integer.parseInt(draw);
                 }
                 if (sCol != null) {
                     num_atributos = Integer.parseInt(sCol);
-                    if (num_atributos < 0 || num_atributos > 9)
+                    if (num_atributos < 0 || num_atributos > 9) {
                         num_atributos = 0;
+                    }
                 }
                 if (sdir != null) {
-                    if (!sdir.equals("asc"))
+                    if (!sdir.equals("asc")) {
                         dir = "desc";
+                    }
                 }
                 nombreAtributo = atributosS[num_atributos];
                 total = 0;
@@ -782,30 +796,29 @@ public class ControladorAdministracion extends HttpServlet {
                     String sql = "SELECT count(*) FROM " + tabla;
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ResultSet rs = ps.executeQuery();
-                    if(rs.next()){
+                    if (rs.next()) {
                         total = rs.getInt("count(*)");
                     }
                     int totalAfterFilter = total;
                     String searchSQL = "",
-                            searchTerm = request.getParameter("search[value]"), 
-                            globeSearch = " where (usuario_id like '%" + searchTerm +"%'"
-                            + " or contrasena like '%" + searchTerm +"%'"
-                            + " or rol like '%" + searchTerm +"%'"
-                            + " or nombre like '%" + searchTerm +"%'"
-                            + " or apellidos like '%" + searchTerm +"%'"
-                            + " or dni like '%" + searchTerm +"%'"
-                            + " or direccion like '%" + searchTerm +"%'"
-                            + " or fecha_nacimiento like '%" + searchTerm +"%'"
-                            + " or telefono like '%" + searchTerm +"%'"
-                            + " or sexo like '%" + searchTerm +"%'"
-                            + " or club like '%" + searchTerm +"%'"
+                            searchTerm = request.getParameter("search[value]"),
+                            globeSearch = " where (usuario_id like '%" + searchTerm + "%'"
+                            + " or contrasena like '%" + searchTerm + "%'"
+                            + " or rol like '%" + searchTerm + "%'"
+                            + " or nombre like '%" + searchTerm + "%'"
+                            + " or apellidos like '%" + searchTerm + "%'"
+                            + " or dni like '%" + searchTerm + "%'"
+                            + " or direccion like '%" + searchTerm + "%'"
+                            + " or fecha_nacimiento like '%" + searchTerm + "%'"
+                            + " or telefono like '%" + searchTerm + "%'"
+                            + " or sexo like '%" + searchTerm + "%'"
+                            + " or club like '%" + searchTerm + "%'"
                             + " or federado like '%" + searchTerm + "%'"
                             + " and activa = 1)";
                     sql = "SELECT * FROM " + tabla;
-                    if (!"".equals(searchTerm)){
+                    if (!"".equals(searchTerm)) {
                         searchSQL = globeSearch;
-                    }
-                    else {
+                    } else {
                         searchSQL = " where activa = 1";
                     }
                     sql += searchSQL;
@@ -814,7 +827,7 @@ public class ControladorAdministracion extends HttpServlet {
                     System.out.println(sql);
                     ps = conn.prepareStatement(sql);
                     rs = ps.executeQuery();
-                    Boolean permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso"),
+                    Boolean permiso = session.getAttribute("permiso") == null ? false : (boolean) session.getAttribute("permiso"),
                             user = session.getAttribute("usuario") != null;
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
@@ -823,22 +836,21 @@ public class ControladorAdministracion extends HttpServlet {
                         }
                         if (!permiso) {
                             if (user) {
-                                ja.add(columnasS[atributosS.length], new JsonPrimitive("<a href='inscribirse?"+atributosS[0]+"="+ja.get(columnasS[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
-                            }
-                            else {
+                                ja.add(columnasS[atributosS.length], new JsonPrimitive("<a href='inscribirse?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                            } else {
                                 ja.add(columnasS[atributosS.length], new JsonPrimitive("<a href='crearUsuario.jsp'>Registrate ya!</a>"));
                             }
                         }
-                        ja.add(columnasS[atributosS.length + 1], new JsonPrimitive("<a href='seguir-prueba?"+atributosS[0]+"="+ja.get(columnasS[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
-                        
+                        ja.add(columnasS[atributosS.length + 1], new JsonPrimitive("<a href='seguir-prueba?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+
                         if (permiso) {
-                            ja.add(columnasS[atributosS.length + 2], new JsonPrimitive("<a href='editar-prueba?"+atributosS[0]+"="+ja.get(columnasS[0]).getAsString()+"'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
-                            ja.add(columnasS[atributosS.length + 3], new JsonPrimitive("<a href='eliminar-prueba?"+atributosS[0]+"="+ja.get(columnasS[0]).getAsString()+"'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>")); 
-                            ja.add(columnasS[atributosS.length + 4], new JsonPrimitive("<a href='inscripciones?"+atributosS[0]+"="+ja.get(columnasS[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                            ja.add(columnasS[atributosS.length + 2], new JsonPrimitive("<a href='editar-prueba?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
+                            ja.add(columnasS[atributosS.length + 3], new JsonPrimitive("<a href='eliminar-prueba?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>"));
+                            ja.add(columnasS[atributosS.length + 4], new JsonPrimitive("<a href='inscripciones?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
                         }
                         array.add(ja);
                     }
-                    String sql2 = "SELECT count(*) FROM " + tabla;
+                    String sql2 = "SELECT count(*) FROM " + tabla + " WHERE activa = 1";
                     if (searchTerm != null) {
                         sql2 += searchSQL;
                         PreparedStatement ps2 = conn.prepareStatement(sql2);
@@ -862,6 +874,37 @@ public class ControladorAdministracion extends HttpServlet {
                     return;
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
+            case "/inscribirse":
+                prueba_id = request.getParameter("prueba_id");
+                prueba = em.find(Prueba.class, prueba_id);
+                consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaId", Inscrito.class);
+                consultaInscritos.setParameter("pruebaId", prueba_id);
+                List<Inscrito> inscritos = consultaInscritos.getResultList();
+                if (inscritos.size() < prueba.getMaximoInscritos()) {
+                    if (inscritos.isEmpty()) {
+                        inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, 1);
+                    }
+                    else {
+                        int i = 0;
+                        boolean hueco = false;
+                        while (!hueco && (i + 1) < inscritos.size()) {
+                            if (inscritos.get(i + 1).getDorsal() - inscritos.get(i).getDorsal() != 1)
+                                hueco = true;
+                            i++;
+                        }
+                        if (!hueco) {
+                            inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, inscritos.size() + 1);
+                        }
+                        else {
+                            inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, i + 1);
+                        }
+                    }
+                    em.persist(inscrito);
+                }
+                else {
+                    System.out.println("YA ESTÁ EL CUPO DE INSCRITOS CUBIERTO");
                 }
                 break;
             default:
