@@ -880,10 +880,8 @@ public class ControladorAdministracion extends HttpServlet {
             case "/inscribirse":
                 prueba_id = request.getParameter("prueba_id");
                 prueba = em.find(Prueba.class, prueba_id);
-                System.out.println("ENTRADA 1");
                 consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaIdOrderingByDorsal", Inscrito.class);
                 consultaInscritos.setParameter("pruebaId", prueba_id);
-                System.out.println("HOLAAAA");
                 List<Inscrito> inscritos = consultaInscritos.getResultList();
                 if (inscritos.size() < prueba.getMaximoInscritos()) {
                     if (inscritos.isEmpty()) {
@@ -893,7 +891,6 @@ public class ControladorAdministracion extends HttpServlet {
                         int i = 0;
                         boolean hueco = false;
                         while (!hueco && (i + 1) < inscritos.size()) {
-                            System.out.println("HOLAAAA " +inscritos.get(i).getDorsal() + " " + inscritos.get(i + 1).getDorsal());
                             if (inscritos.get(i + 1).getDorsal() - inscritos.get(i).getDorsal() != 1)
                                 hueco = true;
                             i++;
