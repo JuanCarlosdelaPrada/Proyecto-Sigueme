@@ -793,7 +793,7 @@ public class ControladorAdministracion extends HttpServlet {
                 nombreAtributo = atributosS[num_atributos];
                 total = 0;
                 try (Connection conn = myDatasource.getConnection()) {
-                    String sql = "SELECT count(*) FROM " + tabla;
+                    String sql = "SELECT count(*) FROM " + tabla + " WHERE activa = 1";
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ResultSet rs = ps.executeQuery();
                     if (rs.next()) {
@@ -819,7 +819,7 @@ public class ControladorAdministracion extends HttpServlet {
                     if (!"".equals(searchTerm)) {
                         searchSQL = globeSearch;
                     } else {
-                        searchSQL = " where activa = 1";
+                        searchSQL = " WHERE activa = 1";
                     }
                     sql += searchSQL;
                     sql += " order by " + nombreAtributo + " " + dir;
@@ -850,10 +850,11 @@ public class ControladorAdministracion extends HttpServlet {
                         }
                         array.add(ja);
                     }
-                    String sql2 = "SELECT count(*) FROM " + tabla + " WHERE activa = 1";
+                    String sql2 = "SELECT count(*) FROM " + tabla;
                     if (searchTerm != null) {
                         sql2 += searchSQL;
                         PreparedStatement ps2 = conn.prepareStatement(sql2);
+                        System.out.println(sql2);
                         ResultSet rs2 = ps2.executeQuery();
                         if (rs2.next()) {
                             totalAfterFilter = rs2.getInt("count(*)");
@@ -879,17 +880,20 @@ public class ControladorAdministracion extends HttpServlet {
             case "/inscribirse":
                 prueba_id = request.getParameter("prueba_id");
                 prueba = em.find(Prueba.class, prueba_id);
-                consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaId", Inscrito.class);
+                System.out.println("ENTRADA 1");
+                consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaIdOrderingByDorsal", Inscrito.class);
                 consultaInscritos.setParameter("pruebaId", prueba_id);
+                System.out.println("HOLAAAA");
                 List<Inscrito> inscritos = consultaInscritos.getResultList();
                 if (inscritos.size() < prueba.getMaximoInscritos()) {
                     if (inscritos.isEmpty()) {
-                        inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, 1);
+                        inscrito = new Inscrito(new InscritoPK(prueba_id, session.getAttribute("correo").toString()), false, 1);
                     }
                     else {
                         int i = 0;
                         boolean hueco = false;
                         while (!hueco && (i + 1) < inscritos.size()) {
+                            System.out.println("HOLAAAA " +inscritos.get(i).getDorsal() + " " + inscritos.get(i + 1).getDorsal());
                             if (inscritos.get(i + 1).getDorsal() - inscritos.get(i).getDorsal() != 1)
                                 hueco = true;
                             i++;
@@ -901,7 +905,8 @@ public class ControladorAdministracion extends HttpServlet {
                             inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, i + 1);
                         }
                     }
-                    em.persist(inscrito);
+                    System.out.println(inscrito.toString());
+                    persist(inscrito);
                 }
                 else {
                     System.out.println("YA ESTÁ EL CUPO DE INSCRITOS CUBIERTO");

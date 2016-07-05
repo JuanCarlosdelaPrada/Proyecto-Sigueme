@@ -8,6 +8,7 @@
 </sql:query>
 <% synchronized(session){
     if(session.isNew()){
+        session.setAttribute("correo", null);
         session.setAttribute("usuario", null);
         session.setAttribute("permiso", null);
     }
