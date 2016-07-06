@@ -38,7 +38,14 @@
               
         <div class="page-header">
             <div class="col-xs-offset-1">
-                <h1>Inscripciones</h1> 
+                <c:choose>
+                    <c:when test="${empty requestScope.prueba_id}">
+                        <h1>Inscripciones de ${requestScope.usuario_id}</h1>
+                    </c:when>
+                    <c:otherwise>
+                        <h1>Inscripciones en ${requestScope.prueba_id}</h1>
+                    </c:otherwise> 
+                </c:choose>
             </div>
         </div>
         
@@ -93,8 +100,12 @@
                         "processing": true,
                         "serverSide": true,
                         "ajax": {
-                            "url": "inscripciones",
-                            "type": "POST"
+                            "url": "inscripciones_",
+                            "type": "POST",
+                            "data": {
+                                "prueba_id":"${requestScope.prueba_id}",
+                                "usuario_id":"${requestScope.usuario_id}"
+                            }
                         },
                         "deferRender": true,
                         "columns": [

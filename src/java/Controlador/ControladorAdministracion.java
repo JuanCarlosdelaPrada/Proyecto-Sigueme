@@ -75,7 +75,8 @@ import javax.sql.DataSource;
     "/usuarios",
     "/usuario", //--
     "/inscribirse",
-    "/inscripciones"
+    "/inscripciones",
+    "/inscripciones_"
 })
 @MultipartConfig
 
@@ -913,21 +914,29 @@ public class ControladorAdministracion extends HttpServlet {
             case "/inscripciones":
                 prueba_id = request.getParameter("prueba_id");
                 usuario_id = request.getParameter("usuario_id");
+                request.setAttribute("prueba_id", prueba_id);
+                request.setAttribute("usuario_id", usuario_id);
+                vista = "inscripciones.jsp";
+                break;
+            case "/inscripciones_":
+                prueba_id = request.getParameter("prueba_id");
+                usuario_id = request.getParameter("usuario_id");
                 List<String> columnasI;
                 List<String> atributosI;
-                String campo;
-                if (prueba_id != null) {
+                String campo,
+                       criterio;
+                if (!"".equals(prueba_id)) {
                     columnasI = Arrays.asList(new String[]{"Correo", "Dorsal", "Pagado", "Editar", "Borrar"});
                     atributosI = Arrays.asList(new String[]{"usuario_id", "dorsal", "pagado"});
+                    criterio = "prueba_id";
                     campo = prueba_id;
                 }
                 else {
                     columnasI = Arrays.asList(new String[]{"Nombre de la prueba", "Dorsal", "Pagado", "Editar", "Borrar"});
                     atributosI = Arrays.asList(new String[]{"prueba_id", "dorsal", "pagado"});
+                    criterio = "usuario_id";
                     campo = usuario_id;
                 }
-                System.out.println("P " + prueba_id);
-                System.out.println("U " + usuario_id);
                 tabla = "inscrito";
                 resultado = new JsonObject();
                 array = new JsonArray();
@@ -971,7 +980,7 @@ public class ControladorAdministracion extends HttpServlet {
                 nombreAtributo = atributosI.get(num_atributos);
                 total = 0;
                 try (Connection conn = myDatasource.getConnection()) {
-                    String sql = "SELECT count(*) FROM " + tabla + " WHERE " + atributosI.get(0) + " = '" + campo + "'";
+                    String sql = "SELECT count(*) FROM " + tabla + " WHERE " + criterio + " = '" + campo + "'";
                     PreparedStatement ps = conn.prepareStatement(sql);
                     ResultSet rs = ps.executeQuery();
                     if (rs.next()) {
@@ -992,12 +1001,12 @@ public class ControladorAdministracion extends HttpServlet {
                             + " or sexo like '%" + searchTerm + "%'"
                             + " or club like '%" + searchTerm + "%'"
                             + " or federado like '%" + searchTerm + "%'"
-                            + " and " + atributosI.get(0) + " = '" + campo + "')";
+                            + " and " + criterio + " = '" + campo + "')";
                     sql = "SELECT * FROM " + tabla;
                     if (!"".equals(searchTerm)) {
                         searchSQL = globeSearch;
                     } else {
-                        searchSQL = " WHERE " + atributosI.get(0) + " = '" + campo + "'";
+                        searchSQL = " WHERE " + criterio + " = '" + campo + "'";
                     }
                     sql += searchSQL;
                     sql += " order by " + nombreAtributo + " " + dir;
@@ -1038,11 +1047,10 @@ public class ControladorAdministracion extends HttpServlet {
                     out.print(resultado);
                     out.flush();
                     conn.close();
-                    return;// FUNCIONARA?? nooooooooooooooo!!!
+                    return;
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                vista = "inscripciones.jsp";
                 break;
             default:
                 vista = "inicio.jsp";
