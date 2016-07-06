@@ -74,7 +74,8 @@ import javax.sql.DataSource;
     "/seguimientoPruebas", //modificar (SQL)
     "/usuarios",
     "/usuario", //--
-    "/inscribirse"
+    "/inscribirse",
+    "/inscripciones"
 })
 @MultipartConfig
 
@@ -908,6 +909,140 @@ public class ControladorAdministracion extends HttpServlet {
                 else {
                     System.out.println("YA ESTÁ EL CUPO DE INSCRITOS CUBIERTO");
                 }
+                break;
+            case "/inscripciones":
+                prueba_id = request.getParameter("prueba_id");
+                usuario_id = request.getParameter("usuario_id");
+                List<String> columnasI;
+                List<String> atributosI;
+                String campo;
+                if (prueba_id != null) {
+                    columnasI = Arrays.asList(new String[]{"Correo", "Dorsal", "Pagado", "Editar", "Borrar"});
+                    atributosI = Arrays.asList(new String[]{"usuario_id", "dorsal", "pagado"});
+                    campo = prueba_id;
+                }
+                else {
+                    columnasI = Arrays.asList(new String[]{"Nombre de la prueba", "Dorsal", "Pagado", "Editar", "Borrar"});
+                    atributosI = Arrays.asList(new String[]{"prueba_id", "dorsal", "pagado"});
+                    campo = usuario_id;
+                }
+                System.out.println("P " + prueba_id);
+                System.out.println("U " + usuario_id);
+                tabla = "inscrito";
+                resultado = new JsonObject();
+                array = new JsonArray();
+                cantidad = 10;
+                comienzo = 0;
+                idraw = 0;
+                num_atributos = 0;
+
+                dir = "asc";
+                sStart = request.getParameter("start");
+                sAmount = request.getParameter("length");
+                draw = request.getParameter("draw");
+                sCol = request.getParameter("order[0][column]");
+                sdir = request.getParameter("order[0][dir]");
+                if (sStart != null) {
+                    comienzo = Integer.parseInt(sStart);
+                    if (comienzo < 0) {
+                        comienzo = 0;
+                    }
+                }
+                if (sAmount != null) {
+                    cantidad = Integer.parseInt(sAmount);
+                    if (cantidad < 10 || cantidad > 100) {
+                        cantidad = 10;
+                    }
+                }
+                if (draw != null) {
+                    idraw = Integer.parseInt(draw);
+                }
+                if (sCol != null) {
+                    num_atributos = Integer.parseInt(sCol);
+                    if (num_atributos < 0 || num_atributos > 9) {
+                        num_atributos = 0;
+                    }
+                }
+                if (sdir != null) {
+                    if (!sdir.equals("asc")) {
+                        dir = "desc";
+                    }
+                }
+                nombreAtributo = atributosI.get(num_atributos);
+                total = 0;
+                try (Connection conn = myDatasource.getConnection()) {
+                    String sql = "SELECT count(*) FROM " + tabla + " WHERE " + atributosI.get(0) + " = '" + campo + "'";
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    ResultSet rs = ps.executeQuery();
+                    if (rs.next()) {
+                        total = rs.getInt("count(*)");
+                    }
+                    int totalAfterFilter = total;
+                    String searchSQL = "",
+                            searchTerm = request.getParameter("search[value]"),
+                            globeSearch = " where (usuario_id like '%" + searchTerm + "%'"
+                            + " or contrasena like '%" + searchTerm + "%'"
+                            + " or rol like '%" + searchTerm + "%'"
+                            + " or nombre like '%" + searchTerm + "%'"
+                            + " or apellidos like '%" + searchTerm + "%'"
+                            + " or dni like '%" + searchTerm + "%'"
+                            + " or direccion like '%" + searchTerm + "%'"
+                            + " or fecha_nacimiento like '%" + searchTerm + "%'"
+                            + " or telefono like '%" + searchTerm + "%'"
+                            + " or sexo like '%" + searchTerm + "%'"
+                            + " or club like '%" + searchTerm + "%'"
+                            + " or federado like '%" + searchTerm + "%'"
+                            + " and " + atributosI.get(0) + " = '" + campo + "')";
+                    sql = "SELECT * FROM " + tabla;
+                    if (!"".equals(searchTerm)) {
+                        searchSQL = globeSearch;
+                    } else {
+                        searchSQL = " WHERE " + atributosI.get(0) + " = '" + campo + "'";
+                    }
+                    sql += searchSQL;
+                    sql += " order by " + nombreAtributo + " " + dir;
+                    sql += " limit " + comienzo + ", " + cantidad;
+                    System.out.println(sql);
+                    ps = conn.prepareStatement(sql);
+                    rs = ps.executeQuery();
+                    Boolean permiso = session.getAttribute("permiso") == null ? false : (boolean) session.getAttribute("permiso"),
+                            user = session.getAttribute("usuario") != null;
+                    while (rs.next()) {
+                        JsonObject ja = new JsonObject();
+                        for (int i = 0; i < atributosI.size(); i++) {
+                            ja.add(columnasI.get(i), new JsonPrimitive(rs.getString(atributosI.get(i))));
+                        }
+                        if (permiso) {
+                            ja.add(columnasI.get(atributosI.size()), new JsonPrimitive("<a href='editar-inscripcion?" + atributosI.get(0) + "=" + ja.get(columnasI.get(0)).getAsString() + "'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
+                            ja.add(columnasI.get(atributosI.size() + 1), new JsonPrimitive("<a href='eliminar-inscripcion?" + atributosI.get(0) + "=" + ja.get(columnasI.get(0)).getAsString() + "'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>"));
+                        }                        
+                        array.add(ja);
+                    }
+                    String sql2 = "SELECT count(*) FROM " + tabla;
+                    if (searchTerm != null) {
+                        sql2 += searchSQL;
+                        PreparedStatement ps2 = conn.prepareStatement(sql2);
+                        ResultSet rs2 = ps2.executeQuery();
+                        if (rs2.next()) {
+                            totalAfterFilter = rs2.getInt("count(*)");
+                        }
+                    }
+                    resultado.add("draw", new JsonPrimitive(idraw));
+                    resultado.add("recordsTotal", new JsonPrimitive(total));
+                    resultado.add("recordsFiltered", new JsonPrimitive(totalAfterFilter));
+                    resultado.add("data", array);
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setHeader("Cache-Control", "no-store");
+                    PrintWriter out = response.getWriter();
+                    out.print(resultado);
+                    out.flush();
+                    conn.close();
+                    return;// FUNCIONARA?? nooooooooooooooo!!!
+                } catch (SQLException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                vista = "inscripciones.jsp";
                 break;
             default:
                 vista = "inicio.jsp";
