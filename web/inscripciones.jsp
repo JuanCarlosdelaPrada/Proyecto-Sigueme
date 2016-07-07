@@ -54,7 +54,15 @@
                 <table id="example" class="table table-striped dt-responsive" cellspacing="0" width="100%">
                     <thead>
                         <tr>
-                            <th>Correo</th>
+                            <c:choose>
+                                <c:when test="${not empty requestScope.prueba_id}">
+                                    <th>Correo</th>
+                                </c:when>
+                                <c:otherwise>
+                                    <th>Nombre de la prueba</th>
+                                </c:otherwise>
+                            </c:choose>
+                            
                             <th>Dorsal</th>
                             <th>Pagado</th>
                             <c:if test="${sessionScope.permiso}">
@@ -65,7 +73,14 @@
                     </thead>
                     <tfoot>
                          <tr>
-                            <th>Correo</th>
+                            <c:choose>
+                                <c:when test="${not empty requestScope.prueba_id}">
+                                    <th>Correo</th>
+                                </c:when>
+                                <c:otherwise>
+                                    <th>Nombre de la prueba</th>
+                                </c:otherwise>
+                            </c:choose>
                             <th>Dorsal</th>
                             <th>Pagado</th>
                             <c:if test="${sessionScope.permiso}">
@@ -109,7 +124,14 @@
                         },
                         "deferRender": true,
                         "columns": [
-                            {"data": "Correo"}
+                            <c:choose>
+                                <c:when test="${not empty requestScope.prueba_id}">
+                                    {"data": "Correo"}
+                                </c:when>
+                                <c:otherwise>
+                                    {"data": "Nombre de la prueba"}
+                                </c:otherwise>
+                            </c:choose>
                             ,{"data": "Dorsal"}
                             ,{"data": "Pagado"}
                             <c:if test="${sessionScope.permiso}"> 

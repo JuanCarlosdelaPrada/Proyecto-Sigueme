@@ -63,6 +63,7 @@
                             <c:if test="${sessionScope.permiso}">
                                 <th>Editar</th>
                                 <th>Borrar</th>
+                                <th>Ver inscripciones</th>
                             </c:if>
                         </tr>
                     </thead>
@@ -84,6 +85,7 @@
                             <c:if test="${sessionScope.permiso}">
                                 <th>Editar</th>
                                 <th>Borrar</th>
+                                <th>Ver inscripciones</th>
                             </c:if>
                         </tr>
                     </tfoot>
@@ -134,6 +136,7 @@
                             <c:if test="${sessionScope.permiso}"> 
                                 ,{"data": "Editar"}
                                 ,{"data": "Borrar"}
+                                ,{"data": "Ver inscripciones"}
                             </c:if>
                         ],
                         "language": {

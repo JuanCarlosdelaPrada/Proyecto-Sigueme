@@ -624,7 +624,7 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 break;
             case "/usuarios":
-                String[] columnasU = {"Correo", "Contrasena", "Rol", "Nombre", "Apellidos", "DNI", "Direccion", "Fecha Nacimiento", "Telefono", "Sexo", "Club", "Federado", "Mas informacion", "Editar", "Borrar"};
+                String[] columnasU = {"Correo", "Contrasena", "Rol", "Nombre", "Apellidos", "DNI", "Direccion", "Fecha Nacimiento", "Telefono", "Sexo", "Club", "Federado", "Mas informacion", "Editar", "Borrar", "Ver inscripciones"};
                 String[] atributosU = {"usuario_id", "contrasena", "rol", "nombre", "apellidos", "dni", "direccion", "fecha_nacimiento", "telefono", "sexo", "club", "federado"};
                 tabla = "usuario";
                 resultado = new JsonObject();
@@ -720,6 +720,7 @@ public class ControladorAdministracion extends HttpServlet {
                         if (permiso) {
                             ja.add(columnasU[atributosU.length + 1], new JsonPrimitive("<a href='editar-usuario?" + atributosU[0] + "=" + ja.get(columnasU[0]).getAsString() + "'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
                             ja.add(columnasU[atributosU.length + 2], new JsonPrimitive("<a href='eliminar-usuario?" + atributosU[0] + "=" + ja.get(columnasU[0]).getAsString() + "'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>"));
+                            ja.add(columnasU[atributosU.length + 3], new JsonPrimitive("<a href='inscripciones?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
                         }
                         array.add(ja);
                     }
@@ -967,8 +968,8 @@ public class ControladorAdministracion extends HttpServlet {
                     idraw = Integer.parseInt(draw);
                 }
                 if (sCol != null) {
-                    num_atributos = Integer.parseInt(sCol);
-                    if (num_atributos < 0 || num_atributos > 9) {
+                    num_atributos = Integer.parseInt(sCol);;
+                    if (num_atributos < 0 || num_atributos > 5) {
                         num_atributos = 0;
                     }
                 }
@@ -989,18 +990,7 @@ public class ControladorAdministracion extends HttpServlet {
                     int totalAfterFilter = total;
                     String searchSQL = "",
                             searchTerm = request.getParameter("search[value]"),
-                            globeSearch = " where (usuario_id like '%" + searchTerm + "%'"
-                            + " or contrasena like '%" + searchTerm + "%'"
-                            + " or rol like '%" + searchTerm + "%'"
-                            + " or nombre like '%" + searchTerm + "%'"
-                            + " or apellidos like '%" + searchTerm + "%'"
-                            + " or dni like '%" + searchTerm + "%'"
-                            + " or direccion like '%" + searchTerm + "%'"
-                            + " or fecha_nacimiento like '%" + searchTerm + "%'"
-                            + " or telefono like '%" + searchTerm + "%'"
-                            + " or sexo like '%" + searchTerm + "%'"
-                            + " or club like '%" + searchTerm + "%'"
-                            + " or federado like '%" + searchTerm + "%'"
+                            globeSearch = " WHERE (" + atributosI.get(0) + " like '%" + searchTerm + "%'"
                             + " and " + criterio + " = '" + campo + "')";
                     sql = "SELECT * FROM " + tabla;
                     if (!"".equals(searchTerm)) {
@@ -1019,7 +1009,12 @@ public class ControladorAdministracion extends HttpServlet {
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
                         for (int i = 0; i < atributosI.size(); i++) {
-                            ja.add(columnasI.get(i), new JsonPrimitive(rs.getString(atributosI.get(i))));
+                            if (!"Pagado".equals(columnasI.get(i))) {
+                                ja.add(columnasI.get(i), new JsonPrimitive(rs.getString(atributosI.get(i))));
+                            }
+                            else {
+                                ja.add(columnasI.get(i), new JsonPrimitive(rs.getString(atributosI.get(i)).equals("0")? "No": "Sí"));
+                            }
                         }
                         if (permiso) {
                             ja.add(columnasI.get(atributosI.size()), new JsonPrimitive("<a href='editar-inscripcion?" + atributosI.get(0) + "=" + ja.get(columnasI.get(0)).getAsString() + "'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
