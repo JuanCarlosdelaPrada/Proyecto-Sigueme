@@ -48,45 +48,15 @@
                     <thead>
                         <tr>
                             <th>Nombre de la prueba</th>
-                            <th>Descripción</th>
-                            <th>Ruta</th>
-                            <th>Lugar</th>
-                            <th>Fecha celebración</th>
-                            <th>Hora celebración</th>
-                            <th>Fecha apertura inscripción</th>
-                            <th>Fecha límite inscripción</th>
-                            <th>Nº Máximo inscritos</th>
-                            <c:if test="${empty sessionScope.permiso or !sessionScope.permiso}">
-                                <th>Inscribirse</th>
-                            </c:if>
                             <th>Ver</th>
-                            <c:if test="${sessionScope.permiso}">
-                                <th>Editar</th>
-                                <th>Borrar</th>
-                                <th>Ver inscripciones</th>
-                            </c:if>
+                            <th>Más información</th>
                         </tr>
                     </thead>
                     <tfoot>
                          <tr>
                             <th>Nombre de la prueba</th>
-                            <th>Descripción</th>
-                            <th>Ruta</th>
-                            <th>Lugar</th>
-                            <th>Fecha celebración</th>
-                            <th>Hora celebración</th>
-                            <th>Fecha apertura inscripción</th>
-                            <th>Fecha límite inscripción</th>
-                            <th>Nº Máximo inscritos</th>
-                            <c:if test="${empty sessionScope.permiso or !sessionScope.permiso}">
-                                <th>Inscribirse</th>
-                            </c:if>
                             <th>Ver</th>
-                            <c:if test="${sessionScope.permiso}">
-                                <th>Editar</th>
-                                <th>Borrar</th>
-                                <th>Ver inscripciones</th>
-                            </c:if>
+                            <th>Más información</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -121,23 +91,8 @@
                         "deferRender": true,
                         "columns": [
                             {"data": "Nombre de la prueba"}
-                            ,{"data": "Descripcion"}
-                            ,{"data": "Ruta"}
-                            ,{"data": "Lugar"}
-                            ,{"data": "Fecha celebracion"}
-                            ,{"data": "Hora celebracion"}
-                            ,{"data": "Fecha apertura inscripcion"}
-                            ,{"data": "Fecha limite inscripcion"}
-                            ,{"data": "Nº Maximo inscritos"}
-                             <c:if test="${empty sessionScope.permiso or !sessionScope.permiso}">
-                                ,{"data": "Inscribirse"}
-                            </c:if>
                             ,{"data": "Ver"}
-                            <c:if test="${sessionScope.permiso}"> 
-                                ,{"data": "Editar"}
-                                ,{"data": "Borrar"}
-                                ,{"data": "Ver inscripciones"}
-                            </c:if>
+                            ,{"data": "Mas informacion"}
                         ],
                         "language": {
                             "url": "js/Spanish.json"

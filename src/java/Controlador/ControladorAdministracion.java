@@ -67,11 +67,11 @@ import javax.sql.DataSource;
     "/logout",
     "/subirRuta",
     "/crearPrueba",
-    "/rutas", //modificar (SQL)
+    "/rutas", 
     "/ruta",
-    "/pruebas", //modificar (SQL)
+    "/pruebas", 
     "/prueba", //--
-    "/seguimientoPruebas", //modificar (SQL)
+    "/seguimientoPruebas", 
     "/usuarios",
     "/usuario", //--
     "/inscribirse",
@@ -398,7 +398,7 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 if (sCol != null) {
                     num_atributos = Integer.parseInt(sCol);
-                    if (num_atributos < 0 || num_atributos > 9)
+                    if (num_atributos < 0 || num_atributos > 8)
                         num_atributos = 0;
                 }
                 if (sdir != null) {
@@ -418,15 +418,15 @@ public class ControladorAdministracion extends HttpServlet {
                     int totalAfterFilter = total;
                     String searchSQL = "",
                             searchTerm = request.getParameter("search[value]"), 
-                            globeSearch = " where (ruta_id like '%" + searchTerm +"%'"
-                            + " or descripcion like '%" + searchTerm +"%'"
+                            globeSearch = " where (ruta_id like '%" + searchTerm +"%')";
+                            /*+ " or descripcion like '%" + searchTerm +"%'"
                             + " or distancia like '%" + searchTerm +"%'"
                             + " or dificultad like '%" + searchTerm +"%'"
                             + " or fichero_gpx like '%" + searchTerm +"%'"
                             + " or lat_min like '%" + searchTerm +"%'"
                             + " or lat_max like '%" + searchTerm +"%'"
                             + " or long_min like '%" + searchTerm +"%'"
-                            + " or long_max like '%" + searchTerm + "%')";
+                            + " or long_max like '%" + searchTerm + "%')";*/
                     sql = "SELECT * FROM " + tabla;
                     
                     /*if(!"".equals(searchTerm) && !"".equals(individualSearch)){
@@ -532,7 +532,7 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 if (sCol != null) {
                     num_atributos = Integer.parseInt(sCol);
-                    if (num_atributos < 0 || num_atributos > 9)
+                    if (num_atributos < 0 || num_atributos > 8)
                         num_atributos = 0;
                 }
                 if (sdir != null) {
@@ -551,18 +551,7 @@ public class ControladorAdministracion extends HttpServlet {
                     int totalAfterFilter = total;
                     String searchSQL = "",
                             searchTerm = request.getParameter("search[value]"), 
-                            globeSearch = " where (usuario_id like '%" + searchTerm +"%'"
-                            + " or contrasena like '%" + searchTerm +"%'"
-                            + " or rol like '%" + searchTerm +"%'"
-                            + " or nombre like '%" + searchTerm +"%'"
-                            + " or apellidos like '%" + searchTerm +"%'"
-                            + " or dni like '%" + searchTerm +"%'"
-                            + " or direccion like '%" + searchTerm +"%'"
-                            + " or fecha_nacimiento like '%" + searchTerm +"%'"
-                            + " or telefono like '%" + searchTerm +"%'"
-                            + " or sexo like '%" + searchTerm +"%'"
-                            + " or club like '%" + searchTerm +"%'"
-                            + " or federado like '%" + searchTerm + "%')";
+                            globeSearch = " where (prueba_id like '%" + searchTerm +"%')";
                     sql = "SELECT * FROM " + tabla;
                     
                     if(!"".equals(searchTerm)){
@@ -657,7 +646,7 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 if (sCol != null) {
                     num_atributos = Integer.parseInt(sCol);
-                    if (num_atributos < 0 || num_atributos > 9) {
+                    if (num_atributos < 0 || num_atributos > 11) {
                         num_atributos = 0;
                     }
                 }
@@ -678,8 +667,8 @@ public class ControladorAdministracion extends HttpServlet {
                     int totalAfterFilter = total;
                     String searchSQL = "",
                             searchTerm = request.getParameter("search[value]"),
-                            globeSearch = " where (usuario_id like '%" + searchTerm + "%'"
-                            + " or contrasena like '%" + searchTerm + "%'"
+                            globeSearch = " where (usuario_id like '%" + searchTerm + "%')";
+                            /*+ " or contrasena like '%" + searchTerm + "%'"
                             + " or rol like '%" + searchTerm + "%'"
                             + " or nombre like '%" + searchTerm + "%'"
                             + " or apellidos like '%" + searchTerm + "%'"
@@ -689,7 +678,7 @@ public class ControladorAdministracion extends HttpServlet {
                             + " or telefono like '%" + searchTerm + "%'"
                             + " or sexo like '%" + searchTerm + "%'"
                             + " or club like '%" + searchTerm + "%'"
-                            + " or federado like '%" + searchTerm + "%')";
+                            + " or federado like '%" + searchTerm + "%')";*/
                     sql = "SELECT * FROM " + tabla;
 
                     if (!"".equals(searchTerm)) {
@@ -751,8 +740,8 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 break;
             case "/seguimientoPruebas":
-                String[] columnasS = {"Nombre de la prueba", "Descripcion", "Ruta", "Lugar", "Fecha celebracion", "Hora celebracion", "Fecha apertura inscripcion", "Fecha limite inscripcion", "Nº Maximo inscritos", "Inscribirse", "Ver", "Editar", "Borrar", "Ver inscripciones"};
-                String[] atributosS = {"prueba_id", "descripcion", "ruta_id", "lugar", "fecha_cel", "hora_cel", "fecha_inscrip_min", "fecha_inscrip_max", "maximo_inscritos"};
+                String[] columnasS = {"Nombre de la prueba", "Ver", "Mas informacion"};
+                String[] atributosS = {"prueba_id"};
                 tabla = "prueba";
                 resultado = new JsonObject();
                 array = new JsonArray();
@@ -784,7 +773,7 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 if (sCol != null) {
                     num_atributos = Integer.parseInt(sCol);
-                    if (num_atributos < 0 || num_atributos > 9) {
+                    if (num_atributos < 0 || num_atributos > 0) {
                         num_atributos = 0;
                     }
                 }
@@ -805,18 +794,7 @@ public class ControladorAdministracion extends HttpServlet {
                     int totalAfterFilter = total;
                     String searchSQL = "",
                             searchTerm = request.getParameter("search[value]"),
-                            globeSearch = " where (usuario_id like '%" + searchTerm + "%'"
-                            + " or contrasena like '%" + searchTerm + "%'"
-                            + " or rol like '%" + searchTerm + "%'"
-                            + " or nombre like '%" + searchTerm + "%'"
-                            + " or apellidos like '%" + searchTerm + "%'"
-                            + " or dni like '%" + searchTerm + "%'"
-                            + " or direccion like '%" + searchTerm + "%'"
-                            + " or fecha_nacimiento like '%" + searchTerm + "%'"
-                            + " or telefono like '%" + searchTerm + "%'"
-                            + " or sexo like '%" + searchTerm + "%'"
-                            + " or club like '%" + searchTerm + "%'"
-                            + " or federado like '%" + searchTerm + "%'"
+                            globeSearch = " where (prueba_id like '%" + searchTerm + "%'"
                             + " and activa = 1)";
                     sql = "SELECT * FROM " + tabla;
                     if (!"".equals(searchTerm)) {
@@ -827,30 +805,16 @@ public class ControladorAdministracion extends HttpServlet {
                     sql += searchSQL;
                     sql += " order by " + nombreAtributo + " " + dir;
                     sql += " limit " + comienzo + ", " + cantidad;
-                    System.out.println(sql);
                     ps = conn.prepareStatement(sql);
                     rs = ps.executeQuery();
-                    Boolean permiso = session.getAttribute("permiso") == null ? false : (boolean) session.getAttribute("permiso"),
-                            user = session.getAttribute("usuario") != null;
+                    Boolean user = session.getAttribute("usuario") != null;
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
                         for (int i = 0; i < atributosS.length; i++) {
                             ja.add(columnasS[i], new JsonPrimitive(rs.getString(atributosS[i])));
                         }
-                        if (!permiso) {
-                            if (user) {
-                                ja.add(columnasS[atributosS.length], new JsonPrimitive("<a href='inscribirse?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
-                            } else {
-                                ja.add(columnasS[atributosS.length], new JsonPrimitive("<a href='crearUsuario.jsp'>Registrate ya!</a>"));
-                            }
-                        }
-                        ja.add(columnasS[atributosS.length + 1], new JsonPrimitive("<a href='seguir-prueba?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
-
-                        if (permiso) {
-                            ja.add(columnasS[atributosS.length + 2], new JsonPrimitive("<a href='editar-prueba?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
-                            ja.add(columnasS[atributosS.length + 3], new JsonPrimitive("<a href='eliminar-prueba?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>"));
-                            ja.add(columnasS[atributosS.length + 4], new JsonPrimitive("<a href='inscripciones?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
-                        }
+                        ja.add(columnasS[atributosS.length], new JsonPrimitive("<a href='seguir-prueba?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                        ja.add(columnasS[atributosS.length + 1], new JsonPrimitive("<a href='prueba?"+atributosS[0]+"="+ja.get(columnasS[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
                         array.add(ja);
                     }
                     String sql2 = "SELECT count(*) FROM " + tabla;
@@ -886,30 +850,36 @@ public class ControladorAdministracion extends HttpServlet {
                 consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaIdOrderingByDorsal", Inscrito.class);
                 consultaInscritos.setParameter("pruebaId", prueba_id);
                 List<Inscrito> inscritos = consultaInscritos.getResultList();
-                if (inscritos.size() < prueba.getMaximoInscritos()) {
-                    if (inscritos.isEmpty()) {
-                        inscrito = new Inscrito(new InscritoPK(prueba_id, session.getAttribute("correo").toString()), false, 1);
-                    }
-                    else {
-                        int i = 0;
-                        boolean hueco = false;
-                        while (!hueco && (i + 1) < inscritos.size()) {
-                            if (inscritos.get(i + 1).getDorsal() - inscritos.get(i).getDorsal() != 1)
-                                hueco = true;
-                            i++;
-                        }
-                        if (!hueco) {
-                            inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, inscritos.size() + 1);
+                InscritoPK inscritoPK = new InscritoPK(prueba_id, session.getAttribute("correo").toString());
+                if (em.find(Inscrito.class, inscritoPK) == null) {
+                    if (inscritos.size() < prueba.getMaximoInscritos()) {
+                        if (inscritos.isEmpty()) {
+                            inscrito = new Inscrito(inscritoPK, false, 1);
                         }
                         else {
-                            inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, i + 1);
+                            int i = 0;
+                            boolean hueco = false;
+                            while (!hueco && (i + 1) < inscritos.size()) {
+                                if (inscritos.get(i + 1).getDorsal() - inscritos.get(i).getDorsal() != 1)
+                                    hueco = true;
+                                i++;
+                            }
+                            if (!hueco) {
+                                inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, inscritos.size() + 1);
+                            }
+                            else {
+                                inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, i + 1);
+                            }
                         }
+                        System.out.println(inscrito.toString());
+                        persist(inscrito);
                     }
-                    System.out.println(inscrito.toString());
-                    persist(inscrito);
+                    else {
+                        System.out.println("YA ESTÁ EL CUPO DE INSCRITOS CUBIERTO");
+                    }
                 }
                 else {
-                    System.out.println("YA ESTÁ EL CUPO DE INSCRITOS CUBIERTO");
+                    System.out.println("YA ESTÁ INSCRITO");
                 }
                 break;
             case "/inscripciones":
@@ -969,7 +939,7 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 if (sCol != null) {
                     num_atributos = Integer.parseInt(sCol);;
-                    if (num_atributos < 0 || num_atributos > 5) {
+                    if (num_atributos < 0 || num_atributos > 2) {
                         num_atributos = 0;
                     }
                 }
