@@ -6,6 +6,7 @@ package Controlador;
  * and open the template in the editor.
  */
 
+import Herramientas.AES;
 import Herramientas.DistanciaDeHaversine;
 import Herramientas.ParserGPX;
 import JPA_Entidades.Inscrito;
@@ -152,12 +153,12 @@ public class ControladorAdministracion extends HttpServlet {
             case "/login":
                 String correo_login = request.getParameter("correo_login");
                 String contrasena_login = request.getParameter("contrasena_login");
-                byte[]_contrasena_login = contrasena_login.getBytes();
+                String _contrasena_login = AES.decrypt(contrasena_login);
                 consultaUsuarios = em.createNamedQuery("Usuario.findByUsuarioId", Usuario.class);
                 consultaUsuarios.setParameter("usuarioId", correo_login);
                 try { 
                     usuario = consultaUsuarios.getSingleResult();
-                    if(Arrays.equals(usuario.getContrasena(), _contrasena_login)) {
+                    if(Arrays.equals(usuario.getContrasena(), _contrasena_login.getBytes())) {
                         session.setAttribute("correo", usuario.getUsuarioId());
                         session.setAttribute("usuario", usuario.getNombre());
                         session.setAttribute("permiso", usuario.getRol());
@@ -195,8 +196,8 @@ public class ControladorAdministracion extends HttpServlet {
                        club = request.getParameter("club"),
                        federado = request.getParameter("federado");
                 formato = new SimpleDateFormat("yyyy-MM-dd");
-                byte[] contrasena_tratada = contrasena.getBytes(),
-                       _contrasena_tratada = _contrasena.getBytes();
+                String contrasena_tratada = AES.encrypt(contrasena);
+                
                 Date fecha_nacimiento_tratada = null;
                 try {
                     fecha_nacimiento_tratada = formato.parse(fecha_nacimiento);
@@ -205,7 +206,7 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 boolean federado_tratado = federado.equals("s");
                 String _club = club.equals("")? null : club;
-                usuario = new Usuario(usuario_id, contrasena_tratada, false, nombre, apellidos, dni, direccion, fecha_nacimiento_tratada, telefono, sexo, federado_tratado);
+                usuario = new Usuario(usuario_id, contrasena_tratada.getBytes(), false, nombre, apellidos, dni, direccion, fecha_nacimiento_tratada, telefono, sexo, federado_tratado);
                 usuario.setClub(_club);
                 if(em.find(JPA_Entidades.Usuario.class, usuario_id) == null) {
                     persist(usuario);

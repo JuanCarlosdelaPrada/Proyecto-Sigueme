@@ -4,10 +4,6 @@
  * and open the template in the editor.
  */
 package Herramientas;
-/**
- *
- * @author Je¡ZZ¡
- */
 
 import java.io.UnsupportedEncodingException;
 import java.security.AlgorithmParameters;
@@ -21,7 +17,6 @@ import java.util.Base64;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
-
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
@@ -31,10 +26,10 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
-
-
-
-
+/**
+ *
+ * @author Je¡ZZ¡
+ */
 public abstract class AES
 {
     private static String salt;
@@ -94,18 +89,11 @@ public abstract class AES
             // Decrypt the message
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(ivBytes));
-
+            System.out.println(cipher.doFinal(encryptedTextBytes).length);
             return new String(cipher.doFinal(encryptedTextBytes));
         } catch (IllegalBlockSizeException | BadPaddingException | UnsupportedEncodingException | NoSuchAlgorithmException | InvalidKeySpecException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException ex) {
             Logger.getLogger(AES.class.getName()).log(Level.SEVERE, null, ex);
         }
         return null;
-    }
-
-    public static void main(String[] args) throws Exception {
-        System.out.println("Encrypted string:" + AES.encrypt("Hello"));           
-        String encryptedText = AES.encrypt("Hello");
-        System.out.println("Decrypted string:" + AES.decrypt(encryptedText));         
- 
     }
 }
