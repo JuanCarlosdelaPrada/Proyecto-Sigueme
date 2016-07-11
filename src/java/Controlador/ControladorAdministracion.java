@@ -11,6 +11,7 @@ import Herramientas.DistanciaDeHaversine;
 import Herramientas.ParserGPX;
 import JPA_Entidades.Inscrito;
 import JPA_Entidades.InscritoPK;
+import JPA_Entidades.Ivbytes;
 import JPA_Entidades.Prueba;
 import JPA_Entidades.Ruta;
 import JPA_Entidades.Usuario;
@@ -36,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -114,14 +116,18 @@ public class ControladorAdministracion extends HttpServlet {
         
         TypedQuery<Inscrito> consultaInscritos;
         TypedQuery<Usuario> consultaUsuarios;
+        TypedQuery<Ivbytes> consultaIvBytes;
         SimpleDateFormat formato;
         JsonObject resultado;
         ParserGPX parseador;
         Inscrito inscrito;
         JsonArray array;
+        Ivbytes ivbytes;
         Usuario usuario;
         Prueba prueba;
         Ruta ruta;
+                
+        byte[] ivBytes;
         
         int cantidad,
             comienzo,
@@ -151,14 +157,21 @@ public class ControladorAdministracion extends HttpServlet {
         vista = "";
         switch(accion) {
             case "/login":
-                String correo_login = request.getParameter("correo_login");
-                String contrasena_login = request.getParameter("contrasena_login");
-                String _contrasena_login = AES.decrypt(contrasena_login);
-                consultaUsuarios = em.createNamedQuery("Usuario.findByUsuarioId", Usuario.class);
-                consultaUsuarios.setParameter("usuarioId", correo_login);
-                try { 
+                try {
+                    String correo_login = request.getParameter("correo_login");
+                    String contrasena_login = request.getParameter("contrasena_login");
+                    
+                    consultaUsuarios = em.createNamedQuery("Usuario.findByUsuarioId", Usuario.class);
+                    consultaUsuarios.setParameter("usuarioId", correo_login);
+                    
                     usuario = consultaUsuarios.getSingleResult();
-                    if(Arrays.equals(usuario.getContrasena(), _contrasena_login.getBytes())) {
+                    
+                    consultaIvBytes = em.createNamedQuery("Ivbytes.findByUsuarioId", Ivbytes.class);
+                    consultaIvBytes.setParameter("usuarioId", correo_login);
+                    
+                    ivbytes = consultaIvBytes.getSingleResult();
+                    AES.setIvBytes(ivbytes.getIvbytesId());
+                    if (contrasena_login.equals(AES.decrypt(new String(usuario.getContrasena())))) {
                         session.setAttribute("correo", usuario.getUsuarioId());
                         session.setAttribute("usuario", usuario.getNombre());
                         session.setAttribute("permiso", usuario.getRol());
@@ -196,8 +209,12 @@ public class ControladorAdministracion extends HttpServlet {
                        club = request.getParameter("club"),
                        federado = request.getParameter("federado");
                 formato = new SimpleDateFormat("yyyy-MM-dd");
-                String contrasena_tratada = AES.encrypt(contrasena);
                 
+                //Encriptamos la contraseña con AES-256
+                String contrasena_tratada = AES.encrypt(contrasena);
+                System.out.println("contraseña "+contrasena_tratada);
+                ivBytes = AES.getIvBytes();
+                System.out.println(ivBytes);
                 Date fecha_nacimiento_tratada = null;
                 try {
                     fecha_nacimiento_tratada = formato.parse(fecha_nacimiento);
@@ -208,8 +225,11 @@ public class ControladorAdministracion extends HttpServlet {
                 String _club = club.equals("")? null : club;
                 usuario = new Usuario(usuario_id, contrasena_tratada.getBytes(), false, nombre, apellidos, dni, direccion, fecha_nacimiento_tratada, telefono, sexo, federado_tratado);
                 usuario.setClub(_club);
+                ivbytes = new Ivbytes(usuario_id);
+                ivbytes.setIvbytesId(ivBytes);
                 if(em.find(JPA_Entidades.Usuario.class, usuario_id) == null) {
                     persist(usuario);
+                    persist(ivbytes);
                 }
                 vista = "inicio.jsp";
                 break;

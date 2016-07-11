@@ -64,3 +64,10 @@ CREATE TABLE POSICION (
 	FOREIGN KEY (prueba_id) REFERENCES PRUEBA(prueba_id),
 	FOREIGN KEY (usuario_id) REFERENCES USUARIO(usuario_id)
 );
+
+CREATE TABLE IVBYTES (
+	ivbytes_id BLOB,
+	usuario_id VARCHAR(64),
+	PRIMARY KEY(usuario_id),
+	FOREIGN KEY (usuario_id) REFERENCES USUARIO(usuario_id)
+);
