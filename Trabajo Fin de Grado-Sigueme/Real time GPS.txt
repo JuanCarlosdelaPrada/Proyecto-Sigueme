@@ -3,4 +3,8 @@ http://stackoverflow.com/questions/3305225/real-time-gps-tracker-on-just-html-js
 http://stackoverflow.com/questions/16403475/real-time-tracking-in-google-map
 http://stackoverflow.com/questions/9626134/google-maps-v3-updating-markers-periodically
 
-http://modernweb.com/2013/04/22/google-maps-markers/#prettyPhoto
+https://www.sanwebe.com/2013/10/google-map-v3-editing-saving-marker-in-database
+
+http://stackoverflow.com/questions/22157001/update-reload-markers-without-reloading-google-map
+http://stackoverflow.com/questions/6190482/google-maps-api-v3-update-marker
+http://stackoverflow.com/questions/8640994/update-marker-position-google-maps-v3
