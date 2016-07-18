@@ -58,6 +58,8 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import javax.sql.DataSource;
+import org.jdom.Document;
+import org.jdom.Element;
 
 /**
  *
@@ -75,6 +77,7 @@ import javax.sql.DataSource;
     "/pruebas", 
     "/prueba", //--
     "/seguimientoPruebas", 
+    "/seguimiento_prueba",
     "/usuarios",
     "/usuario", //--
     "/inscribirse",
@@ -214,7 +217,6 @@ public class ControladorAdministracion extends HttpServlet {
                 String contrasena_tratada = AES.encrypt(contrasena);
                 System.out.println("contraseña "+contrasena_tratada);
                 ivBytes = AES.getIvBytes();
-                System.out.println(ivBytes);
                 Date fecha_nacimiento_tratada = null;
                 try {
                     fecha_nacimiento_tratada = formato.parse(fecha_nacimiento);
@@ -864,6 +866,11 @@ public class ControladorAdministracion extends HttpServlet {
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                break;
+            case "/seguimiento_prueba":
+                Element markers = new Element("markers");
+                Document doc = new Document(markers);
+                doc.setRootElement(markers);
                 break;
             case "/inscribirse":
                 prueba_id = request.getParameter("prueba_id");
