@@ -63,7 +63,7 @@
             });  
             */
         }
-    });
+    
     
     //############### Create Marker Function ##############
     function create_marker(MapPos, MapTitle, MapDesc,  InfoOpenDefault, DragAble, Removable/*, iconPath*/) {                 
@@ -183,6 +183,7 @@
         });
     }
 });*/
+});
 </script>
 
 <style type="text/css">
