@@ -21,6 +21,7 @@ import com.google.gson.JsonPrimitive;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -58,8 +59,11 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 import javax.sql.DataSource;
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  *
@@ -124,6 +128,7 @@ public class ControladorAdministracion extends HttpServlet {
         JsonObject resultado;
         ParserGPX parseador;
         Inscrito inscrito;
+        PrintWriter out;
         JsonArray array;
         Ivbytes ivbytes;
         Usuario usuario;
@@ -502,7 +507,7 @@ public class ControladorAdministracion extends HttpServlet {
                     response.setContentType("application/json");
                     response.setCharacterEncoding("UTF-8");
                     response.setHeader("Cache-Control", "no-store");
-                    PrintWriter out = response.getWriter();
+                    out = response.getWriter();
                     out.print(resultado);
                     out.flush();
                     conn.close();
@@ -626,7 +631,7 @@ public class ControladorAdministracion extends HttpServlet {
                     response.setContentType("application/json");
                     response.setCharacterEncoding("UTF-8");
                     response.setHeader("Cache-Control", "no-store");
-                    PrintWriter out = response.getWriter();
+                    out = response.getWriter();
                     out.print(resultado);
                     out.flush();
                     conn.close();
@@ -753,7 +758,7 @@ public class ControladorAdministracion extends HttpServlet {
                     response.setContentType("application/json");
                     response.setCharacterEncoding("UTF-8");
                     response.setHeader("Cache-Control", "no-store");
-                    PrintWriter out = response.getWriter();
+                    out = response.getWriter();
                     out.print(resultado);
                     out.flush();
                     conn.close();
@@ -858,7 +863,7 @@ public class ControladorAdministracion extends HttpServlet {
                     response.setContentType("application/json");
                     response.setCharacterEncoding("UTF-8");
                     response.setHeader("Cache-Control", "no-store");
-                    PrintWriter out = response.getWriter();
+                    out = response.getWriter();
                     out.print(resultado);
                     out.flush();
                     conn.close();
@@ -871,7 +876,47 @@ public class ControladorAdministracion extends HttpServlet {
                 Element markers = new Element("markers");
                 Document doc = new Document(markers);
                 doc.setRootElement(markers);
-                break;
+                
+                final String[] atributes = {"name", "address", "lat", "lng", "type"};
+               
+                Element marker = new Element("marker");
+                marker.setAttribute(new Attribute("name", "ola k ase"));
+                marker.setAttribute(new Attribute("address", "pepin"));
+                marker.setAttribute(new Attribute("lat", "47.624561"));
+                marker.setAttribute(new Attribute("lng", "-122.356445"));
+                marker.setAttribute(new Attribute("type", "bar"));
+                
+                /*para otros elementos y añadir texto sería:
+                    Element staff2 = new Element("staff");
+                    staff2.setAttribute(new Attribute("id", "2"));
+                    staff2.addContent(new Element("firstname").setText("low"));
+                    staff2.addContent(new Element("lastname").setText("yin fong"));
+                    staff2.addContent(new Element("nickname").setText("fong fong"));
+                    staff2.addContent(new Element("salary").setText("188888"));
+                */
+                doc.getRootElement().addContent(marker);
+                
+                // new XMLOutputter().output(doc, System.out);
+		XMLOutputter xmlOutput = new XMLOutputter();
+
+		// display nice nice
+		xmlOutput.setFormat(Format.getPrettyFormat());
+                
+                
+                response.setContentType("text/xml");
+                response.setCharacterEncoding("UTF-8");
+                response.setHeader("Content-type", "application/xhtml+xml");
+                out = response.getWriter();
+                xmlOutput.output(doc, out);
+                out.flush();
+                /*
+                System.out.println(resultado);
+                    
+                    
+                    out.print(resultado);
+                    
+                */
+                return;
             case "/inscribirse":
                 prueba_id = request.getParameter("prueba_id");
                 prueba = em.find(Prueba.class, prueba_id);
@@ -1036,7 +1081,7 @@ public class ControladorAdministracion extends HttpServlet {
                     response.setContentType("application/json");
                     response.setCharacterEncoding("UTF-8");
                     response.setHeader("Cache-Control", "no-store");
-                    PrintWriter out = response.getWriter();
+                    out = response.getWriter();
                     out.print(resultado);
                     out.flush();
                     conn.close();

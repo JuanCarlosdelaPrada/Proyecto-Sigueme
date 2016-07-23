@@ -5,7 +5,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
-<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyBO-SUTN3pwBYm44vcHwrrEU28ScOR0F5s&sensor=false"></script>
+<script type="text/javascript" src="//maps.googleapis.com/maps/api/js?key=AIzaSyBO-SUTN3pwBYm44vcHwrrEU28ScOR0F5s"></script>
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -33,13 +33,14 @@
 
             //Load Markers from the XML File, Check (map_process.php) //CAMBIADO POR SEGUIMIENTO PRUEBA
             $.get("seguimiento_prueba", function (data) {
+                alert(data);
                 $(data).find("marker").each(function () {
                      //Get user input values for the marker from the form
                       var name      = $(this).attr('name');
                       var address   = '<p>'+ $(this).attr('address') +'</p>';
                       var type      = $(this).attr('type');
                       var point     = new google.maps.LatLng(parseFloat($(this).attr('lat')),parseFloat($(this).attr('lng')));
-
+                      alert(name+" "+address+" "+type+" "+point);
                       //call create_marker() function for xml loaded maker
                       create_marker(point, name, address, false, false, false/*, "http://PATH-TO-YOUR-WEBSITE-ICON/icons/pin_blue.png"*/);
                 });
@@ -63,7 +64,7 @@
             */
         }
     });
-
+    
     //############### Create Marker Function ##############
     function create_marker(MapPos, MapTitle, MapDesc,  InfoOpenDefault, DragAble, Removable/*, iconPath*/) {                 
         //new marker
