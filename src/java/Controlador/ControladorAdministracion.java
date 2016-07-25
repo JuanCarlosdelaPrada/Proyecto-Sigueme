@@ -81,6 +81,7 @@ import org.jdom.output.XMLOutputter;
     "/pruebas", 
     "/prueba", //--
     "/seguimientoPruebas", 
+    "/seguir-prueba",
     "/seguimiento_prueba",
     "/usuarios",
     "/usuario", //--
@@ -871,6 +872,18 @@ public class ControladorAdministracion extends HttpServlet {
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                break;
+            case "/seguir-prueba":
+                prueba_id = request.getParameter("prueba_id");
+                prueba = em.find(Prueba.class, prueba_id);
+                if (prueba != null) {
+                    File ficheroGpx = new File(prueba.getRutaId().getFicheroGpx());
+                    parseador = new ParserGPX(ficheroGpx);
+                    JsonArray latlng = parseador.gpxToJson();
+                    request.setAttribute("prueba", prueba);
+                    request.setAttribute("latlng", latlng);
+                }
+                vista = "seguirPrueba.jsp";
                 break;
             case "/seguimiento_prueba":
                 Element markers = new Element("markers");

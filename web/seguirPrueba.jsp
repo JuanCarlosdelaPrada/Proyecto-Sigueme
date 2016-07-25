@@ -9,9 +9,10 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        var mapCenter = new google.maps.LatLng(47.6145, -122.3418); //Google map Coordinates
         var map;
-
+        var markers = [];
+        var mapCenter = new google.maps.LatLng(47.6145, -122.3418); //Google map Coordinates
+       
         map_initialize(); // initialize google map
 
         //############### Google Map Initialize ##############
@@ -32,19 +33,8 @@
             map = new google.maps.Map(document.getElementById("google_map"), googleMapOptions);         
 
             //Load Markers from the XML File, Check (map_process.php) //CAMBIADO POR SEGUIMIENTO PRUEBA
-            $.get("seguimiento_prueba", function (data) {
-                alert(data);
-                $(data).find("marker").each(function () {
-                     //Get user input values for the marker from the form
-                      var name      = $(this).attr('name');
-                      var address   = '<p>'+ $(this).attr('address') +'</p>';
-                      var type      = $(this).attr('type');
-                      var point     = new google.maps.LatLng(parseFloat($(this).attr('lat')),parseFloat($(this).attr('lng')));
-                      alert(name+" "+address+" "+type+" "+point);
-                      //call create_marker() function for xml loaded maker
-                      create_marker(point, name, address, false, false, false/*, "http://PATH-TO-YOUR-WEBSITE-ICON/icons/pin_blue.png"*/);
-                });
-            }); 
+            window.setInterval(create_markers, 1000);
+            
             /*
             //drop a new marker on right click
             google.maps.event.addListener(map, 'rightclick', function(event) {
@@ -63,8 +53,33 @@
             });  
             */
         }
+    //
+    var lngv = 0.0;
+    //
+    function create_markers() {
+        $.get("seguimiento_prueba", function (data) {
+            if (markers.length !== 0) {
+                delete_markers();
+            }
+            $(data).find("marker").each(function () {
+                //Get user input values for the marker from the form
+                 var name      = $(this).attr('name');
+                 var address   = '<p>'+ $(this).attr('address') +'</p>';
+                 var type      = $(this).attr('type');
+                 var point     = new google.maps.LatLng(parseFloat($(this).attr('lat')),parseFloat($(this).attr('lng')) + lngv);
+                 lngv++; //
+                 //call create_marker() function for xml loaded maker
+                 create_marker(point, name, address, false, false, false/*, "http://PATH-TO-YOUR-WEBSITE-ICON/icons/pin_blue.png"*/);
+            });
+        }); 
+    }
     
-    
+    function delete_markers() {
+        for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(null);
+        }
+        markers = [];
+    }
     //############### Create Marker Function ##############
     function create_marker(MapPos, MapTitle, MapDesc,  InfoOpenDefault, DragAble, Removable/*, iconPath*/) {                 
         //new marker
@@ -72,11 +87,11 @@
             position: MapPos,
             map: map,
             draggable:DragAble,
-            animation: google.maps.Animation.DROP,
+            //animation: google.maps.Animation.DROP,
             title:"Hello World!"/*,
             icon: iconPath*/
         });
-
+        markers.push(marker);
         //Content structure of info Window for the Markers
         var contentString = $('<div class="marker-info-win">'+
         '<div class="marker-inner-win"><span class="info-content">'+
