@@ -10,28 +10,33 @@
 <script type="text/javascript">
     $(document).ready(function() {
         var map;
+        var path = ${requestScope.latlng};
         var markers = [];
-        var mapCenter = new google.maps.LatLng(47.6145, -122.3418); //Google map Coordinates
+        //var mapCenter = new google.maps.LatLng(47.6145, -122.3418); //Google map Coordinates
        
         map_initialize(); // initialize google map
 
         //############### Google Map Initialize ##############
         function map_initialize() {
-            var googleMapOptions = 
-            { 
-                center: mapCenter, // map center
-                zoom: 17, //zoom level, 0 = earth view to higher value
+            map = new google.maps.Map(document.getElementById("google_map"), {
+                zoom: 8, //zoom level, 0 = earth view to higher value
+                center: path[1],
+                mapTypeId: 'terrain',
                 panControl: true, //enable pan Control
                 zoomControl: true, //enable zoom control
                 zoomControlOptions: {
                 style: google.maps.ZoomControlStyle.SMALL //zoom control size
             },
-                scaleControl: true, // enable scale control
-                mapTypeId: google.maps.MapTypeId.ROADMAP // google map type
-            };
-
-            map = new google.maps.Map(document.getElementById("google_map"), googleMapOptions);         
-
+                scaleControl: true // enable scale control
+            });
+            
+            var bounds = new google.maps.LatLngBounds();
+            bounds.extend(new google.maps.LatLng(${prueba.rutaId.latMin}, ${prueba.rutaId.longMin}));
+            bounds.extend(new google.maps.LatLng(${prueba.rutaId.latMin}, ${prueba.rutaId.longMax}));
+            bounds.extend(new google.maps.LatLng(${prueba.rutaId.latMax}, ${prueba.rutaId.longMin}));
+            bounds.extend(new google.maps.LatLng(${prueba.rutaId.latMax}, ${prueba.rutaId.longMax}));
+            map.fitBounds(bounds);
+            
             //Load Markers from the XML File, Check (map_process.php) //CAMBIADO POR SEGUIMIENTO PRUEBA
             window.setInterval(create_markers, 1000);
             
