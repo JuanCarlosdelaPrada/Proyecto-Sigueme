@@ -886,6 +886,14 @@ public class ControladorAdministracion extends HttpServlet {
                 vista = "seguirPrueba.jsp";
                 break;
             case "/seguimiento_prueba":
+                prueba_id = request.getParameter("prueba_id");
+                try (Connection con = myDatasource.getConnection()) {
+                    PreparedStatement stm = con.prepareStatement("SELECT * FROM POSICION WHERE prueba_id = ? and (CURTIME()-hora) <= '00:00:10';");
+                    stm.setString(1, prueba_id);
+                } catch (SQLException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
+        
                 Element markers = new Element("markers");
                 Document doc = new Document(markers);
                 doc.setRootElement(markers);
@@ -929,6 +937,7 @@ public class ControladorAdministracion extends HttpServlet {
                     out.print(resultado);
                     
                 */
+                
                 return;
             case "/inscribirse":
                 prueba_id = request.getParameter("prueba_id");
