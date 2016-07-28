@@ -267,13 +267,6 @@ public class Usuario implements Serializable {
         return "JPA_Entidades.Usuario[ usuarioId=" + usuarioId + " ]";
     }
 
-    public byte[] getContrasena() {
-        return contrasena;
-    }
-
-    public void setContrasena(byte[] contrasena) {
-        this.contrasena = contrasena;
-    }
 
     public Ivbytes getIvbytes() {
         return ivbytes;
@@ -281,6 +274,14 @@ public class Usuario implements Serializable {
 
     public void setIvbytes(Ivbytes ivbytes) {
         this.ivbytes = ivbytes;
+    }
+
+    public byte[] getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(byte[] contrasena) {
+        this.contrasena = contrasena;
     }
     
 }

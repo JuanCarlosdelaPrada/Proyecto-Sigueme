@@ -12,6 +12,7 @@ import Herramientas.ParserGPX;
 import JPA_Entidades.Inscrito;
 import JPA_Entidades.InscritoPK;
 import JPA_Entidades.Ivbytes;
+import JPA_Entidades.Posicion;
 import JPA_Entidades.Prueba;
 import JPA_Entidades.Ruta;
 import JPA_Entidades.Usuario;
@@ -40,7 +41,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -887,13 +890,23 @@ public class ControladorAdministracion extends HttpServlet {
                 break;
             case "/seguimiento_prueba":
                 prueba_id = request.getParameter("prueba_id");
+                /*
                 try (Connection con = myDatasource.getConnection()) {
-                    PreparedStatement stm = con.prepareStatement("SELECT * FROM POSICION WHERE prueba_id = ? and (CURTIME()-hora) <= '00:00:10';");
-                    stm.setString(1, prueba_id);
+                    PreparedStatement ps = con.prepareStatement("SELECT * FROM posicion WHERE prueba_id = ? AND hora BETWEEN DATE_SUB(CURTIME(), INTERVAL 10 SECOND) AND CURTIME() ORDER BY hora DESC;");
+                    ps.setString(1, prueba_id);
+                    ResultSet posiciones = ps.executeQuery();
+                    Set<String> usuarios = new HashSet<>();
+                    while(posiciones.next()) {
+                        
+                    }
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
-        
+                */
+                 = em.createNamedQuery("Posicion.findGPSResults", Posicion.class);
+                 /*
+                 consultaIvBytes = em.createNamedQuery("Ivbytes.findByUsuarioId", Ivbytes.class);
+                    consultaIvBytes.setParameter("usuarioId", correo_login);*/
                 Element markers = new Element("markers");
                 Document doc = new Document(markers);
                 doc.setRootElement(markers);

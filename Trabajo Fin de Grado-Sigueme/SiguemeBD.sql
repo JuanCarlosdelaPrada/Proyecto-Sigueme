@@ -61,8 +61,7 @@ CREATE TABLE POSICION (
 	latitud DECIMAL(10,8) NOT NULL,
 	longitud DECIMAL(11,8) NOT NULL,
 	PRIMARY KEY (prueba_id, usuario_id, fecha, hora),
-	FOREIGN KEY (prueba_id) REFERENCES PRUEBA(prueba_id),
-	FOREIGN KEY (usuario_id) REFERENCES USUARIO(usuario_id)
+	FOREIGN KEY (prueba_id, usuario_id) REFERENCES INSCRITO(prueba_id, usuario_id)
 );
 
 CREATE TABLE IVBYTES (

@@ -6,7 +6,9 @@
 package JPA_Entidades;
 
 import java.io.Serializable;
+import java.util.Collection;
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -14,9 +16,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -33,6 +37,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Inscrito.findByPagado", query = "SELECT i FROM Inscrito i WHERE i.pagado = :pagado"),
     @NamedQuery(name = "Inscrito.findByDorsal", query = "SELECT i FROM Inscrito i WHERE i.dorsal = :dorsal")})
 public class Inscrito implements Serializable {
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "inscrito")
+    private Collection<Posicion> posicionCollection;
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -132,6 +139,15 @@ public class Inscrito implements Serializable {
     @Override
     public String toString() {
         return "JPA_Entidades.Inscrito[ inscritoPK=" + inscritoPK + " ]";
+    }
+
+    @XmlTransient
+    public Collection<Posicion> getPosicionCollection() {
+        return posicionCollection;
+    }
+
+    public void setPosicionCollection(Collection<Posicion> posicionCollection) {
+        this.posicionCollection = posicionCollection;
     }
     
 }

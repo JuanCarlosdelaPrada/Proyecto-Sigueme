@@ -1,0 +1,1 @@
+http://stackoverflow.com/questions/6874969/how-do-i-output-the-content-type-text-xml-to-the-browser-in-struts-1-3

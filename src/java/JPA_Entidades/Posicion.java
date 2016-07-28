@@ -13,6 +13,7 @@ import javax.persistence.Column;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -34,7 +35,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Posicion.findByFecha", query = "SELECT p FROM Posicion p WHERE p.posicionPK.fecha = :fecha"),
     @NamedQuery(name = "Posicion.findByHora", query = "SELECT p FROM Posicion p WHERE p.posicionPK.hora = :hora"),
     @NamedQuery(name = "Posicion.findByLatitud", query = "SELECT p FROM Posicion p WHERE p.latitud = :latitud"),
-    @NamedQuery(name = "Posicion.findByLongitud", query = "SELECT p FROM Posicion p WHERE p.longitud = :longitud")})
+    @NamedQuery(name = "Posicion.findByLongitud", query = "SELECT p FROM Posicion p WHERE p.longitud = :longitud"),
+    @NamedQuery(name = "Posicion.findGPSResults", query = "SELECT p FROM Posicion p WHERE p.posicionPK.pruebaId = :pruebaId AND p.posicionPK.hora BETWEEN DATE_SUB(CURTIME(), INTERVAL 10 SECOND) AND CURTIME() ORDER BY p.posicionPK.hora DESC")
+})
 public class Posicion implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -49,12 +52,11 @@ public class Posicion implements Serializable {
     @NotNull
     @Column(name = "longitud")
     private BigDecimal longitud;
-    @JoinColumn(name = "prueba_id", referencedColumnName = "prueba_id", insertable = false, updatable = false)
+    @JoinColumns({
+        @JoinColumn(name = "prueba_id", referencedColumnName = "prueba_id", insertable = false, updatable = false),
+        @JoinColumn(name = "usuario_id", referencedColumnName = "usuario_id", insertable = false, updatable = false)})
     @ManyToOne(optional = false)
-    private Prueba prueba;
-    @JoinColumn(name = "usuario_id", referencedColumnName = "usuario_id", insertable = false, updatable = false)
-    @ManyToOne(optional = false)
-    private Usuario usuario;
+    private Inscrito inscrito;
 
     public Posicion() {
     }
@@ -97,20 +99,12 @@ public class Posicion implements Serializable {
         this.longitud = longitud;
     }
 
-    public Prueba getPrueba() {
-        return prueba;
+    public Inscrito getInscrito() {
+        return inscrito;
     }
 
-    public void setPrueba(Prueba prueba) {
-        this.prueba = prueba;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    public void setInscrito(Inscrito inscrito) {
+        this.inscrito = inscrito;
     }
 
     @Override
