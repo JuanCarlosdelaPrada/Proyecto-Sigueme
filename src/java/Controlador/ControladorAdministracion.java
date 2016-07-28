@@ -911,6 +911,7 @@ public class ControladorAdministracion extends HttpServlet {
                 
                 for (Posicion posicion: posiciones) {
                     if (!usuarios.contains(posicion.getInscrito().getDorsal())) {
+                        System.out.println(posicion.getInscrito().getDorsal());
                         usuarios.add(posicion.getInscrito().getDorsal());
                     }
                 }
