@@ -903,10 +903,18 @@ public class ControladorAdministracion extends HttpServlet {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 */
-                 = em.createNamedQuery("Posicion.findGPSResults", Posicion.class);
-                 /*
-                 consultaIvBytes = em.createNamedQuery("Ivbytes.findByUsuarioId", Ivbytes.class);
-                    consultaIvBytes.setParameter("usuarioId", correo_login);*/
+                TypedQuery<Posicion> consultaPosiciones = em.createNamedQuery("Posicion.findGPSResults", Posicion.class);
+                consultaPosiciones.setParameter("pruebaId", prueba_id);
+                List<Posicion> posiciones = consultaPosiciones.getResultList();
+                
+                Set<Integer> usuarios  = new HashSet<>();
+                
+                for (Posicion posicion: posiciones) {
+                    if (!usuarios.contains(posicion.getInscrito().getDorsal())) {
+                        usuarios.add(posicion.getInscrito().getDorsal());
+                    }
+                }
+                
                 Element markers = new Element("markers");
                 Document doc = new Document(markers);
                 doc.setRootElement(markers);
