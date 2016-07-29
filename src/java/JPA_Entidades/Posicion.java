@@ -35,9 +35,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Posicion.findByFecha", query = "SELECT p FROM Posicion p WHERE p.posicionPK.fecha = :fecha"),
     @NamedQuery(name = "Posicion.findByHora", query = "SELECT p FROM Posicion p WHERE p.posicionPK.hora = :hora"),
     @NamedQuery(name = "Posicion.findByLatitud", query = "SELECT p FROM Posicion p WHERE p.latitud = :latitud"),
-    @NamedQuery(name = "Posicion.findByLongitud", query = "SELECT p FROM Posicion p WHERE p.longitud = :longitud"),
-    @NamedQuery(name = "Posicion.findGPSResults", query = "SELECT p FROM Posicion p WHERE p.posicionPK.pruebaId = :pruebaId AND p.posicionPK.hora BETWEEN DATE_SUB(CURTIME(), INTERVAL 10 SECOND) AND CURTIME() ORDER BY p.posicionPK.hora DESC")
-})
+    @NamedQuery(name = "Posicion.findByLongitud", query = "SELECT p FROM Posicion p WHERE p.longitud = :longitud")})
 public class Posicion implements Serializable {
 
     private static final long serialVersionUID = 1L;

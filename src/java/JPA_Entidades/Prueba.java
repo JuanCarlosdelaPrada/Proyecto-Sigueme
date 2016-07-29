@@ -90,8 +90,6 @@ public class Prueba implements Serializable {
     @Column(name = "activa")
     private boolean activa;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "prueba")
-    private Collection<Posicion> posicionCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prueba")
     private Collection<Inscrito> inscritoCollection;
     @JoinColumn(name = "ruta_id", referencedColumnName = "ruta_id")
     @ManyToOne(optional = false)
@@ -185,15 +183,6 @@ public class Prueba implements Serializable {
 
     public void setActiva(boolean activa) {
         this.activa = activa;
-    }
-
-    @XmlTransient
-    public Collection<Posicion> getPosicionCollection() {
-        return posicionCollection;
-    }
-
-    public void setPosicionCollection(Collection<Posicion> posicionCollection) {
-        this.posicionCollection = posicionCollection;
     }
 
     @XmlTransient

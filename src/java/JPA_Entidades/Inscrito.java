@@ -32,14 +32,10 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Inscrito.findAll", query = "SELECT i FROM Inscrito i"),
     @NamedQuery(name = "Inscrito.findByPruebaId", query = "SELECT i FROM Inscrito i WHERE i.inscritoPK.pruebaId = :pruebaId"),
-    @NamedQuery(name = "Inscrito.findByPruebaIdOrderingByDorsal", query = "SELECT i FROM Inscrito i WHERE i.inscritoPK.pruebaId = :pruebaId ORDER BY i.dorsal ASC"),
     @NamedQuery(name = "Inscrito.findByUsuarioId", query = "SELECT i FROM Inscrito i WHERE i.inscritoPK.usuarioId = :usuarioId"),
     @NamedQuery(name = "Inscrito.findByPagado", query = "SELECT i FROM Inscrito i WHERE i.pagado = :pagado"),
     @NamedQuery(name = "Inscrito.findByDorsal", query = "SELECT i FROM Inscrito i WHERE i.dorsal = :dorsal")})
 public class Inscrito implements Serializable {
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "inscrito")
-    private Collection<Posicion> posicionCollection;
 
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -52,6 +48,8 @@ public class Inscrito implements Serializable {
     @NotNull
     @Column(name = "dorsal")
     private int dorsal;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "inscrito")
+    private Collection<Posicion> posicionCollection;
     @JoinColumn(name = "prueba_id", referencedColumnName = "prueba_id", insertable = false, updatable = false)
     @ManyToOne(optional = false)
     private Prueba prueba;
@@ -100,6 +98,15 @@ public class Inscrito implements Serializable {
         this.dorsal = dorsal;
     }
 
+    @XmlTransient
+    public Collection<Posicion> getPosicionCollection() {
+        return posicionCollection;
+    }
+
+    public void setPosicionCollection(Collection<Posicion> posicionCollection) {
+        this.posicionCollection = posicionCollection;
+    }
+
     public Prueba getPrueba() {
         return prueba;
     }
@@ -139,15 +146,6 @@ public class Inscrito implements Serializable {
     @Override
     public String toString() {
         return "JPA_Entidades.Inscrito[ inscritoPK=" + inscritoPK + " ]";
-    }
-
-    @XmlTransient
-    public Collection<Posicion> getPosicionCollection() {
-        return posicionCollection;
-    }
-
-    public void setPosicionCollection(Collection<Posicion> posicionCollection) {
-        this.posicionCollection = posicionCollection;
     }
     
 }

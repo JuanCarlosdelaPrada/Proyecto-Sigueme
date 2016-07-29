@@ -48,14 +48,6 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Usuario.findByFederado", query = "SELECT u FROM Usuario u WHERE u.federado = :federado")})
 public class Usuario implements Serializable {
 
-    @Basic(optional = false)
-    @NotNull
-    @Lob
-    @Column(name = "contrasena")
-    private byte[] contrasena;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "usuario")
-    private Ivbytes ivbytes;
-
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
@@ -63,6 +55,11 @@ public class Usuario implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "usuario_id")
     private String usuarioId;
+    @Basic(optional = false)
+    @NotNull
+    @Lob
+    @Column(name = "contrasena")
+    private byte[] contrasena;
     @Basic(optional = false)
     @NotNull
     @Column(name = "rol")
@@ -110,9 +107,9 @@ public class Usuario implements Serializable {
     @Column(name = "federado")
     private boolean federado;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuario")
-    private Collection<Posicion> posicionCollection;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "usuario")
     private Collection<Inscrito> inscritoCollection;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "usuario")
+    private Ivbytes ivbytes;
 
     public Usuario() {
     }
@@ -143,6 +140,13 @@ public class Usuario implements Serializable {
         this.usuarioId = usuarioId;
     }
 
+    public byte[] getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(byte[] contrasena) {
+        this.contrasena = contrasena;
+    }
 
     public boolean getRol() {
         return rol;
@@ -225,21 +229,20 @@ public class Usuario implements Serializable {
     }
 
     @XmlTransient
-    public Collection<Posicion> getPosicionCollection() {
-        return posicionCollection;
-    }
-
-    public void setPosicionCollection(Collection<Posicion> posicionCollection) {
-        this.posicionCollection = posicionCollection;
-    }
-
-    @XmlTransient
     public Collection<Inscrito> getInscritoCollection() {
         return inscritoCollection;
     }
 
     public void setInscritoCollection(Collection<Inscrito> inscritoCollection) {
         this.inscritoCollection = inscritoCollection;
+    }
+
+    public Ivbytes getIvbytes() {
+        return ivbytes;
+    }
+
+    public void setIvbytes(Ivbytes ivbytes) {
+        this.ivbytes = ivbytes;
     }
 
     @Override
@@ -265,23 +268,6 @@ public class Usuario implements Serializable {
     @Override
     public String toString() {
         return "JPA_Entidades.Usuario[ usuarioId=" + usuarioId + " ]";
-    }
-
-
-    public Ivbytes getIvbytes() {
-        return ivbytes;
-    }
-
-    public void setIvbytes(Ivbytes ivbytes) {
-        this.ivbytes = ivbytes;
-    }
-
-    public byte[] getContrasena() {
-        return contrasena;
-    }
-
-    public void setContrasena(byte[] contrasena) {
-        this.contrasena = contrasena;
     }
     
 }

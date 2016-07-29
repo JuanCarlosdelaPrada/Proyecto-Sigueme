@@ -903,6 +903,7 @@ public class ControladorAdministracion extends HttpServlet {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 */
+                //@NamedQuery(name = "Posicion.findGPSResults", query = "SELECT p FROM Posicion p WHERE p.posicionPK.pruebaId = :pruebaId AND p.posicionPK.hora BETWEEN DATE_SUB(CURTIME(), INTERVAL 10 SECOND) AND CURTIME() ORDER BY p.posicionPK.hora DESC")
                 TypedQuery<Posicion> consultaPosiciones = em.createNamedQuery("Posicion.findGPSResults", Posicion.class);
                 consultaPosiciones.setParameter("pruebaId", prueba_id);
                 List<Posicion> posiciones = consultaPosiciones.getResultList();
