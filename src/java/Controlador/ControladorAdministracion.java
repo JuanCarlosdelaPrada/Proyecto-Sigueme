@@ -40,6 +40,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -125,6 +126,7 @@ public class ControladorAdministracion extends HttpServlet {
         accion = request.getServletPath();
         session = request.getSession();
         
+        TypedQuery<Posicion> consultaPosiciones;
         TypedQuery<Inscrito> consultaInscritos;
         TypedQuery<Usuario> consultaUsuarios;
         TypedQuery<Ivbytes> consultaIvBytes;
@@ -889,32 +891,34 @@ public class ControladorAdministracion extends HttpServlet {
                 vista = "seguirPrueba.jsp";
                 break;
             case "/seguimiento_prueba":
+                
+                //MODIFICAR PARA COGER LA PRUEBA CORRECTA
                 prueba_id = request.getParameter("prueba_id");
-                /*
+                
                 try (Connection con = myDatasource.getConnection()) {
-                    PreparedStatement ps = con.prepareStatement("SELECT * FROM posicion WHERE prueba_id = ? AND hora BETWEEN DATE_SUB(CURTIME(), INTERVAL 10 SECOND) AND CURTIME() ORDER BY hora DESC;");
-                    ps.setString(1, prueba_id);
+                    PreparedStatement ps = con.prepareStatement("SELECT i.dorsal, p.* "+
+                                                                "FROM posicion p INNER JOIN inscrito i "+
+                                                                "WHERE ("+
+                                                                    "p.prueba_id = ? "+
+                                                                    "AND "+
+                                                                    "hora BETWEEN DATE_SUB(CURTIME(), INTERVAL 10 SECOND) "+
+                                                                    "AND "+
+                                                                    "CURTIME()"+
+                                                                ") "+
+                                                                "ORDER BY hora DESC;");
+                    ps.setString(1, "camboya");
                     ResultSet posiciones = ps.executeQuery();
-                    Set<String> usuarios = new HashSet<>();
+                    Set<Integer> dorsales = new HashSet<>();
+                    System.out.println("HOLA");
                     while(posiciones.next()) {
-                        
+                        int dorsal = posiciones.getInt("dorsal");
+                        System.out.println(dorsal);
+                        if(dorsales.add(dorsal)) {
+                            System.out.println(posiciones.getString("usuario_id"));
+                        }
                     }
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                */
-                //@NamedQuery(name = "Posicion.findGPSResults", query = "SELECT p FROM Posicion p WHERE p.posicionPK.pruebaId = :pruebaId AND p.posicionPK.hora BETWEEN DATE_SUB(CURTIME(), INTERVAL 10 SECOND) AND CURTIME() ORDER BY p.posicionPK.hora DESC")
-                TypedQuery<Posicion> consultaPosiciones = em.createNamedQuery("Posicion.findGPSResults", Posicion.class);
-                consultaPosiciones.setParameter("pruebaId", prueba_id);
-                List<Posicion> posiciones = consultaPosiciones.getResultList();
-                
-                Set<Integer> usuarios  = new HashSet<>();
-                
-                for (Posicion posicion: posiciones) {
-                    if (!usuarios.contains(posicion.getInscrito().getDorsal())) {
-                        System.out.println(posicion.getInscrito().getDorsal());
-                        usuarios.add(posicion.getInscrito().getDorsal());
-                    }
                 }
                 
                 Element markers = new Element("markers");
