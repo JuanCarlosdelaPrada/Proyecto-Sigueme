@@ -891,10 +891,7 @@ public class ControladorAdministracion extends HttpServlet {
                 vista = "seguirPrueba.jsp";
                 break;
             case "/seguimiento_prueba":
-                
-                //MODIFICAR PARA COGER LA PRUEBA CORRECTA
                 prueba_id = request.getParameter("prueba_id");
-                
                 try (Connection con = myDatasource.getConnection()) {
                     PreparedStatement ps = con.prepareStatement("SELECT i.dorsal, p.* "+
                                                                 "FROM posicion p INNER JOIN inscrito i "+
@@ -906,33 +903,42 @@ public class ControladorAdministracion extends HttpServlet {
                                                                     "CURTIME()"+
                                                                 ") "+
                                                                 "ORDER BY hora DESC;");
-                    ps.setString(1, "camboya");
+                    ps.setString(1, prueba_id);
                     ResultSet posiciones = ps.executeQuery();
                     Set<Integer> dorsales = new HashSet<>();
-                    System.out.println("HOLA");
+                    Element markers = new Element("markers");
+                    Document doc = new Document(markers);
+                    doc.setRootElement(markers);
+                    
+                    String[] attributes = {"dorsal", "usuario_id", "latitud", "longitud"};
                     while(posiciones.next()) {
                         int dorsal = posiciones.getInt("dorsal");
                         System.out.println(dorsal);
                         if(dorsales.add(dorsal)) {
-                            System.out.println(posiciones.getString("usuario_id"));
+                            Element marker = new Element("marker");
+                            for (String attribute: attributes) {
+                                marker.setAttribute(new Attribute(attribute, posiciones.getString(attribute)));
+                            }
+                            doc.getRootElement().addContent(marker);
                         }
                     }
+                    // new XMLOutputter().output(doc, System.out);
+                    XMLOutputter xmlOutput = new XMLOutputter();
+
+                    // display nice nice
+                    xmlOutput.setFormat(Format.getPrettyFormat());
+
+                    response.setContentType("text/xml");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setHeader("Content-type", "application/xhtml+xml");
+                    out = response.getWriter();
+                    xmlOutput.output(doc, out);
+                    out.flush();
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                
-                Element markers = new Element("markers");
-                Document doc = new Document(markers);
-                doc.setRootElement(markers);
-                
-                final String[] atributes = {"name", "address", "lat", "lng", "type"};
                
-                Element marker = new Element("marker");
-                marker.setAttribute(new Attribute("name", "ola k ase"));
-                marker.setAttribute(new Attribute("address", "pepin"));
-                marker.setAttribute(new Attribute("lat", "47.624561"));
-                marker.setAttribute(new Attribute("lng", "-122.356445"));
-                marker.setAttribute(new Attribute("type", "bar"));
+                
                 
                 /*para otros elementos y añadir texto sería:
                     Element staff2 = new Element("staff");
@@ -942,21 +948,7 @@ public class ControladorAdministracion extends HttpServlet {
                     staff2.addContent(new Element("nickname").setText("fong fong"));
                     staff2.addContent(new Element("salary").setText("188888"));
                 */
-                doc.getRootElement().addContent(marker);
                 
-                // new XMLOutputter().output(doc, System.out);
-		XMLOutputter xmlOutput = new XMLOutputter();
-
-		// display nice nice
-		xmlOutput.setFormat(Format.getPrettyFormat());
-                
-                
-                response.setContentType("text/xml");
-                response.setCharacterEncoding("UTF-8");
-                response.setHeader("Content-type", "application/xhtml+xml");
-                out = response.getWriter();
-                xmlOutput.output(doc, out);
-                out.flush();
                 /*
                 System.out.println(resultado);
                     
