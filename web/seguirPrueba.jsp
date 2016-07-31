@@ -138,8 +138,9 @@
                         map: map,
                         draggable: DragAble,
                         //animation: google.maps.Animation.DROP,
-                        title: Title/*,
+                        title: Title,/*,
                          icon: iconPath*/
+                        icon: BitmapDecriptorFactory.defaultMarker(Title)
                     });
                     markers.push(marker);
                     //Content structure of info Window for the Markers

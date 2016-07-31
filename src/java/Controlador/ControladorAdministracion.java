@@ -911,10 +911,11 @@ public class ControladorAdministracion extends HttpServlet {
                     doc.setRootElement(markers);
                     
                     String[] attributes = {"dorsal", "usuario_id", "latitud", "longitud"};
+                    System.out.println("Estoy aki");
                     while(posiciones.next()) {
                         int dorsal = posiciones.getInt("dorsal");
-                        System.out.println(dorsal);
                         if(dorsales.add(dorsal)) {
+                            System.out.println(dorsal);
                             Element marker = new Element("marker");
                             for (String attribute: attributes) {
                                 marker.setAttribute(new Attribute(attribute, posiciones.getString(attribute)));
