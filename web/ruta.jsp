@@ -94,6 +94,20 @@
                     opacity: 0.4,
                     map: map
                 });
+                
+                // Dibujar inicio y fin
+                new google.maps.Marker({
+                    position: path[0],
+                    map: map,
+                    icon: 'markers/start-flag.png',
+                    title: 'Comienzo de la ruta'
+                });
+                new google.maps.Marker({
+                    position: path[path.length - 1],
+                    map: map,
+                    icon: 'markers/finish.png',
+                    title: 'Final de la ruta'
+                });
                 /*
                 //Distancia
                 var path_coords = new google.maps.MVCArray();
