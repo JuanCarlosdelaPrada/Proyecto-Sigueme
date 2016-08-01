@@ -41,8 +41,19 @@
             </div>
             <div id="intro"></div>
             <div id="descripcion" class="panel panel-default col-xs-4" style="padding:0">
-                <div class="panel-heading">Descripción</div>
-                <div class="panel-body">${requestScope.ruta.descripcion}</div>
+                <div class="panel-heading">Opciones</div>
+                <div class="panel-body">
+                    <div class="checkbox">
+                        <label>
+                            <input id="circuito" name="circuito" value="1" type="checkbox">Mostrar circuito
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input id="nombres" type="checkbox">Mostrar nombres
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
         <div class="row"></br></div>
@@ -84,6 +95,8 @@
                             map: map
                     });
 
+                    alert(document.getElementById("#circuito").value);
+                    
                     //Load Markers from the XML File, Check (map_process.php) //CAMBIADO POR SEGUIMIENTO PRUEBA
                     window.setInterval(create_markers, 2500);
 
