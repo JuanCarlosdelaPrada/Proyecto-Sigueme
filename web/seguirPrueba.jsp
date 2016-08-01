@@ -40,17 +40,41 @@
                 <div id="map" style="width:100%;height:400px"></div>
             </div>
             <div id="intro"></div>
-            <div id="descripcion" class="panel panel-default col-xs-4" style="padding:0">
+            <div id="listado_competidores" class="panel panel-default col-xs-4" style="padding:0">
+                <div class="panel-heading">Listado competidores</div>
+                <div class="panel-body">
+                    <label for="sel2">Mutiple select list (hold shift to select more than one):</label>
+                    <select multiple class="form-control" id="sel2">
+                      <option>1</option>
+                      <option>2</option>
+                      <option>3</option>
+                      <option>4</option>
+                      <option>5</option>
+                    </select>
+                </div>
+            </div>
+            <div id="intro"></div>
+            <div id="opciones" class="panel panel-default col-xs-4" style="padding:0">
                 <div class="panel-heading">Opciones</div>
                 <div class="panel-body">
                     <div class="checkbox">
                         <label>
-                            <input id="circuito" name="circuito" value="1" type="checkbox">Mostrar circuito
+                            <input id="inicio" type="checkbox" onclick="show_start();">Mostrar inicio
                         </label>
                     </div>
                     <div class="checkbox">
                         <label>
-                            <input id="nombres" type="checkbox">Mostrar nombres
+                            <input id="fin" type="checkbox" onclick="show_finish();">Mostrar meta
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input id="circuito" type="checkbox" onclick="show_way();">Mostrar circuito
+                        </label>
+                    </div>
+                    <div class="checkbox">
+                        <label>
+                            <input id="nombres" type="checkbox" onclick="show_names();">Mostrar nombres
                         </label>
                     </div>
                 </div>
@@ -60,12 +84,21 @@
         <!--Pie-->
         <%@include file="WEB-INF/jspf/pie.jspf"%>
         
+        <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
         <script type="text/javascript">
-                var map;
                 var path = ${requestScope.latlng};
+                var inicio;
+                var fin;
+                var circuito; 
                 var markers = [];
-                //var mapCenter = new google.maps.LatLng(47.6145, -122.3418); //Google map Coordinates
-
+                var infowindows = [];
+                var map;
+                
+                $("#inicio").data("clicked",false);
+                $("#fin").data("clicked",false);
+                $("#circuito").data("clicked",false);
+                $("#nombres").data("clicked",false);
+                
                 //############### Google Map Initialize ##############
                 function map_initialize() {
                     map = new google.maps.Map(document.getElementById("map"), {
@@ -86,16 +119,6 @@
                     bounds.extend(new google.maps.LatLng(${prueba.rutaId.latMax}, ${prueba.rutaId.longMin}));
                     bounds.extend(new google.maps.LatLng(${prueba.rutaId.latMax}, ${prueba.rutaId.longMax}));
                     map.fitBounds(bounds);
-
-                    //add to click event
-                    new google.maps.Polyline({
-                            path: path,
-                            strokeColor: '#0000CC',
-                            opacity: 0.4,
-                            map: map
-                    });
-
-                    alert(document.getElementById("#circuito").value);
                     
                     //Load Markers from the XML File, Check (map_process.php) //CAMBIADO POR SEGUIMIENTO PRUEBA
                     window.setInterval(create_markers, 2500);
@@ -186,6 +209,8 @@
                     var infowindow = new google.maps.InfoWindow();
                     //set the content of infoWindow
                     infowindow.setContent(contentString[0]);
+                    
+                    infowindows.push(infowindow);
                     /*
                      //Find remove button in infoWindow
                      var removeBtn   = contentString.find('button.remove-marker')[0];
@@ -218,7 +243,8 @@
                      });
                      }
                      */
-                    //add click listner to save marker button        
+                    //add click listner to save marker button 
+                    /*
                     google.maps.event.addListener(marker, 'click', function () {
                         infowindow.open(map, marker); // click on marker opens info window 
                     });
@@ -226,6 +252,71 @@
                     if (InfoOpenDefault) //whether info window should be open by default
                     {
                         infowindow.open(map, marker);
+                    }*/
+                }
+                
+                function show_way() {
+                    if ($("#circuito").data('clicked') === false) {
+                        circuito = new google.maps.Polyline({
+                                path: path,
+                                strokeColor: '#0000CC',
+                                opacity: 0.4,
+                                map: map
+                        });
+                        $("#circuito").data('clicked', true);
+                    }
+                    else {
+                        circuito.setMap(null);
+                        $("#circuito").data('clicked', false);
+                    }
+                }
+                
+                function show_start() {
+                    if ($("#inicio").data('clicked') === false) {
+                        inicio = new google.maps.Marker({
+                            position: path[0],
+                            map: map,
+                            icon: 'markers/start-flag.png',
+                            title: 'Inicio de la prueba'
+                        });
+                        $("#inicio").data('clicked', true);
+                    }
+                    else {
+                        inicio.setMap(null);
+                        $("#inicio").data('clicked', false);
+                    }
+                }
+                
+                function show_finish() {
+                    if ($("#fin").data('clicked') === false) {
+                        fin = new google.maps.Marker({
+                            position: path[path.length - 1],
+                            map: map,
+                            icon: 'markers/finish.png',
+                            title: 'Meta'
+                        });
+                        $("#fin").data('clicked', true);
+                    }
+                    else {
+                        fin.setMap(null);
+                        $("#fin").data('clicked', false);
+                    }
+                }
+                
+                infowindow.open(map, marker);
+                function show_names() {
+                    if ($("#nombres").data('clicked') === false) {
+                        for(var i = 0; i < infowindows.length; i++) {
+                            infowindows[i].open(map, markers[i]);
+                        }
+                        $("#nombres").data('clicked', true);
+                    }
+                    else {
+                        for(var i = 0; i < infowindows.length; i++) {
+                            infowindows[i].close();
+                        }
+                        fin.setMap(null);
+                        $("#nombres").data('clicked', false);
                     }
                 }
 
@@ -282,7 +373,6 @@
         </script>
         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBO-SUTN3pwBYm44vcHwrrEU28ScOR0F5s&signed_in=false&callback=map_initialize"
             async defer></script>
-        <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/Bootstrap/bootstrap.min.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>
     </body>
