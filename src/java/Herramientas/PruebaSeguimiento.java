@@ -57,7 +57,7 @@ public class PruebaSeguimiento implements Runnable {
         }
     }
     
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
         ExecutorService hilos = Executors.newFixedThreadPool(5);
         
         Random nAleatorios = new Random(System.currentTimeMillis());
@@ -66,6 +66,7 @@ public class PruebaSeguimiento implements Runnable {
         for (int i = 0; i < 5; i++) {
             Runnable persona = new PruebaSeguimiento("camboya", idUsuarios[i], nAleatorios.nextLong());
             hilos.execute(persona);
+            Thread.sleep(5000);
         }
         
         hilos.shutdown();

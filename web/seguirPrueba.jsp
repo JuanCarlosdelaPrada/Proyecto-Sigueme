@@ -36,11 +36,11 @@
         </div>
         
         <div class="container-fluid">
-            <div id="map-canvas" class="col-xs-offset-1 col-xs-4">
+            <div id="map-canvas" class="col-xs-offset-1 col-xs-6">
                 <div id="map" style="width:100%;height:400px"></div>
             </div>
             <div id="intro"></div>
-            <div id="descripcion" class="panel panel-default col-xs-6" style="padding:0">
+            <div id="descripcion" class="panel panel-default col-xs-4" style="padding:0">
                 <div class="panel-heading">Descripción</div>
                 <div class="panel-body">${requestScope.ruta.descripcion}</div>
             </div>
@@ -132,15 +132,32 @@
 
                 //############### Create Marker Function ##############
                 function create_marker(MapPos, MapTitle, Title, InfoOpenDefault, DragAble, Removable/*, iconPath*/) {
+                    var colores = [
+                        'FF0000', //Rojo
+                        'FFFC00', //Amarillo
+                        '2BFF00', //Verde
+                        'FFB300', //Naranja claro
+                        '00FFFC', //Azul claro
+                        'FF00D1', //Rosa
+                        'B700FF', //Violeta
+                        'C9FF00', //Verde amarillento
+                        'FF7C00', //Naranja fuerte
+                        '00B3FF' //Azul
+                    ];
+                    
+                    var pinImage = new google.maps.MarkerImage("http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|" + colores[(Title - 1) % colores.length],
+                        new google.maps.Size(21, 34),
+                        new google.maps.Point(0,0),
+                        new google.maps.Point(10, 34));
+                        
                     //new marker
                     var marker = new google.maps.Marker({
                         position: MapPos,
                         map: map,
                         draggable: DragAble,
                         //animation: google.maps.Animation.DROP,
-                        title: Title,/*,
-                         icon: iconPath*/
-                        icon: BitmapDecriptorFactory.defaultMarker(Title)
+                        title: Title,
+                        icon: pinImage
                     });
                     markers.push(marker);
                     //Content structure of info Window for the Markers
