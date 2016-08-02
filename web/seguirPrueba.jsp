@@ -170,6 +170,7 @@
                 function create_markers() {
                     $.get("seguimiento_prueba?prueba_id=${requestScope.prueba.pruebaId}", function (data) {
                         if (markers.length !== 0) {
+                            delete_names();
                             delete_markers();
                         }
                         $(data).find("marker").each(function () {
@@ -185,16 +186,10 @@
                 }
 
                 function delete_markers() {
-                    for (var i = 0; i < markers.length; i++) {
-                        markers[i].setMap(null);
-                        if ($("#nombres").data("clicked") === true) {
-                            infowindows[i].close();
-                        }
+                    for (var i = markers.length; i > 0; i--) {
+                        markers[i - 1].setMap(null);
                     }
                     markers = [];
-                    if ($("#nombres").data("clicked") === true) {
-                        infowindows = [];
-                    }
                 }
 
                 //############### Create Marker Function ##############
@@ -229,24 +224,30 @@
                     markers.push(marker);
                     //Content structure of info Window for the Markers
                     var contentString = $('<div class="marker-info-win">' +
-                            '<div class="marker-inner-win"><span class="info-content">' +
+                            '<div class="marker-inner-win">'+
+                            '<span class="info-content">' +
                             '<p>' + MapTitle + '</p>' +
                             //'<h1 class="marker-heading">' + MapTitle + '</h1>' +
                             //MapDesc+ 
+                            '</span>'+
                             //'</span><button name="remove-marker" class="remove-marker" title="Remove Marker">Remove Marker</button>' +
                             '</div></div>');
 
 
                     //Create an infoWindow
-                    var infowindow = new google.maps.InfoWindow();
-                    //set the content of infoWindow
-                    infowindow.setContent(contentString[0]);
+                    var infowindow = new google.maps.InfoWindow({
+                        //set the content of infoWindow
+                        content: contentString[0],
+                        position: marker.getPosition(),
+                        pixelOffset: new google.maps.Size(0, -marker.getIcon().size.height)
+                        
+                    });
+                    //alert(marker.getIcon().size.height);
+                    if ($("#nombres").data("clicked") === true) {
+                        infowindow.open(map/*, marker*/);
+                    }
                     
                     infowindows.push(infowindow);
-                    
-                    if ($("#nombres").data("clicked") === true) {
-                        infowindow.open(map, marker);
-                    }
                     /*
                      //Find remove button in infoWindow
                      var removeBtn   = contentString.find('button.remove-marker')[0];
