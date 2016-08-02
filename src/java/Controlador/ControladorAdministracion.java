@@ -895,6 +895,7 @@ public class ControladorAdministracion extends HttpServlet {
                 try (Connection con = myDatasource.getConnection()) {
                     PreparedStatement ps = con.prepareStatement("SELECT i.dorsal, p.* "+
                                                                 "FROM posicion p INNER JOIN inscrito i "+
+                                                                    "ON (p.usuario_id = i.usuario_id and p.prueba_id = i.prueba_id) "+
                                                                 "WHERE ("+
                                                                     "p.prueba_id = ? "+
                                                                     "AND "+

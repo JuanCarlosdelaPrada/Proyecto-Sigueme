@@ -120,6 +120,31 @@
                     bounds.extend(new google.maps.LatLng(${prueba.rutaId.latMax}, ${prueba.rutaId.longMax}));
                     map.fitBounds(bounds);
                     
+                    if ($("#inicio").data("clicked") === true) {
+                        inicio = new google.maps.Marker({
+                            position: path[0],
+                            map: map,
+                            icon: 'markers/start-flag.png',
+                            title: 'Inicio de la prueba'
+                        });
+                    }
+                    if ($("#fin").data("clicked") === true) {
+                        fin = new google.maps.Marker({
+                            position: path[path.length - 1],
+                            map: map,
+                            icon: 'markers/finish.png',
+                            title: 'Meta'
+                        });
+                    }
+                    if ($("#circuito").data("clicked") === true) {
+                        circuito = new google.maps.Polyline({
+                            path: path,
+                            strokeColor: '#0000CC',
+                            opacity: 0.4,
+                            map: map
+                        });
+                    }
+                    
                     //Load Markers from the XML File, Check (map_process.php) //CAMBIADO POR SEGUIMIENTO PRUEBA
                     window.setInterval(create_markers, 2500);
 
@@ -162,8 +187,14 @@
                 function delete_markers() {
                     for (var i = 0; i < markers.length; i++) {
                         markers[i].setMap(null);
+                        if ($("#nombres").data("clicked") === true) {
+                            infowindows[i].close();
+                        }
                     }
                     markers = [];
+                    if ($("#nombres").data("clicked") === true) {
+                        infowindows = [];
+                    }
                 }
 
                 //############### Create Marker Function ##############
@@ -199,9 +230,10 @@
                     //Content structure of info Window for the Markers
                     var contentString = $('<div class="marker-info-win">' +
                             '<div class="marker-inner-win"><span class="info-content">' +
-                            '<h1 class="marker-heading">' + MapTitle + '</h1>' +
+                            '<p>' + MapTitle + '</p>' +
+                            //'<h1 class="marker-heading">' + MapTitle + '</h1>' +
                             //MapDesc+ 
-                            '</span><button name="remove-marker" class="remove-marker" title="Remove Marker">Remove Marker</button>' +
+                            //'</span><button name="remove-marker" class="remove-marker" title="Remove Marker">Remove Marker</button>' +
                             '</div></div>');
 
 
@@ -211,6 +243,10 @@
                     infowindow.setContent(contentString[0]);
                     
                     infowindows.push(infowindow);
+                    
+                    if ($("#nombres").data("clicked") === true) {
+                        infowindow.open(map, marker);
+                    }
                     /*
                      //Find remove button in infoWindow
                      var removeBtn   = contentString.find('button.remove-marker')[0];
@@ -303,7 +339,6 @@
                     }
                 }
                 
-                infowindow.open(map, marker);
                 function show_names() {
                     if ($("#nombres").data('clicked') === false) {
                         for(var i = 0; i < infowindows.length; i++) {
@@ -312,14 +347,17 @@
                         $("#nombres").data('clicked', true);
                     }
                     else {
-                        for(var i = 0; i < infowindows.length; i++) {
-                            infowindows[i].close();
-                        }
-                        fin.setMap(null);
+                        delete_names();
                         $("#nombres").data('clicked', false);
                     }
                 }
-
+                
+                function delete_names() {
+                    for(var i = 0; i < infowindows.length; i++) {
+                        infowindows[i].close();
+                    }
+                    infowindows = [];
+                }
                 /*
                  //############### Remove Marker Function ##############
                  function remove_marker(Marker) {
