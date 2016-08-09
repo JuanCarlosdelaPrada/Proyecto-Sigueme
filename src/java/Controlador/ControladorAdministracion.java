@@ -82,7 +82,9 @@ import org.jdom.output.XMLOutputter;
     "/crearPrueba",
     "/rutas", 
     "/ruta",
+    "/eliminar-ruta",
     "/pruebas", 
+    "/eliminar-prueba",
     "/prueba", //--
     "/seguimientoPruebas", 
     "/seguir-prueba",
@@ -130,6 +132,8 @@ public class ControladorAdministracion extends HttpServlet {
         TypedQuery<Inscrito> consultaInscritos;
         TypedQuery<Usuario> consultaUsuarios;
         TypedQuery<Ivbytes> consultaIvBytes;
+        TypedQuery<Prueba> consultaPruebas;
+        TypedQuery<Ruta> consultaRutas;
         SimpleDateFormat formato;
         JsonObject resultado;
         ParserGPX parseador;
@@ -256,7 +260,7 @@ public class ControladorAdministracion extends HttpServlet {
                 //Subo el fichero ".gpx" de la ruta a una carpeta
                 OutputStream salida = null;
                 InputStream contenidoDelFichero = null;
-                PrintWriter writer = response.getWriter();
+               // PrintWriter writer = response.getWriter();
                 File destino = new File("C:\\Users\\Je¡ZZ¡\\Documents\\NetBeansProjects\\Sigueme\\ficherosGPX");
                 File archivo = new File(destino + File.separator + ruta_id + ".gpx");
                 try {                   
@@ -269,12 +273,12 @@ public class ControladorAdministracion extends HttpServlet {
                     while((read = contenidoDelFichero.read(bytes)) != -1) {
                         salida.write(bytes, 0, read);
                     }
-                    writer.println(ruta_id + ".gpx creado");
+                    //writer.println(ruta_id + ".gpx creado");
                 } catch (FileNotFoundException fne) {
-                    writer.println("Puede que no especificases el fichero a subir o que "
-                            + "estes intentando subir un archivo a una localizacion protegida "
-                            + "o inexistente.");
-                    writer.println("<br> ERROR: " + fne.getMessage());
+                    //writer.println("Puede que no especificases el fichero a subir o que "
+                      //      + "estes intentando subir un archivo a una localizacion protegida "
+                        //    + "o inexistente.");
+                    //writer.println("<br> ERROR: " + fne.getMessage());
                 } finally {
                     if (salida != null) {
                         salida.close();
@@ -282,9 +286,9 @@ public class ControladorAdministracion extends HttpServlet {
                     if (contenidoDelFichero != null) {
                         contenidoDelFichero.close();
                     }
-                    if (writer != null) {
-                        writer.close();
-                    }
+                    //if (writer != null) {
+                      //  writer.close();
+                    //}
                 }         
                 
                 parseador = new ParserGPX(archivo);
@@ -304,7 +308,7 @@ public class ControladorAdministracion extends HttpServlet {
                 if(em.find(JPA_Entidades.Ruta.class, ruta_id) == null) {
                     persist(ruta);
                 }
-                vista = "inicio.jsp";
+                vista = "rutas.jsp";
                 break;
             case "/crearPrueba":
                 prueba_id = request.getParameter("prueba_id");
@@ -347,7 +351,7 @@ public class ControladorAdministracion extends HttpServlet {
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                vista = "inicio.jsp";
+                vista = "pruebas.jsp";
                 break;
             case "/rutas":
                 String[] columnas = {"Nombre de la ruta", "Descripcion", "Distancia", "Dificultad", "ficheroGPX", "minlatitud", "minlongitud", "maxlatitud", "maxlongitud", "Mas informacion", "Editar", "Borrar"};
@@ -534,6 +538,41 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 vista = "ruta.jsp";
                 break;
+            case "/eliminar-ruta":
+                ruta_id = request.getParameter("ruta_id");
+                ruta = em.find(Ruta.class, ruta_id);
+                if (ruta != null) {
+                    consultaPruebas = em.createNamedQuery("Prueba.findByRutaId", Prueba.class);
+                    consultaPruebas.setParameter("rutaId", ruta);
+                    List<Prueba> pruebas = consultaPruebas.getResultList();
+                    if (!pruebas.isEmpty()) {
+                        for (Prueba pr : pruebas) {
+                            consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaId", Inscrito.class);
+                            consultaInscritos.setParameter("pruebaId", pr.getPruebaId());
+                            List<Inscrito> inscritos = consultaInscritos.getResultList();
+                            if (!inscritos.isEmpty()) {
+                                for (Inscrito ins: inscritos) {
+                                    consultaPosiciones = em.createNamedQuery("Posicion.findByPruebaId", Posicion.class);
+                                    consultaPosiciones.setParameter("pruebaId", ins.getPrueba().getPruebaId());
+                                    List<Posicion> posiciones = consultaPosiciones.getResultList();
+                                    for (Posicion ps : posiciones) {
+                                        delete(ps);
+                                    }
+                                    delete(ins);
+                                }
+                            }
+                            delete(pr);
+                        } 
+                    }
+                    File ficheroGpx = new File(ruta.getFicheroGpx());
+                    ficheroGpx.delete();
+                    delete(ruta);
+                }
+                else {
+                    System.out.println("La ruta no existe.");
+                }
+                vista = "rutas.jsp";
+                break;
             case "/pruebas":
                 String[] columnasP = {"Nombre de la prueba", "Descripcion", "Ruta", "Lugar", "Fecha celebracion", "Hora celebracion", "Fecha apertura inscripcion", "Fecha limite inscripcion", "Nº Maximo inscritos", "Inscribirse", "Mas informacion", "Editar", "Borrar", "Ver inscripciones"};
                 String[] atributosP = {"prueba_id", "descripcion", "ruta_id", "lugar", "fecha_cel", "hora_cel", "fecha_inscrip_min", "fecha_inscrip_max", "maximo_inscritos"};
@@ -645,6 +684,31 @@ public class ControladorAdministracion extends HttpServlet {
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                break;
+                case "/eliminar-prueba":
+                prueba_id = request.getParameter("prueba_id");
+                prueba = em.find(Prueba.class, prueba_id);
+                if (prueba != null) {
+                    consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaId", Inscrito.class);
+                    consultaInscritos.setParameter("pruebaId", prueba.getPruebaId());
+                    List<Inscrito> inscritos = consultaInscritos.getResultList();
+                    if (!inscritos.isEmpty()) {
+                        for (Inscrito ins: inscritos) {
+                            consultaPosiciones = em.createNamedQuery("Posicion.findByPruebaId", Posicion.class);
+                            consultaPosiciones.setParameter("pruebaId", ins.getPrueba().getPruebaId());
+                            List<Posicion> posiciones = consultaPosiciones.getResultList();
+                            for (Posicion ps : posiciones) {
+                                delete(ps);
+                            }
+                            delete(ins);
+                        }
+                    }
+                    delete(prueba);
+                }
+                else {
+                    System.out.println("La prueba no existe.");
+                }
+                vista = "pruebas.jsp";
                 break;
             case "/usuarios":
                 String[] columnasU = {"Correo", "Contrasena", "Rol", "Nombre", "Apellidos", "DNI", "Direccion", "Fecha Nacimiento", "Telefono", "Sexo", "Club", "Federado", "Mas informacion", "Editar", "Borrar", "Ver inscripciones"};
@@ -1186,6 +1250,18 @@ public class ControladorAdministracion extends HttpServlet {
             em.persist(object);
             utx.commit();
         } catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public void delete(Object object) {
+        try {
+            utx.begin();
+            em.remove(em.merge(object));
+            utx.commit();
+        }
+        catch (Exception e){
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);
             throw new RuntimeException(e);
         }

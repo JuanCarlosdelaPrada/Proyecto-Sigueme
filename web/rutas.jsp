@@ -26,6 +26,7 @@
         <!-- <link href="css/responsive.dataTables.min.css" rel="stylesheet">-->
         <link href="css/dataTables.bootstrap.min.css" rel="stylesheet">
         <link href="css/responsive.bootstrap.min.css" rel="stylesheet">
+        <link href="css/buttons.dataTables.min.css" rel="stylesheet">
         <link href="css/cabecera.css" rel="stylesheet">
         <link href="css/login.css" rel="stylesheet">
     </head>
@@ -97,6 +98,7 @@
         <script type="text/javascript" src="js/dataTables/dataTables.responsive.min.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/dataTables/dataTables.bootstrap.min.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/dataTables/responsive.bootstrap.min.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/dataTables/dataTables.buttons.min.js" charset="utf-8"></script>
         <script type="text/javascript" language="javascript" class="init">
             $(document).ready(function() {
                var tabla =  $('#example')
@@ -131,6 +133,15 @@
                         "language": {
                             "url": "js/Spanish.json"
                         }
+                        <c:if test="${sessionScope.permiso}">
+                            ,dom: 'lBfrtip'
+                            ,buttons: [
+                                {
+                                    text: "Añadir ruta",
+                                    action: function() {window.location.href = "subirRuta.jsp";}
+                                }
+                            ]    
+                       </c:if>
                     });
             });
 	</script>
