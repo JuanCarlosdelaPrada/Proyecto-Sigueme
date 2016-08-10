@@ -156,7 +156,10 @@ public class ControladorAdministracion extends HttpServlet {
             num_atributos,
             total;
         
-        String prueba_id,
+        Boolean permiso;
+        
+        String usuario_id,
+               prueba_id,
                ruta_id,
                descripcion, 
                lugar,
@@ -217,41 +220,53 @@ public class ControladorAdministracion extends HttpServlet {
                 vista = "inicio.jsp";
                 break;
             case "/crearUsuario":
-                String usuario_id = request.getParameter("correo"),
-                       contrasena = request.getParameter("fstPassword"),
-                       _contrasena = request.getParameter("sndPassword"),
-                       nombre = request.getParameter("nombre"),
-                       apellidos = request.getParameter("apellidos"),
-                       dni = request.getParameter("dni"),
-                       direccion = request.getParameter("direccion"),
-                       fecha_nacimiento = request.getParameter("fecha_nacimiento"),
-                       telefono = request.getParameter("telefono"),
-                       sexo = request.getParameter("sexo"),
-                       club = request.getParameter("club"),
-                       federado = request.getParameter("federado");
-                formato = new SimpleDateFormat("yyyy-MM-dd");
-                
-                //Encriptamos la contraseña con AES-256
-                String contrasena_tratada = AES.encrypt(contrasena);
-                System.out.println("contraseña "+contrasena_tratada);
-                ivBytes = AES.getIvBytes();
-                Date fecha_nacimiento_tratada = null;
-                try {
-                    fecha_nacimiento_tratada = formato.parse(fecha_nacimiento);
-                } catch (ParseException ex) {
-                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                permiso = session.getAttribute("permiso") == null? false: (Boolean) session.getAttribute("permiso");
+                if (session.getAttribute("correo") == null || permiso) {
+                           usuario_id = request.getParameter("correo");
+                    String contrasena = request.getParameter("fstPassword"),
+                           _contrasena = request.getParameter("sndPassword"),
+                           nombre = request.getParameter("nombre"),
+                           apellidos = request.getParameter("apellidos"),
+                           dni = request.getParameter("dni"),
+                           direccion = request.getParameter("direccion"),
+                           fecha_nacimiento = request.getParameter("fecha_nacimiento"),
+                           telefono = request.getParameter("telefono"),
+                           sexo = request.getParameter("sexo"),
+                           club = request.getParameter("club"),
+                           federado = request.getParameter("federado");
+                    formato = new SimpleDateFormat("yyyy-MM-dd");
+
+                    //Encriptamos la contraseña con AES-256
+                    String contrasena_tratada = AES.encrypt(contrasena);
+                    System.out.println("contraseña "+contrasena_tratada);
+                    ivBytes = AES.getIvBytes();
+                    Date fecha_nacimiento_tratada = null;
+                    try {
+                        fecha_nacimiento_tratada = formato.parse(fecha_nacimiento);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    boolean federado_tratado = federado.equals("s");
+                    String _club = club.equals("")? null : club;
+                    usuario = new Usuario(usuario_id, contrasena_tratada.getBytes(), false, nombre, apellidos, dni, direccion, fecha_nacimiento_tratada, telefono, sexo, federado_tratado);
+                    usuario.setClub(_club);
+                    ivbytes = new Ivbytes(usuario_id);
+                    ivbytes.setIvbytesId(ivBytes);
+                    if(em.find(JPA_Entidades.Usuario.class, usuario_id) == null) {
+                        persist(usuario);
+                        persist(ivbytes);
+                    }
+                    if (permiso) {
+                        vista = "usuarios.jsp";
+                    }
+                    else {
+                        vista = "inicio.jsp";
+                    }
                 }
-                boolean federado_tratado = federado.equals("s");
-                String _club = club.equals("")? null : club;
-                usuario = new Usuario(usuario_id, contrasena_tratada.getBytes(), false, nombre, apellidos, dni, direccion, fecha_nacimiento_tratada, telefono, sexo, federado_tratado);
-                usuario.setClub(_club);
-                ivbytes = new Ivbytes(usuario_id);
-                ivbytes.setIvbytesId(ivBytes);
-                if(em.find(JPA_Entidades.Usuario.class, usuario_id) == null) {
-                    persist(usuario);
-                    persist(ivbytes);
+                else {
+                    System.out.println("NO TIENE SUFICIENTES PERMISOS");
+                    vista = "inicio.jsp";
                 }
-                vista = "inicio.jsp";
                 break;
             case "/subirRuta": 
                 //Recojo los datos del formulario
@@ -495,7 +510,7 @@ public class ControladorAdministracion extends HttpServlet {
                         }
                         ja.add(columnas[atributos.length], new JsonPrimitive("<a href='ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
                         
-                        Boolean permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
+                        permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
                         if (permiso == true) {
                             ja.add(columnas[atributos.length + 1], new JsonPrimitive("<a href='editar-ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
                             ja.add(columnas[atributos.length + 2], new JsonPrimitive("<a href='eliminar-ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>")); 
@@ -638,8 +653,8 @@ public class ControladorAdministracion extends HttpServlet {
                     sql += " limit " + comienzo + ", " + cantidad;
                     ps = conn.prepareStatement(sql);
                     rs = ps.executeQuery();
-                    Boolean permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso"),
-                            user = session.getAttribute("usuario") != null;
+                    permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
+                    Boolean user = session.getAttribute("usuario") != null;
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
                         for (int i = 0; i < atributosP.length; i++) {
@@ -790,7 +805,7 @@ public class ControladorAdministracion extends HttpServlet {
                     sql += " limit " + comienzo + ", " + cantidad;
                     ps = conn.prepareStatement(sql);
                     rs = ps.executeQuery();
-                    Boolean permiso = session.getAttribute("permiso") == null ? false : (boolean) session.getAttribute("permiso");
+                    permiso = session.getAttribute("permiso") == null ? false : (boolean) session.getAttribute("permiso");
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
                         for (int i = 0; i < atributosU.length; i++) {
@@ -1082,11 +1097,6 @@ public class ControladorAdministracion extends HttpServlet {
                     Calendar fechaMaxima = Calendar.getInstance();
                     fechaMaxima.setTime(prueba.getFechaInscripMax());
                     fechaMaxima.add(Calendar.DATE, 1);
-                    System.out.println(fechaActual.toString());
-                    System.out.println(prueba.getFechaInscripMin().toString());
-                    System.out.println(fechaMaxima.getTime().toString());
-                    System.out.println("Comparacion >= " + fechaActual.compareTo(prueba.getFechaInscripMin()));
-                    System.out.println("Comparacion <= " + fechaActual.compareTo(prueba.getFechaInscripMax()));
                     if ((fechaActual.compareTo(prueba.getFechaInscripMin()) >= 0 && fechaActual.compareTo(fechaMaxima.getTime()) <= 0) && inscritos.size() < prueba.getMaximoInscritos()) {
                         if (inscritos.isEmpty()) {
                             inscrito = new Inscrito(inscritoPK, false, 1);
@@ -1106,7 +1116,6 @@ public class ControladorAdministracion extends HttpServlet {
                                 inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, i + 1);
                             }
                         }
-                        System.out.println(inscrito.toString());
                         persist(inscrito);
                     }
                     else if (!(fechaActual.compareTo(prueba.getFechaInscripMin()) >= 0 && fechaActual.compareTo(prueba.getFechaInscripMax()) <= 0)) {
@@ -1153,7 +1162,7 @@ public class ControladorAdministracion extends HttpServlet {
                             for (Posicion ps : posiciones) {
                                 delete(ps);
                             }
-                                delete(inscrito);
+                            delete(inscrito);
                         }
                         else {
                             System.out.println("Se produjo un error dicha inscripción no existe");
@@ -1254,8 +1263,8 @@ public class ControladorAdministracion extends HttpServlet {
                     System.out.println(sql);
                     ps = conn.prepareStatement(sql);
                     rs = ps.executeQuery();
-                    Boolean permiso = session.getAttribute("permiso") == null ? false : (boolean) session.getAttribute("permiso"),
-                            user = session.getAttribute("usuario") != null;
+                    permiso = session.getAttribute("permiso") == null ? false : (boolean) session.getAttribute("permiso");
+                    Boolean user = session.getAttribute("usuario") != null;
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
                         for (int i = 0; i < atributosI.size(); i++) {
