@@ -1077,8 +1077,17 @@ public class ControladorAdministracion extends HttpServlet {
                 consultaInscritos.setParameter("pruebaId", prueba_id);
                 inscritos = consultaInscritos.getResultList();
                 InscritoPK inscritoPK = new InscritoPK(prueba_id, session.getAttribute("correo").toString());
-                if (em.find(Inscrito.class, inscritoPK) == null) {
-                    if (inscritos.size() < prueba.getMaximoInscritos()) {
+                if (prueba != null && em.find(Inscrito.class, inscritoPK) == null) {
+                    Date fechaActual = new Date();
+                    Calendar fechaMaxima = Calendar.getInstance();
+                    fechaMaxima.setTime(prueba.getFechaInscripMax());
+                    fechaMaxima.add(Calendar.DATE, 1);
+                    System.out.println(fechaActual.toString());
+                    System.out.println(prueba.getFechaInscripMin().toString());
+                    System.out.println(fechaMaxima.getTime().toString());
+                    System.out.println("Comparacion >= " + fechaActual.compareTo(prueba.getFechaInscripMin()));
+                    System.out.println("Comparacion <= " + fechaActual.compareTo(prueba.getFechaInscripMax()));
+                    if ((fechaActual.compareTo(prueba.getFechaInscripMin()) >= 0 && fechaActual.compareTo(fechaMaxima.getTime()) <= 0) && inscritos.size() < prueba.getMaximoInscritos()) {
                         if (inscritos.isEmpty()) {
                             inscrito = new Inscrito(inscritoPK, false, 1);
                         }
@@ -1100,9 +1109,15 @@ public class ControladorAdministracion extends HttpServlet {
                         System.out.println(inscrito.toString());
                         persist(inscrito);
                     }
+                    else if (!(fechaActual.compareTo(prueba.getFechaInscripMin()) >= 0 && fechaActual.compareTo(prueba.getFechaInscripMax()) <= 0)) {
+                        System.out.println("TIENE QUE CUMPLIR EL PLAZO DE INSCRIPCIONES");
+                    }
                     else {
                         System.out.println("YA ESTÁ EL CUPO DE INSCRITOS CUBIERTO");
                     }
+                }
+                else if (prueba == null) {
+                        System.out.println("DICHA PRUEBA NO EXISTE");
                 }
                 else {
                     System.out.println("YA ESTÁ INSCRITO");
