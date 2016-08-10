@@ -90,9 +90,11 @@ import org.jdom.output.XMLOutputter;
     "/seguir-prueba",
     "/seguimiento_prueba",
     "/usuarios",
+    "/eliminar-usuario",
     "/usuario", //--
     "/inscribirse",
     "/inscripciones",
+    "/eliminar-inscripcion",
     "/inscripciones_"
 })
 @MultipartConfig
@@ -135,14 +137,15 @@ public class ControladorAdministracion extends HttpServlet {
         TypedQuery<Prueba> consultaPruebas;
         TypedQuery<Ruta> consultaRutas;
         SimpleDateFormat formato;
+        List<Inscrito> inscritos;
         JsonObject resultado;
         ParserGPX parseador;
         Inscrito inscrito;
         PrintWriter out;
         JsonArray array;
         Ivbytes ivbytes;
-        Usuario usuario;
-        Prueba prueba;
+        Usuario usuario = null;
+        Prueba prueba = null;
         Ruta ruta;
                 
         byte[] ivBytes;
@@ -549,7 +552,7 @@ public class ControladorAdministracion extends HttpServlet {
                         for (Prueba pr : pruebas) {
                             consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaId", Inscrito.class);
                             consultaInscritos.setParameter("pruebaId", pr.getPruebaId());
-                            List<Inscrito> inscritos = consultaInscritos.getResultList();
+                            inscritos = consultaInscritos.getResultList();
                             if (!inscritos.isEmpty()) {
                                 for (Inscrito ins: inscritos) {
                                     consultaPosiciones = em.createNamedQuery("Posicion.findByPruebaId", Posicion.class);
@@ -691,7 +694,7 @@ public class ControladorAdministracion extends HttpServlet {
                 if (prueba != null) {
                     consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaId", Inscrito.class);
                     consultaInscritos.setParameter("pruebaId", prueba.getPruebaId());
-                    List<Inscrito> inscritos = consultaInscritos.getResultList();
+                    inscritos = consultaInscritos.getResultList();
                     if (!inscritos.isEmpty()) {
                         for (Inscrito ins: inscritos) {
                             consultaPosiciones = em.createNamedQuery("Posicion.findByPruebaId", Posicion.class);
@@ -836,6 +839,31 @@ public class ControladorAdministracion extends HttpServlet {
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                break;
+            case "/eliminar-usuario":
+                usuario_id = request.getParameter("usuario_id");
+                usuario = em.find(Usuario.class, usuario_id);
+                if (usuario != null) {
+                    consultaInscritos = em.createNamedQuery("Inscrito.findByUsuarioId", Inscrito.class);
+                    consultaInscritos.setParameter("usuarioId", usuario.getUsuarioId());
+                    inscritos = consultaInscritos.getResultList();
+                    if (!inscritos.isEmpty()) {
+                        for (Inscrito ins: inscritos) {
+                            consultaPosiciones = em.createNamedQuery("Posicion.findByPruebaId", Posicion.class);
+                            consultaPosiciones.setParameter("pruebaId", ins.getPrueba().getPruebaId());
+                            List<Posicion> posiciones = consultaPosiciones.getResultList();
+                            for (Posicion ps : posiciones) {
+                                delete(ps);
+                            }
+                            delete(ins);
+                        }
+                    }
+                    delete(usuario);
+                }
+                else {
+                    System.out.println("El usuario no existe.");
+                }
+                vista = "usuarios.jsp";
                 break;
             case "/seguimientoPruebas":
                 String[] columnasS = {"Nombre de la prueba", "Ver", "Mas informacion"};
@@ -1029,7 +1057,7 @@ public class ControladorAdministracion extends HttpServlet {
                 prueba = em.find(Prueba.class, prueba_id);
                 consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaIdOrderingByDorsal", Inscrito.class);
                 consultaInscritos.setParameter("pruebaId", prueba_id);
-                List<Inscrito> inscritos = consultaInscritos.getResultList();
+                inscritos = consultaInscritos.getResultList();
                 InscritoPK inscritoPK = new InscritoPK(prueba_id, session.getAttribute("correo").toString());
                 if (em.find(Inscrito.class, inscritoPK) == null) {
                     if (inscritos.size() < prueba.getMaximoInscritos()) {
@@ -1068,6 +1096,45 @@ public class ControladorAdministracion extends HttpServlet {
                 request.setAttribute("prueba_id", prueba_id);
                 request.setAttribute("usuario_id", usuario_id);
                 vista = "inscripciones.jsp";
+                break;
+            case "/eliminar-inscripcion":
+                prueba_id = request.getParameter("prueba_id");
+                usuario_id = request.getParameter("usuario_id");
+                Enumeration<String> parametros = request.getParameterNames();
+                if (parametros.hasMoreElements() && !"".equals(prueba_id) && !"".equals(usuario_id))
+                {
+                    String identificador = parametros.nextElement();
+                    prueba = em.find(Prueba.class, prueba_id);
+                    usuario = em.find(Usuario.class, usuario_id);
+
+                    if (prueba != null && usuario != null) {
+                        consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaIdAndUsuarioId", Inscrito.class);
+                        consultaInscritos.setParameter("usuarioId", usuario.getUsuarioId());
+                        consultaInscritos.setParameter("pruebaId", prueba.getPruebaId());
+                        inscrito = consultaInscritos.getSingleResult();
+                        if (inscrito != null) {
+                            consultaPosiciones = em.createNamedQuery("Posicion.findByPruebaIdAndUsuarioId", Posicion.class);
+                            consultaPosiciones.setParameter("usuarioId", usuario.getUsuarioId());
+                            consultaPosiciones.setParameter("pruebaId", prueba.getPruebaId());
+                            List<Posicion> posiciones = consultaPosiciones.getResultList();
+                            for (Posicion ps : posiciones) {
+                                delete(ps);
+                            }
+                                delete(inscrito);
+                        }
+                        else {
+                            System.out.println("Se produjo un error dicha inscripción no existe");
+                        }
+                    }
+                    else {
+                        System.out.println("Se produjo un error, dicha prueba o dicho usuario no existen.");
+                    }
+                    request.setAttribute(identificador, request.getParameter(identificador));
+                    vista = "inscripciones.jsp";
+                }
+                else {
+                    vista = "inicio.jsp";
+                }
                 break;
             case "/inscripciones_":
                 prueba_id = request.getParameter("prueba_id");
@@ -1168,7 +1235,7 @@ public class ControladorAdministracion extends HttpServlet {
                         }
                         if (permiso) {
                             ja.add(columnasI.get(atributosI.size()), new JsonPrimitive("<a href='editar-inscripcion?" + atributosI.get(0) + "=" + ja.get(columnasI.get(0)).getAsString() + "'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
-                            ja.add(columnasI.get(atributosI.size() + 1), new JsonPrimitive("<a href='eliminar-inscripcion?" + atributosI.get(0) + "=" + ja.get(columnasI.get(0)).getAsString() + "'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>"));
+                            ja.add(columnasI.get(atributosI.size() + 1), new JsonPrimitive("<a href='eliminar-inscripcion?" + criterio + "=" + campo + "&amp;" + atributosI.get(0) + "=" + ja.get(columnasI.get(0)).getAsString() + "'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>"));
                         }                        
                         array.add(ja);
                     }
