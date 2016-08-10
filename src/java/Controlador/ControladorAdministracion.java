@@ -841,29 +841,47 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 break;
             case "/eliminar-usuario":
-                usuario_id = request.getParameter("usuario_id");
-                usuario = em.find(Usuario.class, usuario_id);
-                if (usuario != null) {
-                    consultaInscritos = em.createNamedQuery("Inscrito.findByUsuarioId", Inscrito.class);
-                    consultaInscritos.setParameter("usuarioId", usuario.getUsuarioId());
-                    inscritos = consultaInscritos.getResultList();
-                    if (!inscritos.isEmpty()) {
-                        for (Inscrito ins: inscritos) {
-                            consultaPosiciones = em.createNamedQuery("Posicion.findByPruebaId", Posicion.class);
-                            consultaPosiciones.setParameter("pruebaId", ins.getPrueba().getPruebaId());
-                            List<Posicion> posiciones = consultaPosiciones.getResultList();
-                            for (Posicion ps : posiciones) {
-                                delete(ps);
+                String sesion_usuario = (String) session.getAttribute("correo");
+                Boolean sesion_permiso = session.getAttribute("permiso") == null ? false: (Boolean) session.getAttribute("permiso");
+                if (!"".equals(sesion_usuario)) {
+                    usuario_id = request.getParameter("usuario_id");
+                    usuario = em.find(Usuario.class, usuario_id);
+                    if (usuario != null && (sesion_usuario.equals(usuario_id) || sesion_permiso)) {
+                        consultaInscritos = em.createNamedQuery("Inscrito.findByUsuarioId", Inscrito.class);
+                        consultaInscritos.setParameter("usuarioId", usuario.getUsuarioId());
+                        inscritos = consultaInscritos.getResultList();
+                        if (!inscritos.isEmpty()) {
+                            for (Inscrito ins: inscritos) {
+                                consultaPosiciones = em.createNamedQuery("Posicion.findByPruebaId", Posicion.class);
+                                consultaPosiciones.setParameter("pruebaId", ins.getPrueba().getPruebaId());
+                                List<Posicion> posiciones = consultaPosiciones.getResultList();
+                                for (Posicion ps : posiciones) {
+                                    delete(ps);
+                                }
+                                delete(ins);
                             }
-                            delete(ins);
+                        }
+                        delete(usuario);
+                        if (sesion_usuario.equals(usuario_id)) {
+                            vista = "logout";
+                        }
+                        else {
+                            vista = "usuarios.jsp";
                         }
                     }
-                    delete(usuario);
+                    else if (!sesion_usuario.equals(usuario_id)) {
+                        System.out.println("No tiene suficientes permisos para eliminar dicho usuario.");
+                        vista = "inicio.jsp";
+                    }
+                    else {
+                        System.out.println("El usuario no existe.");
+                        vista = "inicio.jsp";
+                    }
                 }
                 else {
-                    System.out.println("El usuario no existe.");
+                    System.out.println("Se ha accedido a una zona restringida");
+                    vista = "inicio.jsp";
                 }
-                vista = "usuarios.jsp";
                 break;
             case "/seguimientoPruebas":
                 String[] columnasS = {"Nombre de la prueba", "Ver", "Mas informacion"};
