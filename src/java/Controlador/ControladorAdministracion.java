@@ -876,6 +876,9 @@ public class ControladorAdministracion extends HttpServlet {
                                 delete(ins);
                             }
                         }
+                        consultaIvBytes = em.createNamedQuery("Ivbytes.findByUsuarioId", Ivbytes.class);
+                        consultaIvBytes.setParameter("usuarioId", usuario.getUsuarioId());
+                        delete(consultaIvBytes.getSingleResult());
                         delete(usuario);
                         if (sesion_usuario.equals(usuario_id)) {
                             vista = "logout";
