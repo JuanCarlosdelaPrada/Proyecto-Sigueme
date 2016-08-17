@@ -82,6 +82,7 @@ import org.jdom.output.XMLOutputter;
     "/crearPrueba",
     "/rutas", 
     "/ruta",
+    "/editar-ruta",
     "/eliminar-ruta",
     "/pruebas", 
     "/eliminar-prueba",
@@ -555,6 +556,15 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("latlng", latlng);
                 }
                 vista = "ruta.jsp";
+                break;
+            case "/editar-ruta":
+                ruta_id = request.getParameter("ruta_id");
+                ruta = em.find(Ruta.class, ruta_id);
+                permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
+                if (ruta != null && permiso) {
+                    request.setAttribute("ruta", ruta);
+                }
+                vista = "editarRuta.jsp";
                 break;
             case "/eliminar-ruta":
                 ruta_id = request.getParameter("ruta_id");

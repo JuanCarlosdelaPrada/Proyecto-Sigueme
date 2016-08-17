@@ -61,11 +61,11 @@ public class PruebaSeguimiento implements Runnable {
         ExecutorService hilos = Executors.newFixedThreadPool(5);
         
         Random nAleatorios = new Random(System.currentTimeMillis());
-        String[] idUsuarios = {"prh_19_666arq@hotmail.com", "a@g.es", "b@g.es", "c@g.es", "d@g.es"};
+        String[] idUsuarios = { "a@g.es", "b@g.es", "c@g.es", "d@g.es", "e@g.es"};
         
         for (int i = 0; i < 5; i++) {
             System.out.println("Lanzado hilo "+ (i+1));
-            Runnable persona = new PruebaSeguimiento("camboya", idUsuarios[i], nAleatorios.nextLong());
+            Runnable persona = new PruebaSeguimiento("PEPITO 2", idUsuarios[i], nAleatorios.nextLong());
             hilos.execute(persona);
             Thread.sleep(5000);
         }
