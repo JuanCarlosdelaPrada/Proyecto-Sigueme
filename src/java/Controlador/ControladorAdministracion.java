@@ -85,14 +85,16 @@ import org.jdom.output.XMLOutputter;
     "/editar-ruta",
     "/eliminar-ruta",
     "/pruebas", 
-    "/eliminar-prueba",
     "/prueba", //--
+    "/editar-prueba",
+    "/eliminar-prueba",
     "/seguimientoPruebas", 
     "/seguir-prueba",
     "/seguimiento_prueba",
     "/usuarios",
-    "/eliminar-usuario",
     "/usuario", //--
+    "/editar-usuario",
+    "/eliminar-usuario",
     "/inscribirse",
     "/inscripciones",
     "/eliminar-inscripcion",
@@ -280,7 +282,7 @@ public class ControladorAdministracion extends HttpServlet {
                 OutputStream salida = null;
                 InputStream contenidoDelFichero = null;
                // PrintWriter writer = response.getWriter();
-                File destino = new File("C:\\Users\\Je¡ZZ¡\\Documents\\NetBeansProjects\\Sigueme\\ficherosGPX");
+                File destino = new File("C:\\Users\\Je¡ZZ¡\\Documents\\NetBeansProjects\\Sigueme\\web\\ficherosGPX");
                 File archivo = new File(destino + File.separator + ruta_id + ".gpx");
                 try {                   
                     salida = new FileOutputStream(archivo);
@@ -713,6 +715,19 @@ public class ControladorAdministracion extends HttpServlet {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
+                case "editar-prueba":
+                    prueba_id = request.getParameter("prueba_id");
+                    prueba = em.find(Prueba.class, prueba_id);
+                    permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
+                    if (prueba != null && permiso) {
+                        SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
+                        request.setAttribute("fechaNacimiento", formateador.format(prueba.getFechaCel()));
+                        request.setAttribute("fechaNacimiento", formateador.format(prueba.getFechaCel()));
+                        request.setAttribute("fechaNacimiento", formateador.format(prueba.getFechaCel()));
+                        request.setAttribute("prueba", prueba);
+                    }
+                    vista = "editarPrueba.jsp";
+                    break;
                 case "/eliminar-prueba":
                 prueba_id = request.getParameter("prueba_id");
                 prueba = em.find(Prueba.class, prueba_id);
@@ -864,6 +879,17 @@ public class ControladorAdministracion extends HttpServlet {
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                break;
+            case "/editar-usuario":
+                usuario_id = request.getParameter("usuario_id");
+                usuario = em.find(Usuario.class, usuario_id);
+                permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
+                if (usuario != null && permiso) {
+                    SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
+                    request.setAttribute("fechaNacimiento", formateador.format(usuario.getFechaNacimiento()));
+                    request.setAttribute("usuario", usuario);
+                }
+                vista = "editarUsuario.jsp";
                 break;
             case "/eliminar-usuario":
                 String sesion_usuario = (String) session.getAttribute("correo");

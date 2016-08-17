@@ -32,14 +32,14 @@
         <!--Contenido-->
          <div class="page-header">
              <div class="col-sm-offset-1">
-                 <h1>Editar ruta: ${requestScope.ruta.rutaId} ${requestScope.ruta.dificultad}</h1> 
+                 <h1>Editar ruta: ${requestScope.ruta.rutaId}</h1> 
             </div>
         </div>
         <div class="container-fluid">
             <div class="row">
                 <br>
             </div>
-            <form class="form-horizontal" role="form" method="POST" action="subirRuta" enctype="multipart/form-data">
+            <form class="form-horizontal" role="form" method="POST" action="editarRuta" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="track_id" class="col-lg-offset-1 col-lg-2 control-label">Nombre de la ruta:</label>
                     <div class="col-lg-3">
@@ -58,7 +58,7 @@
                         <div class="radio">
                             <label>
                                 <c:choose>
-                                    <c:when test="${requestScope.ruta.descripcion == 'fácil'}">
+                                    <c:when test="${requestScope.ruta.dificultad eq 'fácil'}">
                                         <input type="radio" name="dificultad" value="fácil" required checked>
                                     </c:when>
                                     <c:otherwise>
@@ -71,7 +71,7 @@
                         <div class="radio">
                             <label>
                                 <c:choose>
-                                    <c:when test="${requestScope.ruta.descripcion == 'moderado'}">
+                                    <c:when test="${requestScope.ruta.dificultad eq 'moderado'}">
                                         <input type="radio" name="dificultad" value="moderado" required checked>
                                     </c:when>
                                     <c:otherwise>
@@ -84,7 +84,7 @@
                         <div class="radio">
                             <label>
                                 <c:choose>
-                                    <c:when test="${requestScope.ruta.descripcion == 'difícil'}">
+                                    <c:when test="${requestScope.ruta.dificultad eq 'difícil'}">
                                         <input type="radio" name="dificultad" value="difícil" required checked>
                                     </c:when>
                                     <c:otherwise>
@@ -97,7 +97,7 @@
                         <div class="radio">
                             <label>
                                 <c:choose>
-                                    <c:when test="${requestScope.ruta.descripcion == 'muy difícil'}">
+                                    <c:when test="${requestScope.ruta.dificultad eq 'muy difícil'}">
                                         <input type="radio" name="dificultad" value="muy difícil" required checked>
                                     </c:when>
                                     <c:otherwise>
@@ -110,7 +110,7 @@
                         <div class="radio">
                             <label>
                                 <c:choose>
-                                    <c:when test="${requestScope.ruta.descripcion == 'sólo expertos'}">
+                                    <c:when test="${requestScope.ruta.dificultad eq 'sólo expertos'}">
                                         <input type="radio" name="dificultad" value="sólo expertos" required checked>
                                     </c:when>
                                     <c:otherwise>
@@ -123,7 +123,14 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="ficheroGPX" class="col-lg-offset-1 col-lg-2 control-label">Subir un archivo GPX:</label>
+                    <label for = "GPXactual" class="col-lg-offset-1 col-lg-2 control-label">Archivo GPX actual:</label>
+                    <div class="col-lg-3">
+                        <input class="btn btn-info" id="GPXactual" name="GPXactual" type="button" value="Ver" onclick="window.open('ficherosGPX/${requestScope.ruta.rutaId}.gpx', '_blank')"/>
+                        <a class="btn btn-danger " href="ficherosGPX/${requestScope.ruta.rutaId}.gpx" download>Descargar</a>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="ficheroGPX" class="col-lg-3 control-label">Modificar archivo GPX:</label>
                     <div class="col-lg-3">
                         <input type="file" id="ficheroGPX" name="ficheroGPX" class="filestyle" data-iconName="glyphicon glyphicon-upload" data-input="true" data-buttonText="" data-buttonName="btn btn-default" accept=".gpx" required>
                     </div>
@@ -138,7 +145,7 @@
         
         <!--Pie-->
         <%@include file="WEB-INF/jspf/pie.jspf"%>
-
+        
         <!--Importaciones .js-->
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/Bootstrap/bootstrap.min.js" charset="utf-8"></script>
