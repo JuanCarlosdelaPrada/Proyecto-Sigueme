@@ -715,15 +715,17 @@ public class ControladorAdministracion extends HttpServlet {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
-                case "editar-prueba":
+                case "/editar-prueba":
                     prueba_id = request.getParameter("prueba_id");
                     prueba = em.find(Prueba.class, prueba_id);
                     permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
                     if (prueba != null && permiso) {
                         SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
-                        request.setAttribute("fechaNacimiento", formateador.format(prueba.getFechaCel()));
-                        request.setAttribute("fechaNacimiento", formateador.format(prueba.getFechaCel()));
-                        request.setAttribute("fechaNacimiento", formateador.format(prueba.getFechaCel()));
+                        request.setAttribute("fechaCel", formateador.format(prueba.getFechaCel()));
+                        request.setAttribute("fechaInscripMin", formateador.format(prueba.getFechaInscripMin()));
+                        request.setAttribute("fechaInscripMax", formateador.format(prueba.getFechaInscripMax()));
+                        formateador = new SimpleDateFormat("HH:mm");
+                        request.setAttribute("horaCel", formateador.format(prueba.getHoraCel()));
                         request.setAttribute("prueba", prueba);
                     }
                     vista = "editarPrueba.jsp";
