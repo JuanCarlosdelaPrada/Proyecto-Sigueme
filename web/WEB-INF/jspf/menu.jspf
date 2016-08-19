@@ -61,41 +61,16 @@
                     </ul>
                 </c:when>
                 <c:otherwise>
-                    <ul class="nav navbar-nav navbar-right">  
-                        <li><p class="navbar-text" style="margin-right:0">Bienvenid@,&nbsp;</p></li>
+                    <ul id="bienvenido" class="nav navbar-nav navbar-right">  
                         <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" style="margin-left:0;padding-left:0;padding-right:0">${sessionScope.usuario}<span class="caret"></span></a>
-                            <ul id="login-dp" class="dropdown-menu">
-                                <li>
-                                    <div class="row">
-                                        <div class="col-md-12" >
-                                            <form id="datos_login" class="form" role="form" method="post">
-                                                <div id="correo_login_div" class="form-group">
-                                                    <label class="sr-only" for="correo_login">Correo electrónico</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-addon"><i class="fa fa-envelope fa" aria-hidden="true"></i></span>
-                                                        <input type="text" id="correo_login" name="correo_login" class="form-control" placeholder="Correo electrónico">
-                                                    </div>
-                                                </div>
-                                                <div id="contraseña_login_div" class="form-group">
-                                                    <label class="sr-only" for="contraseña_login">Contraseña</label>
-                                                    <div class="input-group">
-                                                        <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span> 
-                                                        <input type="password" id="contraseña_login" name="contraseña_login" class="form-control" placeholder="Contraseña">
-                                                    </div>
-                                                    <div class="help-block text-right"><a href="">¿Olvidaste la contraseña?</a></div>
-
-                                                </div>
-                                                <div class="form-group">
-                                                    <button id="boton_login" type="submit" class="btn btn-primary btn-block">Sign in</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </li>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Bienvenid@,&nbsp;${sessionScope.usuario}<span class="caret"></span></a>
+                            <ul id="def_usuario" class="dropdown-menu">
+                                <li><a href="usuario?usuario_id=${sessionScope.correo}">Mi perfil</a></li>
+                                <li><a href="editar-usuario?usuario_id=${sessionScope.correo}">Editar mi perfil</a></li>
+                                <li><a href="inscripciones?usuario_id=${sessionScope.correo}">Mis inscripciones</a></li>
+                                <li><a href="logout">Cerrar sesión <span class="btn btn-danger btn-xs glyphicon glyphicon-off" style="color:white; padding:0"></span></a></li>
                             </ul>            
                         </li>
-                        <li><button class="navbar-text btn btn-danger btn-xs" style="color:white;padding:0" onClick="window.location.href='logout'"><span class="glyphicon glyphicon-off"></span></button></li>
                     </ul>
                 </c:otherwise>
             </c:choose>

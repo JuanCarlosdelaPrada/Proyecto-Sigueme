@@ -140,32 +140,37 @@
                 <div class="form-group">
                     <label class="col-lg-offset-1 col-lg-2 control-label">Indique si es federado o no:</label>
                     <div class="col-lg-3">
-                        <div class="radio">
-                            <label>
-                                <c:choose>
-                                    <c:when test="${requestScope.usuario.federado eq 's'}">
+                        <c:choose>
+                            <c:when test="${requestScope.usuario.federado}">
+                                <div class="radio">
+                                    <label>
                                         <input name="federado" value="s" type="radio" checked>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <input name="federado" value="s" type="radio">
-                                    </c:otherwise>
-                                </c:choose>
-                                Sí
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label>
-                                <c:choose>
-                                    <c:when test="${requestScope.usuario.federado eq 'n'}">
+                                        Sí
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
                                         <input name="federado" value="n" type="radio" required>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <input name="federado" value="n" type="radio">
-                                    </c:otherwise>
-                                </c:choose>
-                                No
-                            </label>
-                        </div>
+                                        No
+                                    </label>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="radio">
+                                    <label>
+                                        <input name="federado" value="s" type="radio" required>
+                                        Sí
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input name="federado" value="n" type="radio" checked>
+                                        No
+                                    </label>
+                                </div>
+                                </c:otherwise>
+                            </c:choose>
+                        
                     </div>
                 </div>
                 <div class="form-group">
@@ -183,6 +188,10 @@
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/Bootstrap/bootstrap.min.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/validarUsuario.js" charset="utf-8"></script>
+        <script>
+            var bienvenido = document.getElementById('bienvenido');
+            bienvenido.style.minWidth = bienvenido.getBoundingClientRect().width;
+        </script>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>
     </body>
 </html>

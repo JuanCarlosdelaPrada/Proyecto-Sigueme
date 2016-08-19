@@ -28,6 +28,24 @@ and open the template in the editor.
 #login-dp .form-group {
     margin-bottom: 10px;
 }
+
+#def_usuario{
+    background-color: rgb(41,41,41);
+    border-color: black;
+    overflow:hidden;
+}
+
+#def_usuario li a{
+    text-align: justify;
+    background-color: rgb(41,41,41);
+    color: rgb(157,157,157);
+}
+
+#def_usuario li a:hover{
+    background: rgb(41,41,41);
+    color: #fff;
+}
+
 .btn-fb{
     color: #fff;
     background-color:#3b5998;

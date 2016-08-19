@@ -100,6 +100,10 @@
                     });
             });
 	</script>
+        <script>
+            var bienvenido = document.getElementById('bienvenido');
+            bienvenido.style.minWidth = bienvenido.getBoundingClientRect().width;
+        </script>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>
         
     </body>

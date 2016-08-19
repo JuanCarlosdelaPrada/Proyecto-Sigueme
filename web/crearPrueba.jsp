@@ -125,6 +125,10 @@
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/Bootstrap/bootstrap.min.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/Bootstrap Filestyle/bootstrap-filestyle.min.js" charset="utf-8"></script>
+        <script>
+            var bienvenido = document.getElementById('bienvenido');
+            bienvenido.style.minWidth = bienvenido.getBoundingClientRect().width;
+        </script>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>
     </body>
 </html>
