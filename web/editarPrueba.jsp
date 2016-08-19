@@ -99,7 +99,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="maximo_inscritos" class="col-lg-offset-1 col-lg-2 control-label">Número máximo de inscritos:</label>
+                    <label for="maximo_inscritos" class="col-lg-3 control-label">Número máximo de inscritos:</label>
                     <div class="col-lg-3">
                         <input type="number" id="maximo_inscritos" name="maximo_inscritos" class="form-control" value="${requestScope.prueba.maximoInscritos}" min="0" required>
                     </div>
