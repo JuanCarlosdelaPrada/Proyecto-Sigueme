@@ -888,12 +888,15 @@ public class ControladorAdministracion extends HttpServlet {
                 usuario_id = request.getParameter("usuario_id");
                 usuario = em.find(Usuario.class, usuario_id);
                 permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
-                if (usuario != null && permiso) {
+                if (usuario != null && (permiso || session.getAttribute("correo").equals(usuario_id))) {
                     SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
                     request.setAttribute("fechaNacimiento", formateador.format(usuario.getFechaNacimiento()));
                     request.setAttribute("usuario", usuario);
+                    vista = "editarUsuario.jsp";
                 }
-                vista = "editarUsuario.jsp";
+                else {
+                    vista = "inicio.jsp";
+                }
                 break;
             case "/eliminar-usuario":
                 String sesion_usuario = (String) session.getAttribute("correo");

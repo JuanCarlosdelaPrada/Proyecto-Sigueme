@@ -32,7 +32,14 @@
         <!--Contenido-->
         <div class="page-header">
             <div class="col-sm-offset-1">
-                <h1>Editar usuario: ${requestScope.usuario.usuarioId}</h1> 
+                <c:choose>
+                    <c:when test="${sessionScope.correo eq requestScope.usuario.usuarioId}">
+                        <h1>Editar mi perfil</h1>
+                    </c:when>
+                    <c:otherwise>
+                        <h1>Editar usuario: ${requestScope.usuario.usuarioId}</h1> 
+                    </c:otherwise>
+                </c:choose>
             </div>
         </div>
         <div class="container-fluid">
@@ -46,12 +53,14 @@
                         <input type="email" id="correo" name="correo" class="form-control" value="${requestScope.usuario.usuarioId}" placeholder="Correo electrónico" maxlength="64">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="oldPassword" class="col-lg-offset-1 col-lg-2 control-label">Contraseña:</label>
-                    <div class="col-lg-3">
-                        <input type="password" id="oldPassword" name="oldPassword" class="form-control" placeholder="Contraseña">
+                <c:if test="${sessionScope.correo eq requestScope.usuario.usuarioId}">    
+                    <div class="form-group">
+                        <label for="oldPassword" class="col-lg-offset-1 col-lg-2 control-label">Contraseña:</label>
+                        <div class="col-lg-3">
+                            <input type="password" id="oldPassword" name="oldPassword" class="form-control" placeholder="Contraseña">
+                        </div>
                     </div>
-                </div>
+                </c:if>
                 <div class="form-group">
                     <label for="newPassword" class="col-lg-offset-1 col-lg-2 control-label">Nueva contraseña:</label>
                     <div class="col-lg-3">
@@ -188,10 +197,9 @@
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/Bootstrap/bootstrap.min.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/validarUsuario.js" charset="utf-8"></script>
-        <script>
-            var bienvenido = document.getElementById('bienvenido');
-            bienvenido.style.minWidth = bienvenido.getBoundingClientRect().width;
-        </script>
+        <c:if test="${sessionScope.usuario ne null}">
+            <script type="text/javascript" src="js/menuUsuario.js" charset="utf-8"></script>
+        </c:if>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>
     </body>
 </html>

@@ -40,7 +40,14 @@
             <div class="col-xs-offset-1">
                 <c:choose>
                     <c:when test="${empty requestScope.prueba_id}">
-                        <h1>Inscripciones de ${requestScope.usuario_id}</h1>
+                        <c:choose>
+                            <c:when test="${sessionScope.correo eq requestScope.usuario_id}">
+                                <h1>Mis inscripciones</h1>
+                            </c:when>
+                            <c:otherwise>
+                                <h1>Inscripciones de ${requestScope.usuario_id}</h1>
+                            </c:otherwise>
+                        </c:choose>
                     </c:when>
                     <c:otherwise>
                         <h1>Inscripciones en ${requestScope.prueba_id}</h1>
@@ -145,10 +152,9 @@
                     });
             });
 	</script>
-        <script>
-            var bienvenido = document.getElementById('bienvenido');
-            bienvenido.style.minWidth = bienvenido.getBoundingClientRect().width;
-        </script>
+        <c:if test="${sessionScope.usuario ne null}">
+            <script type="text/javascript" src="js/menuUsuario.js" charset="utf-8"></script>
+        </c:if>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>
         
     </body>

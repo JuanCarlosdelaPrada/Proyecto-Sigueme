@@ -122,10 +122,9 @@
             async defer></script>
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/Bootstrap/bootstrap.min.js" charset="utf-8"></script>
-        <script>
-            var bienvenido = document.getElementById('bienvenido');
-            bienvenido.style.minWidth = bienvenido.getBoundingClientRect().width;
-        </script>
+        <c:if test="${sessionScope.usuario ne null}">
+            <script type="text/javascript" src="js/menuUsuario.js" charset="utf-8"></script>
+        </c:if>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>
     </body>
 </html>

@@ -100,10 +100,9 @@
                     });
             });
 	</script>
-        <script>
-            var bienvenido = document.getElementById('bienvenido');
-            bienvenido.style.minWidth = bienvenido.getBoundingClientRect().width;
-        </script>
+        <c:if test="${sessionScope.usuario ne null}">
+            <script type="text/javascript" src="js/menuUsuario.js" charset="utf-8"></script>
+        </c:if>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>
         
     </body>
