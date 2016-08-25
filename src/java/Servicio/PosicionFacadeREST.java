@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Controlador.service;
+package Servicio;
 
 import JPA_Entidades.Posicion;
 import JPA_Entidades.PosicionPK;
@@ -27,7 +27,7 @@ import javax.ws.rs.core.PathSegment;
  * @author Je¡ZZ¡
  */
 @Stateless
-@Path("jpa_entidades.posicion")
+@Path("posiciones")
 public class PosicionFacadeREST extends AbstractFacade<Posicion> {
 
     @PersistenceContext(unitName = "SiguemePU")
@@ -110,7 +110,7 @@ public class PosicionFacadeREST extends AbstractFacade<Posicion> {
     }
 
     @GET
-    @Path("count")
+    @Path("contar")
     @Produces(MediaType.TEXT_PLAIN)
     public String countREST() {
         return String.valueOf(super.count());
