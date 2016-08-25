@@ -11,7 +11,7 @@ import javax.ws.rs.core.Application;
 /**
  *
  * @author Je¡ZZ¡
- */@javax.ws.rs.ApplicationPath("ServicioREST")
+ */@javax.ws.rs.ApplicationPath("")
 public class ApplicationConfig extends Application{
     
      @Override
@@ -22,6 +22,7 @@ public class ApplicationConfig extends Application{
      }
      
      private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(Servicio.CrossOriginResourceSharingFilter.class);
         resources.add(Servicio.PosicionFacadeREST.class);
      }
 }
