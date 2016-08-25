@@ -11,7 +11,7 @@ import javax.ws.rs.core.Application;
 /**
  *
  * @author Je¡ZZ¡
- */@javax.ws.rs.ApplicationPath("api")
+ */@javax.ws.rs.ApplicationPath("")
 public class ApplicationConfig extends Application{
     
      @Override
@@ -22,10 +22,6 @@ public class ApplicationConfig extends Application{
      }
      
      private void addRestResourceClasses(Set<Class<?>> resources) {
-        resources.add(Controlador.service.InscritoFacadeREST.class);
         resources.add(Controlador.service.PosicionFacadeREST.class);
-        resources.add(Controlador.service.PruebaFacadeREST.class);
-        resources.add(Controlador.service.RutaFacadeREST.class);
-        resources.add(Controlador.service.UsuarioFacadeREST.class);
      }
 }
