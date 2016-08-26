@@ -35,6 +35,7 @@ public class ApplicationConfig extends Application {
         resources.add(ServicioREST.PruebaFacadeREST.class);
         resources.add(ServicioREST.RutaFacadeREST.class);
         resources.add(ServicioREST.UsuarioFacadeREST.class);
+        resources.add(Util.NewCrossOriginResourceSharingFilter.class);
     }
     
 }
