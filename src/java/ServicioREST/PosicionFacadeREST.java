@@ -84,27 +84,45 @@ public class PosicionFacadeREST extends AbstractFacade<Posicion> {
         super.create(entity);
     }
     
-    @POST
-    @Path("nueva-posicion")
+     @POST
+    @Path("MADAFACKA")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    public void posicion(@FormParam("name") String name,
-                         @FormParam("message") String message) {
-        System.out.println("name: "+ name);
-        System.out.println("message: "+ message);
-        //super.create(entity);
+    public void createMessage(@FormParam("name") String name,
+                                @FormParam("message") String message,
+                                @FormParam("thelist") List<String> list) {
+        if(name.trim().length() > 0 && message.trim().length() > 0 && !list.isEmpty()) {
+            // Note 1: Normally you would persist the new message to a datastore
+            // of some sort. I'm going to pretend I've done that and
+            // use a unique id for it that obviously points to nothing in
+            // this case.
+            // Note 2: The way I'm returning the data should be more like the commented
+            // out piece, I am being verbose for the sake of showing you how to
+            // get the values and show that it was read.
+            System.out.println("name: "+ name);
+            System.out.println("message: "+ message);
+            /* 
+                    return Response.created(URI.create("/messages/" + String.valueOf(UUID.randomUUID()))).entity(
+                    name+ ": " + message + " --> the items: " + list.get(0) + " - " + list.get(1)).build();
+            */
+            // This is a more real world "return"
+            //return Response.created(URI.create("/messages/" + String.valueOf(UUID.randomUUID()))).build();
+        }
+        //return Response.status(Response.Status.PRECONDITION_FAILED).build();
     }
     
     public static void main(String[] args) {
-        String BASE_URI = "http://localhost:8080/Sigueme/servicio-rest/jpa_entidades.posicion/";
+        String BASE_URI = "http://localhost:8080/Sigueme/webresources/jpa_entidades.posicion/";
         try {
             HttpClient httpclient = new DefaultHttpClient();
 
-            HttpPost post = new HttpPost(BASE_URI + "nueva-posicion");
+            HttpPost post = new HttpPost(BASE_URI + "MADAFACKA");
 
             // Setup form data
             List<NameValuePair> nameValuePairs = new ArrayList<>();
             nameValuePairs.add(new BasicNameValuePair("name", "blive1"));
             nameValuePairs.add(new BasicNameValuePair("message", "d30a62033c24df68bb091a958a68a169"));
+            nameValuePairs.add(new BasicNameValuePair("thelist", "blive1"));
+            nameValuePairs.add(new BasicNameValuePair("thelist", "blive1"));
             post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
             // Execute request

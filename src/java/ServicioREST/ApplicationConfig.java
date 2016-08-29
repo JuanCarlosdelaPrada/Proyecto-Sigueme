@@ -12,7 +12,7 @@ import javax.ws.rs.core.Application;
  *
  * @author Je¡ZZ¡
  */
-@javax.ws.rs.ApplicationPath("servicio-rest")
+@javax.ws.rs.ApplicationPath("webresources")
 public class ApplicationConfig extends Application {
 
     @Override
