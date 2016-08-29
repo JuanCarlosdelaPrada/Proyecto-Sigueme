@@ -7,8 +7,15 @@ package ServicioREST;
 
 import JPA_Entidades.Posicion;
 import JPA_Entidades.PosicionPK;
+import java.math.BigDecimal;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -89,16 +96,10 @@ public class PosicionFacadeREST extends AbstractFacade<Posicion> {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public void posicion(@FormParam("pruebaId") String pruebaId,
                         @FormParam("usuarioId") String usuarioId,
-                        @FormParam("fecha") String fecha,
-                        @FormParam("hora") String hora,
                         @FormParam("latitud") String latitud,
                         @FormParam("longitud") String longitud) {
-        System.out.println("prueba: "+ pruebaId);
-        System.out.println("usuario: "+ usuarioId);
-        System.out.println("fecha: "+ fecha);
-        System.out.println("hora: "+ hora);
-        System.out.println("latitud: "+ latitud);
-        System.out.println("longitud: "+ longitud);
+        Posicion posicion = new Posicion(new PosicionPK(pruebaId, usuarioId, new Date(), new Date()), new BigDecimal(Double.parseDouble(latitud)), new BigDecimal(Double.parseDouble(longitud)));
+        super.create(posicion);
     }
     
     public static void main(String[] args) {
@@ -110,12 +111,10 @@ public class PosicionFacadeREST extends AbstractFacade<Posicion> {
 
             // Setup form data
             List<NameValuePair> nameValuePairs = new ArrayList<>();
-            nameValuePairs.add(new BasicNameValuePair("pruebaId", "blive1"));
-            nameValuePairs.add(new BasicNameValuePair("usuarioId", "d30a62033c24df68bb091a958a68a169"));
-            nameValuePairs.add(new BasicNameValuePair("fecha", "blive1"));
-            nameValuePairs.add(new BasicNameValuePair("hora", "blive1"));
-            nameValuePairs.add(new BasicNameValuePair("latitud", "blive1"));
-            nameValuePairs.add(new BasicNameValuePair("longitud", "blive1"));
+            nameValuePairs.add(new BasicNameValuePair("pruebaId", "zAZA"));
+            nameValuePairs.add(new BasicNameValuePair("usuarioId", "a@g.es"));
+            nameValuePairs.add(new BasicNameValuePair("latitud", "10"));
+            nameValuePairs.add(new BasicNameValuePair("longitud", "11"));
             post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
             // Execute request
