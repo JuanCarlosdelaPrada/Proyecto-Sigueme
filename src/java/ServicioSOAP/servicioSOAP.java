@@ -5,14 +5,26 @@
  */
 package ServicioSOAP;
 
-import Bean_Sesion.PosicionFacade;
+import JPA_Entidades.Inscrito;
+import JPA_Entidades.InscritoPK;
 import JPA_Entidades.Posicion;
-import java.util.List;
-import javax.ejb.EJB;
-import javax.jws.Oneway;
+import JPA_Entidades.PosicionPK;
+import java.math.BigDecimal;
+import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.annotation.Resource;
+import javax.jws.WebService;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
-import javax.jws.WebService;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.sql.DataSource;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
 
 /**
  *
@@ -20,47 +32,42 @@ import javax.jws.WebService;
  */
 @WebService(serviceName = "servicioSOAP")
 public class servicioSOAP {
-
-    @EJB
-    private PosicionFacade ejbRef;// Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Web Service Operation")
-
-    @WebMethod(operationName = "create")
-    @Oneway
-    public void create(@WebParam(name = "entity") Posicion entity) {
-        ejbRef.create(entity);
-    }
-
-    @WebMethod(operationName = "edit")
-    @Oneway
-    public void edit(@WebParam(name = "entity") Posicion entity) {
-        ejbRef.edit(entity);
-    }
-
-    @WebMethod(operationName = "remove")
-    @Oneway
-    public void remove(@WebParam(name = "entity") Posicion entity) {
-        ejbRef.remove(entity);
-    }
-
-    @WebMethod(operationName = "find")
-    public Posicion find(@WebParam(name = "id") Object id) {
-        return ejbRef.find(id);
-    }
-
-    @WebMethod(operationName = "findAll")
-    public List<Posicion> findAll() {
-        return ejbRef.findAll();
-    }
-
-    @WebMethod(operationName = "findRange")
-    public List<Posicion> findRange(@WebParam(name = "range") int[] range) {
-        return ejbRef.findRange(range);
-    }
-
-    @WebMethod(operationName = "count")
-    public int count() {
-        return ejbRef.count();
+    @PersistenceContext(unitName = "SiguemePU")
+    private EntityManager em;
+    
+    @Resource
+    private javax.transaction.UserTransaction utx;
+    
+    /**
+     * This is a sample web service operation
+     * @param pruebaId
+     * @param usuarioId
+     * @param latitud
+     * @param longitud
+     */
+    @WebMethod(operationName = "posicion-nueva")
+    public String posicion(@WebParam(name = "pruebaId") String pruebaId,
+                        @WebParam(name = "usuarioId") String usuarioId,
+                        @WebParam(name = "latitud") double latitud,
+                        @WebParam(name = "longitud") double longitud) {
+        Inscrito inscrito = em.find(Inscrito.class, new InscritoPK(pruebaId, usuarioId));
+        if (inscrito != null && inscrito.getPrueba().getActiva()) {
+            PosicionPK posicionPK = new PosicionPK(pruebaId, usuarioId, new Date(), new Date());
+            Posicion posicion = new Posicion(posicionPK, new BigDecimal(latitud), new BigDecimal(longitud));  
+            persist(posicion);
+            return "MIARMITA";
+        }
+        return "PIXA";
     }
     
+    private void persist(Object object) {
+        try {
+            utx.begin();
+            em.persist(object);
+            utx.commit();
+        } catch (NotSupportedException | SystemException | RollbackException | HeuristicMixedException | HeuristicRollbackException | SecurityException | IllegalStateException e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);
+            throw new RuntimeException(e);
+        }
+    }
 }
