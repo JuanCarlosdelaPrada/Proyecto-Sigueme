@@ -190,15 +190,10 @@ public class ControladorAdministracion extends HttpServlet {
                     String correo_login = request.getParameter("correo_login");
                     String contrasena_login = request.getParameter("contrasena_login");
                     
-                    consultaUsuarios = em.createNamedQuery("Usuario.findByUsuarioId", Usuario.class);
-                    consultaUsuarios.setParameter("usuarioId", correo_login);
+                    usuario = em.find(Usuario.class, correo_login);
                     
-                    usuario = consultaUsuarios.getSingleResult();
+                    ivbytes= usuario.getIvbytes();
                     
-                    consultaIvBytes = em.createNamedQuery("Ivbytes.findByUsuarioId", Ivbytes.class);
-                    consultaIvBytes.setParameter("usuarioId", correo_login);
-                    
-                    ivbytes = consultaIvBytes.getSingleResult();
                     AES.setIvBytes(ivbytes.getIvbytesId());
                     if (contrasena_login.equals(AES.decrypt(new String(usuario.getContrasena())))) {
                         session.setAttribute("correo", usuario.getUsuarioId());

@@ -16,6 +16,7 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
         <!--Importaciones .css-->
+        <link href="css/jquery-ui.css" rel="stylesheet">
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/bootstrap-theme.min.css" rel="stylesheet">
         <link href="css/font-awesome.min.css" rel="stylesheet">
@@ -36,6 +37,10 @@
         </div>
         
         <div class="container-fluid">
+            <!--MODIFICAR A MI GUSTO-->
+            <label for="autocomplete">Select a programming language: </label>
+            <input id="autocomplete">
+            
             <div id="map-canvas" class="col-xs-offset-1 col-xs-6">
                 <div id="map" style="width:100%;height:400px"></div>
             </div>
@@ -85,6 +90,19 @@
         <%@include file="WEB-INF/jspf/pie.jspf"%>
         
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/jQuery UI/jquery-ui.js" charset="utf-8"></script>
+        <!-- MODIFICAR A MI GUSTO -->
+        <script>
+            var tags = [ "c++", "java", "php", "coldfusion", "javascript", "asp", "ruby" ];
+            $( "#autocomplete" ).autocomplete({
+              source: function( request, response ) {
+                      var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
+                      response( $.grep( tags, function( item ){
+                          return matcher.test( item );
+                      }) );
+                  }
+            });
+        </script>
         <script type="text/javascript">
                 var path = ${requestScope.latlng};
                 var inicio;

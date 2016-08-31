@@ -5,12 +5,18 @@
  */
 package ServicioSOAP;
 
+import Herramientas.AES;
 import JPA_Entidades.Inscrito;
 import JPA_Entidades.InscritoPK;
+import JPA_Entidades.Ivbytes;
 import JPA_Entidades.Posicion;
 import JPA_Entidades.PosicionPK;
+import JPA_Entidades.Usuario;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Resource;
@@ -40,24 +46,38 @@ public class servicioSOAP {
     
     /**
      * This is a sample web service operation
-     * @param pruebaId
      * @param usuarioId
      * @param latitud
      * @param longitud
      */
     @WebMethod(operationName = "posicion-nueva")
-    public String posicion(@WebParam(name = "pruebaId") String pruebaId,
-                        @WebParam(name = "usuarioId") String usuarioId,
+    public void posicion(@WebParam(name = "usuarioId") String usuarioId,
                         @WebParam(name = "latitud") double latitud,
                         @WebParam(name = "longitud") double longitud) {
-        Inscrito inscrito = em.find(Inscrito.class, new InscritoPK(pruebaId, usuarioId));
-        if (inscrito != null && inscrito.getPrueba().getActiva()) {
-            PosicionPK posicionPK = new PosicionPK(pruebaId, usuarioId, new Date(), new Date());
-            Posicion posicion = new Posicion(posicionPK, new BigDecimal(latitud), new BigDecimal(longitud));  
-            persist(posicion);
-            return "MIARMITA";
+        Usuario usuario = em.find(Usuario.class, usuarioId);
+        Collection<Inscrito> inscripciones = usuario.getInscritoCollection();
+        for(Inscrito inscripcion: inscripciones) {
+            if (inscripcion.getPrueba().getActiva()) {
+                PosicionPK posicionPK = new PosicionPK(inscripcion.getPrueba().getPruebaId(), usuarioId, new Date(), new Date());
+                Posicion posicion = new Posicion(posicionPK, new BigDecimal(latitud), new BigDecimal(longitud));  
+                persist(posicion);
+            }
         }
-        return "PIXA";
+    }
+    
+    /**
+     * This is a sample web service operation
+     * @param usuarioId
+     * @param password
+     * @return 
+     */
+    @WebMethod(operationName = "login")
+    public boolean login(@WebParam(name = "usuarioId") String usuarioId,
+                    @WebParam(name = "password") String password) {
+        Usuario usuario = em.find(Usuario.class, usuarioId);
+        Ivbytes ivbytes = usuario.getIvbytes();
+        AES.setIvBytes(ivbytes.getIvbytesId());
+        return password.equals(AES.decrypt(new String(usuario.getContrasena()))); 
     }
     
     private void persist(Object object) {
