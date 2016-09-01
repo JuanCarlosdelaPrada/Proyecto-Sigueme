@@ -41,7 +41,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Prueba.findByMaximoInscritos", query = "SELECT p FROM Prueba p WHERE p.maximoInscritos = :maximoInscritos"),
     @NamedQuery(name = "Prueba.findByActiva", query = "SELECT p FROM Prueba p WHERE p.activa = :activa"),
     @NamedQuery(name = "Prueba.findByNumero", query = "SELECT p FROM Prueba p WHERE p.numero = :numero"),
-    @NamedQuery(name = "Prueba.orderingByNumero", query = "SELECT p FROM Prueba p ORDER BY p.numero")})
+    @NamedQuery(name = "Prueba.orderingByNumero", query = "SELECT p FROM Prueba p ORDER BY p.numero DESC")})
 public class Prueba implements Serializable {
 
     private static final long serialVersionUID = 1L;
