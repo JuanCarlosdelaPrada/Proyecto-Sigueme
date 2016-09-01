@@ -121,31 +121,30 @@
                 <span class="sr-only">Siguiente</span>
             </a>
         </div>
-                
+        
         <!--Noticias-->
-        <div class="container-fluid ">
-            <h2>Pruebas publicadas recientemente</h2>            
-            <div class="row">
-              <div class="col-md-4">
-                <a href="pulpitrock.jpg" class="thumbnail">
-                  <p>Pulpit Rock: A famous tourist attraction in Forsand, Ryfylke, Norway.</p>    
-                  <img src="pulpitrock.jpg" alt="Pulpit Rock" style="width:150px;height:150px">
-                </a>
-              </div>
-              <div class="col-md-4">
-                <a href="moustiers-sainte-marie.jpg" class="thumbnail">
-                  <p>Moustiers-Sainte-Marie: Considered as one of the "most beautiful villages of France".</p>
-                  <img src="moustiers-sainte-marie.jpg" alt="Moustiers Sainte Marie" style="width:150px;height:150px">
-                </a>
-              </div>
-              <div class="col-md-4">
-                <a href="cinqueterre.jpg" class="thumbnail">
-                  <p>The Cinque Terre: A rugged portion of coast in the Liguria region of Italy.</p>      
-                  <img src="cinqueterre.jpg" alt="Cinque Terre" style="width:150px;height:150px">
-                </a>
-              </div>
-            </div>
-        </div>
+        <c:choose>
+            <c:when test="${not empty requestScope.pruebasRecientes}">
+                <div class="container-fluid ">
+                    <h2>Pruebas publicadas recientemente</h2>
+                    <div class="row">
+                        <c:forEach var="prueba" items="${requestScope.pruebasRecientes}">
+                            <div class="col-md-4">
+                                <a href="prueba?prueba_id=${prueba.pruebaId}" class="thumbnail">
+                                  <p>${prueba.pruebaId}: ${prueba.descripcion}</p>    
+                                  <img src="img/logo_web.png" alt="${prueba.pruebaId}" style="width:150px;height:150px">
+                                </a>
+                          </div>
+                        </c:forEach>
+                    </div>
+                </div>
+            </c:when>
+            <c:otherwise>
+                <div class="row" style="margin-top:0.65%">
+                    </br>
+                </div>
+            </c:otherwise>
+        </c:choose>
         
         <!--Pie-->
         <%@include file="WEB-INF/jspf/pie.jspf"%>

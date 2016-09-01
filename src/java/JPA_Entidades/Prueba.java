@@ -6,10 +6,8 @@
 package JPA_Entidades;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -17,14 +15,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
@@ -36,7 +32,6 @@ import javax.xml.bind.annotation.XmlTransient;
 @NamedQueries({
     @NamedQuery(name = "Prueba.findAll", query = "SELECT p FROM Prueba p"),
     @NamedQuery(name = "Prueba.findByPruebaId", query = "SELECT p FROM Prueba p WHERE p.pruebaId = :pruebaId"),
-    @NamedQuery(name = "Prueba.findByRutaId", query = "SELECT p FROM Prueba p WHERE p.rutaId = :rutaId"),
     @NamedQuery(name = "Prueba.findByDescripcion", query = "SELECT p FROM Prueba p WHERE p.descripcion = :descripcion"),
     @NamedQuery(name = "Prueba.findByLugar", query = "SELECT p FROM Prueba p WHERE p.lugar = :lugar"),
     @NamedQuery(name = "Prueba.findByFechaCel", query = "SELECT p FROM Prueba p WHERE p.fechaCel = :fechaCel"),
@@ -44,7 +39,9 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Prueba.findByFechaInscripMin", query = "SELECT p FROM Prueba p WHERE p.fechaInscripMin = :fechaInscripMin"),
     @NamedQuery(name = "Prueba.findByFechaInscripMax", query = "SELECT p FROM Prueba p WHERE p.fechaInscripMax = :fechaInscripMax"),
     @NamedQuery(name = "Prueba.findByMaximoInscritos", query = "SELECT p FROM Prueba p WHERE p.maximoInscritos = :maximoInscritos"),
-    @NamedQuery(name = "Prueba.findByActiva", query = "SELECT p FROM Prueba p WHERE p.activa = :activa")})
+    @NamedQuery(name = "Prueba.findByActiva", query = "SELECT p FROM Prueba p WHERE p.activa = :activa"),
+    @NamedQuery(name = "Prueba.findByNumero", query = "SELECT p FROM Prueba p WHERE p.numero = :numero"),
+    @NamedQuery(name = "Prueba.orderingByNumero", query = "SELECT p FROM Prueba p ORDER BY p.numero")})
 public class Prueba implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -90,8 +87,10 @@ public class Prueba implements Serializable {
     @NotNull
     @Column(name = "activa")
     private boolean activa;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "prueba")
-    private Collection<Inscrito> inscritoCollection;
+    @Basic(optional = false)
+    @NotNull
+    @Column(name = "numero")
+    private int numero;
     @JoinColumn(name = "ruta_id", referencedColumnName = "ruta_id")
     @ManyToOne(optional = false)
     private Ruta rutaId;
@@ -103,7 +102,7 @@ public class Prueba implements Serializable {
         this.pruebaId = pruebaId;
     }
 
-    public Prueba(String pruebaId, String lugar, Date fechaCel, Date horaCel, Date fechaInscripMin, Date fechaInscripMax, int maximoInscritos, boolean activa) {
+    public Prueba(String pruebaId, String lugar, Date fechaCel, Date horaCel, Date fechaInscripMin, Date fechaInscripMax, int maximoInscritos, boolean activa, int numero) {
         this.pruebaId = pruebaId;
         this.lugar = lugar;
         this.fechaCel = fechaCel;
@@ -112,6 +111,7 @@ public class Prueba implements Serializable {
         this.fechaInscripMax = fechaInscripMax;
         this.maximoInscritos = maximoInscritos;
         this.activa = activa;
+        this.numero = numero;
     }
 
     public String getPruebaId() {
@@ -186,13 +186,12 @@ public class Prueba implements Serializable {
         this.activa = activa;
     }
 
-    @XmlTransient
-    public Collection<Inscrito> getInscritoCollection() {
-        return inscritoCollection;
+    public int getNumero() {
+        return numero;
     }
 
-    public void setInscritoCollection(Collection<Inscrito> inscritoCollection) {
-        this.inscritoCollection = inscritoCollection;
+    public void setNumero(int numero) {
+        this.numero = numero;
     }
 
     public Ruta getRutaId() {

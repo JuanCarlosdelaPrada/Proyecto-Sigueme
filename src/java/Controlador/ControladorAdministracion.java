@@ -22,7 +22,6 @@ import com.google.gson.JsonPrimitive;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -33,13 +32,10 @@ import java.util.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Calendar;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -143,6 +139,7 @@ public class ControladorAdministracion extends HttpServlet {
         Enumeration<String> parametros;
         SimpleDateFormat formato;
         List<Inscrito> inscritos;
+        List<Prueba> pruebas;
         JsonObject resultado;
         ParserGPX parseador;
         Inscrito inscrito;
@@ -155,7 +152,8 @@ public class ControladorAdministracion extends HttpServlet {
                 
         byte[] ivBytes;
         
-        int cantidad,
+        int i,
+            cantidad,
             comienzo,
             idraw,
             num_atributos,
@@ -185,6 +183,17 @@ public class ControladorAdministracion extends HttpServlet {
         
         vista = "";
         switch(accion) {
+            case "":
+                List<Prueba> pruebasRecientes = new ArrayList<>();
+                pruebas = em.createNamedQuery("Prueba.orderingByNumero", Prueba.class).getResultList();
+                i = 0;
+                while ( i < pruebas.size() && i < 3) {
+                    pruebasRecientes.add(pruebas.get(i));
+                    i++;
+                }
+                request.setAttribute("pruebasRecientes", pruebasRecientes);
+                vista = "";
+                break;
             case "/login":
                 try {
                     String correo_login = request.getParameter("correo_login");
@@ -210,14 +219,14 @@ public class ControladorAdministracion extends HttpServlet {
                 catch(Exception ex) {
                     System.out.println("<p class='incorrecto'>Dicho usuario no existe en nuestro sistema.</p>");
                 }
-                vista= "inicio.jsp";
+                vista= "";
                 break;
             case "/logout":
                 session.setAttribute("correo", null);
                 session.setAttribute("usuario", null);
                 session.setAttribute("permiso", null);
                 session.invalidate();
-                vista = "inicio.jsp";
+                vista = "";
                 break;
             case "/crearUsuario":
                 permiso = session.getAttribute("permiso") == null? false: (Boolean) session.getAttribute("permiso");
@@ -260,12 +269,12 @@ public class ControladorAdministracion extends HttpServlet {
                         vista = "usuarios.jsp";
                     }
                     else {
-                        vista = "inicio.jsp";
+                        vista = "";
                     }
                 }
                 else {
                     System.out.println("NO TIENE SUFICIENTES PERMISOS");
-                    vista = "inicio.jsp";
+                    vista = "";
                 }
                 break;
             case "/subirRuta": 
@@ -353,7 +362,7 @@ public class ControladorAdministracion extends HttpServlet {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 int maximo_inscritos_tratada = Integer.parseInt(maximo_inscritos);
-                prueba = new Prueba(prueba_id, lugar, fecha_cel_tratada, hora_cel_tratada, fecha_inscrip_min_tratada, fecha_inscrip_max_tratada, maximo_inscritos_tratada, false);
+                prueba = new Prueba(prueba_id, lugar, fecha_cel_tratada, hora_cel_tratada, fecha_inscrip_min_tratada, fecha_inscrip_max_tratada, maximo_inscritos_tratada, false, em.createNamedQuery("Prueba.findAll", Prueba.class).getResultList().size());
                 ruta = em.find(JPA_Entidades.Ruta.class, ruta_id);
                 prueba.setRutaId(ruta);
                 prueba.setDescripcion(descripcion);
@@ -505,7 +514,7 @@ public class ControladorAdministracion extends HttpServlet {
                     rs = ps.executeQuery();
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
-                        for (int i = 0; i < atributos.length; i++) {
+                        for (i = 0; i < atributos.length; i++) {
                             ja.add(columnas[i], new JsonPrimitive(rs.getString(atributos[i])));                            
                         }
                         ja.add(columnas[atributos.length], new JsonPrimitive("<a href='ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
@@ -571,7 +580,7 @@ public class ControladorAdministracion extends HttpServlet {
                 if (ruta != null) {
                     consultaPruebas = em.createNamedQuery("Prueba.findByRutaId", Prueba.class);
                     consultaPruebas.setParameter("rutaId", ruta);
-                    List<Prueba> pruebas = consultaPruebas.getResultList();
+                    pruebas = consultaPruebas.getResultList();
                     if (!pruebas.isEmpty()) {
                         for (Prueba pr : pruebas) {
                             consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaId", Inscrito.class);
@@ -666,7 +675,7 @@ public class ControladorAdministracion extends HttpServlet {
                     Boolean user = session.getAttribute("usuario") != null;
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
-                        for (int i = 0; i < atributosP.length; i++) {
+                        for (i = 0; i < atributosP.length; i++) {
                             ja.add(columnasP[i], new JsonPrimitive(rs.getString(atributosP[i])));
                         }
                         if (!permiso) {
@@ -832,7 +841,7 @@ public class ControladorAdministracion extends HttpServlet {
                     permiso = session.getAttribute("permiso") == null ? false : (boolean) session.getAttribute("permiso");
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
-                        for (int i = 0; i < atributosU.length; i++) {
+                        for (i = 0; i < atributosU.length; i++) {
                             String u;
                             if (!columnasU[i].equals("Federado") && !columnasU[i].equals("Rol")) {
                                 u = rs.getString(atributosU[i]);
@@ -890,7 +899,7 @@ public class ControladorAdministracion extends HttpServlet {
                     vista = "editarUsuario.jsp";
                 }
                 else {
-                    vista = "inicio.jsp";
+                    vista = "";
                 }
                 break;
             case "/eliminar-usuario":
@@ -927,16 +936,16 @@ public class ControladorAdministracion extends HttpServlet {
                     }
                     else if (!sesion_usuario.equals(usuario_id)) {
                         System.out.println("No tiene suficientes permisos para eliminar dicho usuario.");
-                        vista = "inicio.jsp";
+                        vista = "";
                     }
                     else {
                         System.out.println("El usuario no existe.");
-                        vista = "inicio.jsp";
+                        vista = "";
                     }
                 }
                 else {
                     System.out.println("Se ha accedido a una zona restringida");
-                    vista = "inicio.jsp";
+                    vista = "";
                 }
                 break;
             case "/seguimientoPruebas":
@@ -1010,7 +1019,7 @@ public class ControladorAdministracion extends HttpServlet {
                     Boolean user = session.getAttribute("usuario") != null;
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
-                        for (int i = 0; i < atributosS.length; i++) {
+                        for (i = 0; i < atributosS.length; i++) {
                             ja.add(columnasS[i], new JsonPrimitive(rs.getString(atributosS[i])));
                         }
                         ja.add(columnasS[atributosS.length], new JsonPrimitive("<a href='seguir-prueba?" + atributosS[0] + "=" + ja.get(columnasS[0]).getAsString() + "'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
@@ -1143,7 +1152,7 @@ public class ControladorAdministracion extends HttpServlet {
                             inscrito = new Inscrito(inscritoPK, false, 1);
                         }
                         else {
-                            int i = 0;
+                            i = 0;
                             boolean hueco = false;
                             while (!hueco && (i + 1) < inscritos.size()) {
                                 if (inscritos.get(i + 1).getDorsal() - inscritos.get(i).getDorsal() != 1)
@@ -1198,11 +1207,11 @@ public class ControladorAdministracion extends HttpServlet {
                     }
                     else {
                         System.out.println("Se produjo un error dicha inscripción no existe");
-                        vista = "inicio.jsp";
+                        vista = "";
                     }
                 }
                 else {
-                    vista = "inicio.jsp";
+                    vista = "";
                 }
                 break;
             case "/eliminar-inscripcion":
@@ -1241,7 +1250,7 @@ public class ControladorAdministracion extends HttpServlet {
                     vista = "inscripciones.jsp";
                 }
                 else {
-                    vista = "inicio.jsp";
+                    vista = "";
                 }
                 break;
             case "/inscripciones_":
@@ -1333,7 +1342,7 @@ public class ControladorAdministracion extends HttpServlet {
                     Boolean user = session.getAttribute("usuario") != null;
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
-                        for (int i = 0; i < atributosI.size(); i++) {
+                        for (i = 0; i < atributosI.size(); i++) {
                             if (!"Pagado".equals(columnasI.get(i))) {
                                 ja.add(columnasI.get(i), new JsonPrimitive(rs.getString(atributosI.get(i))));
                             }
@@ -1373,7 +1382,7 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 break;
             default:
-                vista = "inicio.jsp";
+                vista = "";
                 break;
         };
         RequestDispatcher rd = request.getRequestDispatcher(vista);
