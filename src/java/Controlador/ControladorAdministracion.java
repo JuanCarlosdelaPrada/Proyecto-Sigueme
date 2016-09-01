@@ -79,6 +79,7 @@ import org.jdom.output.XMLOutputter;
     "/rutas", 
     "/ruta",
     "/editar-ruta",
+    "/editarRuta",
     "/eliminar-ruta",
     "/pruebas", 
     "/prueba", //--
@@ -159,6 +160,8 @@ public class ControladorAdministracion extends HttpServlet {
             num_atributos,
             total;
         
+        Part ficheroGPX;
+                
         Boolean permiso;
         
         String usuario_id,
@@ -282,7 +285,7 @@ public class ControladorAdministracion extends HttpServlet {
                 ruta_id  = request.getParameter("track_id");
                 descripcion = request.getParameter("descripcion");
                 dificultad = request.getParameter("dificultad");
-                Part ficheroGPX = request.getPart("ficheroGPX");
+                ficheroGPX = request.getPart("ficheroGPX");
                 
                 //Subo el fichero ".gpx" de la ruta a una carpeta
                 OutputStream salida = null;
@@ -573,6 +576,38 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("ruta", ruta);
                 }
                 vista = "editarRuta.jsp";
+                break;
+            case "/editarRuta":
+                ruta_id = request.getParameter("ruta_id");
+                ruta = em.find(Ruta.class, ruta_id);
+                
+                String track_id = request.getParameter("track_id");
+                descripcion = request.getParameter("descripcion");
+                dificultad = request.getParameter("dificultad");
+                ficheroGPX = request.getPart("ficheroGPX");
+                
+                ruta.setDescripcion(descripcion);
+                ruta.setDificultad(dificultad);
+                
+                if (!ruta_id.equals(track_id)) {
+                    pruebas = (List<Prueba>) ruta.getPruebaCollection();
+                    
+                    for (Prueba prb: pruebas) {
+                        delete(prb);
+                    }
+                    delete(ruta);
+                    
+                    ruta.setRutaId(track_id);
+                    persist(ruta);
+                    for (Prueba prb: pruebas) {
+                        prb.setRutaId(ruta);
+                        persist(prb);
+                    }
+                }
+                else {
+                    merge(ruta);
+                }
+                vista = "rutas.jsp";
                 break;
             case "/eliminar-ruta":
                 ruta_id = request.getParameter("ruta_id");
@@ -1432,6 +1467,17 @@ public class ControladorAdministracion extends HttpServlet {
         try {
             utx.begin();
             em.persist(object);
+            utx.commit();
+        } catch (Exception e) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);
+            throw new RuntimeException(e);
+        }
+    }
+    
+    public void merge(Object object) {
+        try {
+            utx.begin();
+            em.merge(object);
             utx.commit();
         } catch (Exception e) {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", e);

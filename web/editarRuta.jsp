@@ -40,6 +40,7 @@
                 <br>
             </div>
             <form class="form-horizontal" role="form" method="POST" action="editarRuta" enctype="multipart/form-data">
+                <input type="hidden" name="ruta_id" value="${requestScope.ruta.rutaId}">
                 <div class="form-group">
                     <label for="track_id" class="col-lg-offset-1 col-lg-2 control-label">Nombre de la ruta:</label>
                     <div class="col-lg-3">
@@ -132,7 +133,7 @@
                 <div class="form-group">
                     <label for="ficheroGPX" class="col-lg-3 control-label">Modificar archivo GPX:</label>
                     <div class="col-lg-3">
-                        <input type="file" id="ficheroGPX" name="ficheroGPX" class="filestyle" data-iconName="glyphicon glyphicon-upload" data-input="true" data-buttonText="" data-buttonName="btn btn-default" accept=".gpx" required>
+                        <input type="file" id="ficheroGPX" name="ficheroGPX" class="filestyle" data-iconName="glyphicon glyphicon-upload" data-input="true" data-buttonText="" data-buttonName="btn btn-default" accept=".gpx">
                     </div>
                 </div>
                 <div class="form-group">
