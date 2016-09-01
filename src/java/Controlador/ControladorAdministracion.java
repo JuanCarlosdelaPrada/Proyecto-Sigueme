@@ -192,7 +192,7 @@ public class ControladorAdministracion extends HttpServlet {
                     i++;
                 }
                 request.setAttribute("pruebasRecientes", pruebasRecientes);
-                vista = "";
+                vista = "inicio.jsp";
                 break;
             case "/login":
                 try {

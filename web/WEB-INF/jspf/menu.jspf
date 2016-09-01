@@ -11,7 +11,7 @@
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="">Inicio <span class="sr-only">(current)</span></a></li>
+                <li class="active"><a href="/Sigueme">Inicio <span class="sr-only">(current)</span></a></li>
                 <li><a href="rutas.jsp">Rutas</a></li>
                 <li><a href="pruebas.jsp">Pruebas</a></li>
                 <li><a href="seguimientoPruebas.jsp">Seguimiento de pruebas</a>
