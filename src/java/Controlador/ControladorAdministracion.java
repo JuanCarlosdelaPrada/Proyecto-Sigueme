@@ -310,8 +310,6 @@ public class ControladorAdministracion extends HttpServlet {
                 usuario_id = request.getParameter("correo");
                 usuario = em.find(Usuario.class, usuario_id);
                 
-                String oldPassword = request.getParameter("oldPassword");
-                System.out.println("MI ARMITAAAAAA "+oldPassword);
                 contrasena = request.getParameter("newPassword");
                 _contrasena = request.getParameter("validatePassword");
                 nombre = request.getParameter("nombre");
@@ -324,40 +322,53 @@ public class ControladorAdministracion extends HttpServlet {
                 club = request.getParameter("club");
                 federado = request.getParameter("federado");
                 
-                formato = new SimpleDateFormat("yyyy-MM-dd");
+                if (contrasena.equals(_contrasena)) {
+                    if (!contrasena.equals("")) {
+                        //Encriptamos la contraseña con AES-256
+                        String contrasena_tratada = AES.encrypt(contrasena);
+                        ivBytes = AES.getIvBytes();
+                        usuario.setContrasena(contrasena_tratada.getBytes());
+                        ivbytes = usuario.getIvbytes();
+                        ivbytes.setIvbytesId(ivBytes);
+                        merge(ivbytes);
+                    }
+                    formato = new SimpleDateFormat("yyyy-MM-dd");
+                    Date fecha_nacimiento_tratada = null;
+                    try {
+                        fecha_nacimiento_tratada = formato.parse(fecha_nacimiento);
+                    } catch (ParseException ex) {
+                        Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    boolean federado_tratado = federado.equals("s");
 
-                //Encriptamos la contraseña con AES-256
-                String contrasena_tratada = AES.encrypt(contrasena);
-                ivBytes = AES.getIvBytes();
+                    String _club = club.equals("")? null : club;
+
+                    usuario.setNombre(nombre);
+                    usuario.setApellidos(apellidos);
+                    usuario.setDni(dni);
+                    usuario.setDireccion(direccion);
+                    usuario.setFechaNacimiento(fecha_nacimiento_tratada);
+                    usuario.setTelefono(telefono);
+                    usuario.setSexo(sexo);
+                    usuario.setClub(_club);
+                    usuario.setFederado(federado_tratado);
                 
-                Date fecha_nacimiento_tratada = null;
-                try {
-                    fecha_nacimiento_tratada = formato.parse(fecha_nacimiento);
-                } catch (ParseException ex) {
-                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                    merge(usuario);
+                    
+                    permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
+                    
+                    if (permiso && !session.getAttribute("correo").equals(usuario_id)) {
+                        vista = "usuarios.jsp";
+                    }
+                    else {
+                        System.out.println("CAMBIO REALIZADO CON EXITO");
+                        vista = "";
+                    }
                 }
-                
-                boolean federado_tratado = federado.equals("s");
-                
-                String _club = club.equals("")? null : club;
-                
-                usuario.setNombre(nombre);
-                usuario.setApellidos(apellidos);
-                usuario.setDni(dni);
-                usuario.setDireccion(direccion);
-                usuario.setFechaNacimiento(fecha_nacimiento_tratada);
-                usuario.setTelefono(telefono);
-                usuario.setSexo(sexo);
-                usuario.setClub(_club);
-                usuario.setFederado(federado_tratado);
-                usuario.setContrasena(contrasena_tratada.getBytes());
-                
-                ivbytes = usuario.getIvbytes();
-                ivbytes.setIvbytesId(ivBytes);
-                
-                merge(usuario);
-                merge(ivbytes);
-                vista = "usuarios.jsp";
+                else {
+                    System.out.println("ERROR: la contraseña y su validación son distintas.");
+                    vista = "";
+                }
                 break;
             case "/subirRuta": 
                 //Recojo los datos del formulario

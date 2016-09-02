@@ -173,8 +173,5 @@ public abstract class AES {
         
         AES.setIvBytes(xa);
         System.out.println(AES.decrypt(a));
-        
     }
-
-
 }

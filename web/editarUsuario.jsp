@@ -48,14 +48,6 @@
             </div>
             <form class="form-horizontal" role="form" method="POST" action="editarUsuario">
                 <input type="hidden" name="correo" value="${requestScope.usuario.usuarioId}"/>
-                <c:if test="${sessionScope.correo eq requestScope.usuario.usuarioId}">    
-                    <div class="form-group">
-                        <label for="oldPassword" class="col-lg-offset-1 col-lg-2 control-label">Contraseña:</label>
-                        <div class="col-lg-3">
-                            <input type="password" id="oldPassword" name="oldPassword" class="form-control" placeholder="Contraseña">
-                        </div>
-                    </div>
-                </c:if>
                 <div class="form-group">
                     <label for="newPassword" class="col-lg-offset-1 col-lg-2 control-label">Nueva contraseña:</label>
                     <div class="col-lg-3">
