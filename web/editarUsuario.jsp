@@ -47,12 +47,7 @@
                 <br>
             </div>
             <form class="form-horizontal" role="form" method="POST" action="editarUsuario">
-                <div class="form-group">
-                    <label for="correo" class="col-lg-offset-1 col-lg-2 control-label">Correo electrónico:</label>
-                    <div class="col-lg-3">
-                        <input type="email" id="correo" name="correo" class="form-control" value="${requestScope.usuario.usuarioId}" placeholder="Correo electrónico" maxlength="64">
-                    </div>
-                </div>
+                <input type="hidden" name="correo" value="${requestScope.usuario.usuarioId}"/>
                 <c:if test="${sessionScope.correo eq requestScope.usuario.usuarioId}">    
                     <div class="form-group">
                         <label for="oldPassword" class="col-lg-offset-1 col-lg-2 control-label">Contraseña:</label>
@@ -177,9 +172,8 @@
                                         No
                                     </label>
                                 </div>
-                                </c:otherwise>
-                            </c:choose>
-                        
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
                 <div class="form-group">

@@ -102,7 +102,7 @@
                         <div class="form-group">
                             <label for="maximo_inscritos" class="col-lg-3 control-label">Número máximo de inscritos:</label>
                             <div class="col-lg-3">
-                                <input type="number" id="maximo_inscritos" name="maximo_inscritos" class="form-control" min="0" required>
+                                <input type="number" id="maximo_inscritos" name="maximo_inscritos" class="form-control" min="1" required>
                             </div>
                         </div>
                         <div class="form-group">

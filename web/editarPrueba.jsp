@@ -45,12 +45,7 @@
                 <br>
             </div>
             <form class="form-horizontal" role="form" method="POST" action="editarPrueba">
-                <div class="form-group">
-                    <label for="prueba_id" class="col-lg-offset-1 col-lg-2 control-label">Nombre de la prueba:</label>
-                    <div class="col-lg-3">
-                        <input type="text" id="prueba_id" name="prueba_id" class="form-control" placeholder="Nombre de la prueba" value="${requestScope.prueba.pruebaId}" maxlength="75" required>
-                    </div>
-                </div>
+                <input type="hidden" name="prueba_id" value="${requestScope.prueba.pruebaId}"/>
                 <div class="form-group">
                     <label for="descripcion" class="col-lg-offset-1 col-lg-2 control-label">Descripción de la prueba:</label>
                     <div class="col-lg-3">
@@ -101,7 +96,7 @@
                 <div class="form-group">
                     <label for="maximo_inscritos" class="col-lg-3 control-label">Número máximo de inscritos:</label>
                     <div class="col-lg-3">
-                        <input type="number" id="maximo_inscritos" name="maximo_inscritos" class="form-control" value="${requestScope.prueba.maximoInscritos}" min="0" required>
+                        <input type="number" id="maximo_inscritos" name="maximo_inscritos" class="form-control" value="${requestScope.prueba.maximoInscritos}" min="1" required>
                     </div>
                 </div>
                 <div class="form-group">

@@ -42,12 +42,6 @@
             <form class="form-horizontal" role="form" method="POST" action="editarRuta" enctype="multipart/form-data">
                 <input type="hidden" name="ruta_id" value="${requestScope.ruta.rutaId}">
                 <div class="form-group">
-                    <label for="track_id" class="col-lg-offset-1 col-lg-2 control-label">Nombre de la ruta:</label>
-                    <div class="col-lg-3">
-                        <input type="text" id="track_id" name="track_id" class="form-control" placeholder="Nombre de la ruta" maxlength="75" value="${requestScope.ruta.rutaId}" required>
-                    </div>
-                </div>
-                <div class="form-group">
                     <label for="descripcion" class="col-lg-offset-1 col-lg-2 control-label">Descripción de la ruta:</label>
                     <div class="col-lg-3">
                         <textarea id="descripcion" name="descripcion" class="form-control" placeholder="Descripción de la ruta" maxlength="360">${requestScope.ruta.descripcion}</textarea>

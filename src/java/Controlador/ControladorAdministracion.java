@@ -71,18 +71,18 @@ import org.jdom.output.XMLOutputter;
  */
 @WebServlet(urlPatterns = {
     "",
-    "/crearUsuario",
     "/login",
     "/logout",
-    "/subirRuta",
-    "/crearPrueba",
     "/rutas", 
     "/ruta",
+    "/subirRuta",
     "/editar-ruta",
     "/editarRuta",
     "/eliminar-ruta",
     "/pruebas", 
     "/prueba", //--
+    "/crearPrueba",
+    "/editarPrueba",
     "/editar-prueba",
     "/eliminar-prueba",
     "/seguimientoPruebas", 
@@ -90,6 +90,8 @@ import org.jdom.output.XMLOutputter;
     "/seguimiento_prueba",
     "/usuarios",
     "/usuario", //--
+    "/crearUsuario",
+    "/editarUsuario",
     "/editar-usuario",
     "/eliminar-usuario",
     "/inscripciones",
@@ -159,9 +161,7 @@ public class ControladorAdministracion extends HttpServlet {
             idraw,
             num_atributos,
             total;
-        
-        Part ficheroGPX;
-                
+            
         Boolean permiso;
         
         String usuario_id,
@@ -182,7 +182,32 @@ public class ControladorAdministracion extends HttpServlet {
                draw, 
                sCol, 
                sdir,
-               nombreAtributo;
+               nombreAtributo,
+               contrasena,
+               _contrasena,
+               nombre,
+               apellidos,
+               dni,
+               direccion,
+               fecha_nacimiento,
+               telefono,
+               sexo,
+               club,
+               federado;
+        
+        Part ficheroGPX;
+        
+        File destino,
+             archivo;
+        
+        Date fecha_cel_tratada = null,
+             fecha_inscrip_min_tratada = null,
+             fecha_inscrip_max_tratada = null,
+             hora_cel_tratada = null;
+        
+        OutputStream salida = null;
+        
+        InputStream contenidoDelFichero = null;
         
         vista = "";
         switch(accion) {
@@ -234,18 +259,19 @@ public class ControladorAdministracion extends HttpServlet {
             case "/crearUsuario":
                 permiso = session.getAttribute("permiso") == null? false: (Boolean) session.getAttribute("permiso");
                 if (session.getAttribute("correo") == null || permiso) {
-                           usuario_id = request.getParameter("correo");
-                    String contrasena = request.getParameter("fstPassword"),
-                           _contrasena = request.getParameter("sndPassword"),
-                           nombre = request.getParameter("nombre"),
-                           apellidos = request.getParameter("apellidos"),
-                           dni = request.getParameter("dni"),
-                           direccion = request.getParameter("direccion"),
-                           fecha_nacimiento = request.getParameter("fecha_nacimiento"),
-                           telefono = request.getParameter("telefono"),
-                           sexo = request.getParameter("sexo"),
-                           club = request.getParameter("club"),
-                           federado = request.getParameter("federado");
+                    usuario_id = request.getParameter("correo");
+                    contrasena = request.getParameter("fstPassword");
+                    _contrasena = request.getParameter("sndPassword");
+                    nombre = request.getParameter("nombre");
+                    apellidos = request.getParameter("apellidos");
+                    dni = request.getParameter("dni");
+                    direccion = request.getParameter("direccion");
+                    fecha_nacimiento = request.getParameter("fecha_nacimiento");
+                    telefono = request.getParameter("telefono");
+                    sexo = request.getParameter("sexo");
+                    club = request.getParameter("club");
+                    federado = request.getParameter("federado");
+                    
                     formato = new SimpleDateFormat("yyyy-MM-dd");
 
                     //Encriptamos la contraseña con AES-256
@@ -280,6 +306,59 @@ public class ControladorAdministracion extends HttpServlet {
                     vista = "";
                 }
                 break;
+            case "/editarUsuario":
+                usuario_id = request.getParameter("correo");
+                usuario = em.find(Usuario.class, usuario_id);
+                
+                String oldPassword = request.getParameter("oldPassword");
+                System.out.println("MI ARMITAAAAAA "+oldPassword);
+                contrasena = request.getParameter("newPassword");
+                _contrasena = request.getParameter("validatePassword");
+                nombre = request.getParameter("nombre");
+                apellidos = request.getParameter("apellidos");
+                dni = request.getParameter("dni");
+                direccion = request.getParameter("direccion");
+                fecha_nacimiento = request.getParameter("fecha_nacimiento");
+                telefono = request.getParameter("telefono");
+                sexo = request.getParameter("sexo");
+                club = request.getParameter("club");
+                federado = request.getParameter("federado");
+                
+                formato = new SimpleDateFormat("yyyy-MM-dd");
+
+                //Encriptamos la contraseña con AES-256
+                String contrasena_tratada = AES.encrypt(contrasena);
+                ivBytes = AES.getIvBytes();
+                
+                Date fecha_nacimiento_tratada = null;
+                try {
+                    fecha_nacimiento_tratada = formato.parse(fecha_nacimiento);
+                } catch (ParseException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                boolean federado_tratado = federado.equals("s");
+                
+                String _club = club.equals("")? null : club;
+                
+                usuario.setNombre(nombre);
+                usuario.setApellidos(apellidos);
+                usuario.setDni(dni);
+                usuario.setDireccion(direccion);
+                usuario.setFechaNacimiento(fecha_nacimiento_tratada);
+                usuario.setTelefono(telefono);
+                usuario.setSexo(sexo);
+                usuario.setClub(_club);
+                usuario.setFederado(federado_tratado);
+                usuario.setContrasena(contrasena_tratada.getBytes());
+                
+                ivbytes = usuario.getIvbytes();
+                ivbytes.setIvbytesId(ivBytes);
+                
+                merge(usuario);
+                merge(ivbytes);
+                vista = "usuarios.jsp";
+                break;
             case "/subirRuta": 
                 //Recojo los datos del formulario
                 ruta_id  = request.getParameter("track_id");
@@ -287,12 +366,9 @@ public class ControladorAdministracion extends HttpServlet {
                 dificultad = request.getParameter("dificultad");
                 ficheroGPX = request.getPart("ficheroGPX");
                 
-                //Subo el fichero ".gpx" de la ruta a una carpeta
-                OutputStream salida = null;
-                InputStream contenidoDelFichero = null;
                // PrintWriter writer = response.getWriter();
-                File destino = new File("C:\\Users\\Je¡ZZ¡\\Documents\\NetBeansProjects\\Sigueme\\web\\ficherosGPX");
-                File archivo = new File(destino + File.separator + ruta_id + ".gpx");
+                destino = new File("C:\\Users\\Je¡ZZ¡\\Documents\\NetBeansProjects\\Sigueme\\web\\ficherosGPX");
+                archivo = new File(destino + File.separator + ruta_id + ".gpx");
                 try {                   
                     salida = new FileOutputStream(archivo);
                     contenidoDelFichero = ficheroGPX.getInputStream();
@@ -351,10 +427,6 @@ public class ControladorAdministracion extends HttpServlet {
                 fecha_inscrip_max = request.getParameter("fecha_inscrip_max");
                 maximo_inscritos = request.getParameter("maximo_inscritos");
                 formato = new SimpleDateFormat("yyyy-MM-dd");
-                Date fecha_cel_tratada = null,
-                     fecha_inscrip_min_tratada = null,
-                     fecha_inscrip_max_tratada = null,
-                     hora_cel_tratada = null;
                 try {
                     fecha_cel_tratada = formato.parse(fecha_cel);
                     fecha_inscrip_min_tratada = formato.parse(fecha_inscrip_min);
@@ -372,6 +444,56 @@ public class ControladorAdministracion extends HttpServlet {
                 if (em.find(JPA_Entidades.Prueba.class, prueba_id) == null) {
                     persist(prueba);
                 }
+                try (Connection conn = myDatasource.getConnection()) {
+                    PreparedStatement stm = conn.prepareStatement("CREATE EVENT " + prueba_id + " ON SCHEDULE AT ? DO UPDATE seguimiento_trayectoria.prueba SET activa = 1 WHERE prueba_id = ?");
+                    stm.setString(1, fecha_cel + " " + hora_cel);
+                    stm.setString(2, prueba_id);
+                    System.out.println(stm.toString());
+                    stm.execute();
+                } catch (SQLException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                vista = "pruebas.jsp";
+                break;
+            case "/editarPrueba":
+                prueba_id = request.getParameter("prueba_id");
+                prueba = em.find(Prueba.class, prueba_id);
+                
+                ruta_id = request.getParameter("ruta_id");
+                ruta = em.find(JPA_Entidades.Ruta.class, ruta_id);
+                
+                descripcion = request.getParameter("descripcion");
+                lugar = request.getParameter("lugar");
+                
+                fecha_cel = request.getParameter("fecha_cel");
+                hora_cel = request.getParameter("hora_cel");
+                fecha_inscrip_min = request.getParameter("fecha_inscrip_min");
+                fecha_inscrip_max = request.getParameter("fecha_inscrip_max");
+                formato = new SimpleDateFormat("yyyy-MM-dd");
+                try {
+                    fecha_cel_tratada = formato.parse(fecha_cel);
+                    fecha_inscrip_min_tratada = formato.parse(fecha_inscrip_min);
+                    fecha_inscrip_max_tratada = formato.parse(fecha_inscrip_max);
+                    formato = new SimpleDateFormat("hh:mm");
+                    hora_cel_tratada = formato.parse(hora_cel);
+                } catch (ParseException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                
+                maximo_inscritos = request.getParameter("maximo_inscritos");
+                int maximoInscritos = Integer.parseInt(maximo_inscritos);
+                
+                prueba.setRutaId(ruta);
+                prueba.setDescripcion(descripcion);
+                prueba.setLugar(lugar);
+                prueba.setFechaCel(fecha_cel_tratada);
+                prueba.setFechaInscripMin(fecha_inscrip_min_tratada);
+                prueba.setFechaInscripMax(fecha_inscrip_max_tratada);
+                prueba.setHoraCel(hora_cel_tratada);
+                prueba.setMaximoInscritos(maximoInscritos);
+                
+                merge(prueba);
+                
                 try (Connection conn = myDatasource.getConnection()) {
                     PreparedStatement stm = conn.prepareStatement("CREATE EVENT " + prueba_id + " ON SCHEDULE AT ? DO UPDATE seguimiento_trayectoria.prueba SET activa = 1 WHERE prueba_id = ?");
                     stm.setString(1, fecha_cel + " " + hora_cel);
@@ -581,32 +703,48 @@ public class ControladorAdministracion extends HttpServlet {
                 ruta_id = request.getParameter("ruta_id");
                 ruta = em.find(Ruta.class, ruta_id);
                 
-                String track_id = request.getParameter("track_id");
                 descripcion = request.getParameter("descripcion");
                 dificultad = request.getParameter("dificultad");
                 ficheroGPX = request.getPart("ficheroGPX");
                 
                 ruta.setDescripcion(descripcion);
                 ruta.setDificultad(dificultad);
-                
-                if (!ruta_id.equals(track_id)) {
-                    pruebas = (List<Prueba>) ruta.getPruebaCollection();
+                if (!ficheroGPX.getSubmittedFileName().equals("")) {
+                    File ficheroGpx = new File(ruta.getFicheroGpx());
                     
-                    for (Prueba prb: pruebas) {
-                        delete(prb);
-                    }
-                    delete(ruta);
+                    ficheroGpx.delete();
                     
-                    ruta.setRutaId(track_id);
-                    persist(ruta);
-                    for (Prueba prb: pruebas) {
-                        prb.setRutaId(ruta);
-                        persist(prb);
+                    destino = new File("C:\\Users\\Je¡ZZ¡\\Documents\\NetBeansProjects\\Sigueme\\web\\ficherosGPX");
+                    archivo = new File(destino + File.separator + ruta_id + ".gpx");
+                    
+                    try {                   
+                        salida = new FileOutputStream(archivo);
+                        contenidoDelFichero = ficheroGPX.getInputStream();
+
+                        int read = 0;
+                        byte[] bytes = new byte[1024];
+
+                        while((read = contenidoDelFichero.read(bytes)) != -1) {
+                            salida.write(bytes, 0, read);
+                        }
+                    } catch (FileNotFoundException fne) {
+                    } finally {
+                        if (salida != null) {
+                            salida.close();
+                        }
+                        if (contenidoDelFichero != null) {
+                            contenidoDelFichero.close();
+                        }
                     }
+                    parseador = new ParserGPX(archivo);
+                    
+                    ruta.setLatMin(new BigDecimal(parseador.getMinlat()));
+                    ruta.setLongMin(new BigDecimal(parseador.getMinlon()));
+                    ruta.setLatMax(new BigDecimal(parseador.getMaxlat()));
+                    ruta.setLongMax(new BigDecimal(parseador.getMaxlon()));
+                    ruta.setDistancia(new BigDecimal(DistanciaDeHaversine.getDistancia(parseador.getLatitudes(), parseador.getLongitudes())));
                 }
-                else {
-                    merge(ruta);
-                }
+                merge(ruta);
                 vista = "rutas.jsp";
                 break;
             case "/eliminar-ruta":
