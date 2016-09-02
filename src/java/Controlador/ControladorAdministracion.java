@@ -82,8 +82,8 @@ import org.jdom.output.XMLOutputter;
     "/pruebas", 
     "/prueba", //--
     "/crearPrueba",
-    "/editarPrueba",
     "/editar-prueba",
+    "/editarPrueba",
     "/eliminar-prueba",
     "/seguimientoPruebas", 
     "/seguir-prueba",
@@ -91,14 +91,15 @@ import org.jdom.output.XMLOutputter;
     "/usuarios",
     "/usuario", //--
     "/crearUsuario",
-    "/editarUsuario",
     "/editar-usuario",
+    "/editarUsuario",
     "/eliminar-usuario",
     "/inscripciones",
+    "/inscripciones_",
     "/inscribirse",
     "/editar-inscripcion",
-    "/eliminar-inscripcion",
-    "/inscripciones_"
+    "/editarInscripcion",
+    "/eliminar-inscripcion"
 })
 @MultipartConfig
 
@@ -232,6 +233,7 @@ public class ControladorAdministracion extends HttpServlet {
                     ivbytes= usuario.getIvbytes();
                     
                     AES.setIvBytes(ivbytes.getIvbytesId());
+                    System.out.println(AES.decrypt(new String(usuario.getContrasena())));
                     if (contrasena_login.equals(AES.decrypt(new String(usuario.getContrasena())))) {
                         session.setAttribute("correo", usuario.getUsuarioId());
                         session.setAttribute("usuario", usuario.getNombre());
@@ -867,7 +869,7 @@ public class ControladorAdministracion extends HttpServlet {
                                 ja.add(columnasP[atributosP.length], new JsonPrimitive("<a href='inscribirse?"+atributosP[0]+"="+ja.get(columnasP[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
                             }
                             else {
-                                ja.add(columnasP[atributosP.length], new JsonPrimitive("<a href='crearUsuario.jsp'>Registrate ya!</a>"));
+                                ja.add(columnasP[atributosP.length], new JsonPrimitive("<a href='crearUsuario.jsp'>¡Registrate ya!</a>"));
                             }
                         }
                         ja.add(columnasP[atributosP.length + 1], new JsonPrimitive("<a href='prueba?"+atributosP[0]+"="+ja.get(columnasP[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
@@ -1338,8 +1340,8 @@ public class ControladorAdministracion extends HttpServlet {
                         else {
                             i = 0;
                             boolean hueco = false;
-                            while (!hueco && (i + 1) < inscritos.size()) {
-                                if (inscritos.get(i + 1).getDorsal() - inscritos.get(i).getDorsal() != 1)
+                            while (!hueco && i < inscritos.size()) {
+                                if ((i + 1) != inscritos.get(i).getDorsal())
                                     hueco = true;
                                 i++;
                             }
@@ -1347,7 +1349,7 @@ public class ControladorAdministracion extends HttpServlet {
                                 inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, inscritos.size() + 1);
                             }
                             else {
-                                inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, i + 1);
+                                inscrito = new Inscrito(new InscritoPK(prueba_id, (String) session.getAttribute("correo")), false, i);
                             }
                         }
                         persist(inscrito);
@@ -1372,6 +1374,25 @@ public class ControladorAdministracion extends HttpServlet {
                 request.setAttribute("prueba_id", prueba_id);
                 request.setAttribute("usuario_id", usuario_id);
                 vista = "inscripciones.jsp";
+                break;
+            case "/editarInscripcion":
+                prueba_id = request.getParameter("prueba_id");
+                usuario_id = request.getParameter("usuario_id");
+                inscrito = em.find(Inscrito.class, new InscritoPK(prueba_id, usuario_id));
+                
+                int dorsal = Integer.parseInt(request.getParameter("dorsal"));
+                boolean pagado = request.getParameter("pagado").equals("s");
+                if (inscrito.getDorsal() == dorsal || em.createNamedQuery("Inscrito.findByDorsal", Inscrito.class).setParameter("dorsal", dorsal).getResultList().isEmpty()) {
+                    inscrito.setDorsal(dorsal);
+                    inscrito.setPagado(pagado);
+                    merge(inscrito);
+                    String identificador = request.getParameterNames().nextElement().equals("usuarioId")? "usuario_id": "prueba_id";
+                    request.setAttribute(identificador, request.getParameter(request.getParameterNames().nextElement()));
+                    vista = "inscripciones.jsp";
+                }
+                else {
+                    vista = "";
+                }
                 break;
             case "/editar-inscripcion":
                 prueba_id = request.getParameter("prueba_id");

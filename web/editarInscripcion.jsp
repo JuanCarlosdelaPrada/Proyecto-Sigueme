@@ -34,10 +34,10 @@
             <div class="col-xs-offset-1">
                 <c:choose>
                     <c:when test="${empty requestScope.prueba_id}">
-                        <h1>Editar inscripción de ${requestScope.usuario_id}</h1>
+                        <h1>Editar inscripción de ${requestScope.usuario_id} en "${requestScope.inscrito.inscritoPK.pruebaId}"</h1>
                     </c:when>
                     <c:otherwise>
-                        <h1>Editar inscripción en ${requestScope.prueba_id}</h1>
+                        <h1>Editar inscripción en "${requestScope.prueba_id}" de ${requestScope.inscrito.inscritoPK.usuarioId}</h1>
                     </c:otherwise> 
                 </c:choose>
             </div>
@@ -48,22 +48,16 @@
                 <br>
             </div>
             <form class="form-horizontal" role="form" method="POST" action="editarInscripcion">
-                <div class="form-group">
-                    <c:choose>
-                        <c:when test="${!empty requestScope.prueba_id}">
-                            <label for="track_id" class="col-lg-offset-1 col-lg-2 control-label">Correo:</label>
-                            <div class="col-lg-3">
-                                <input type="text" id="usuario_id" name="usuario_id" class="form-control" placeholder="Correo" maxlength="64" value="${requestScope.inscrito.usuario.usuarioId}" required>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <label for="track_id" class="col-lg-offset-1 col-lg-2 control-label">Nombre de la prueba:</label>
-                            <div class="col-lg-3">
-                                <input type="text" id="prueba_id" name="prueba_id" class="form-control" placeholder="Nombre de la prueba" maxlength="75" value="${requestScope.inscrito.prueba.pruebaId}" required>
-                            </div>
-                        </c:otherwise> 
-                    </c:choose>
-                </div>
+                <c:choose>
+                    <c:when test="${empty requestScope.prueba_id}">
+                        <input type="hidden" name="usuarioId" value="${requestScope.usuario_id}"/>
+                    </c:when>
+                    <c:otherwise>
+                        <input type="hidden" name="pruebaId" value="${requestScope.prueba_id}"/>
+                    </c:otherwise> 
+                </c:choose>
+                <input type="hidden" name="prueba_id" value="${requestScope.inscrito.inscritoPK.pruebaId}"/>
+                <input type="hidden" name="usuario_id" value="${requestScope.inscrito.inscritoPK.usuarioId}"/>
                 <div class="form-group">
                     <label for="dorsal" class="col-lg-offset-1 col-lg-2 control-label">Dorsal:</label>
                     <div class="col-lg-3">
