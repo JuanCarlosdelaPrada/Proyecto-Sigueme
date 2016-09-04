@@ -1074,6 +1074,12 @@ public class ControladorAdministracion extends HttpServlet {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
+            case "/usuario":
+                usuario_id = request.getParameter("usuario_id");
+                usuario = em.find(Usuario.class, usuario_id);
+                request.setAttribute("usuario", usuario);
+                vista = "usuario.jsp";
+                break;
             case "/editar-usuario":
                 usuario_id = request.getParameter("usuario_id");
                 usuario = em.find(Usuario.class, usuario_id);
