@@ -1077,8 +1077,16 @@ public class ControladorAdministracion extends HttpServlet {
             case "/usuario":
                 usuario_id = request.getParameter("usuario_id");
                 usuario = em.find(Usuario.class, usuario_id);
-                request.setAttribute("usuario", usuario);
-                vista = "usuario.jsp";
+                permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
+                if (usuario != null && (permiso || session.getAttribute("correo").equals(usuario_id))) {
+                    SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
+                    request.setAttribute("fechaNacimiento", formateador.format(usuario.getFechaNacimiento()));
+                    request.setAttribute("usuario", usuario);
+                    vista = "usuario.jsp";
+                }
+                else {
+                    vista = "";
+                }
                 break;
             case "/editar-usuario":
                 usuario_id = request.getParameter("usuario_id");

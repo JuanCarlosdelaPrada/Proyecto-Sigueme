@@ -37,7 +37,7 @@
                         <h1>Mi perfil</h1>
                     </c:when>
                     <c:otherwise>
-                        <h1>${requestScope.usuario.usuarioId}</h1> 
+                        <h1>Perfil de ${requestScope.usuario.usuarioId}</h1> 
                     </c:otherwise>
                 </c:choose>
             </div>
@@ -46,116 +46,89 @@
             <div class="row">
                 <br>
             </div>
-            <div class="form-group">
-                <label for="nombre" class="col-lg-offset-1 col-lg-2 control-label">Nombre:</label>
-                <div class="col-lg-3">
-                    <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre" value="${requestScope.usuario.nombre}" maxlength="32">
+            <form class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label for="nombre" class="col-lg-offset-1 col-lg-2 control-label">Nombre:</label>
+                    <div class="col-lg-3">
+                        <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Nombre" value="${requestScope.usuario.nombre}" maxlength="32" disabled>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="apellidos" class="col-lg-offset-1 col-lg-2 control-label">Apellidos:</label>
-                <div class="col-lg-3">
-                    <input type="text" class="form-control" id="apellidos" name="apellidos" placeholder="Apellidos" value="${requestScope.usuario.apellidos}" maxlength="64">
+                <div class="form-group">
+                    <label for="apellidos" class="col-lg-offset-1 col-lg-2 control-label">Apellidos:</label>
+                    <div class="col-lg-3">
+                        <input type="text" class="form-control" id="apellidos" name="apellidos" placeholder="Apellidos" value="${requestScope.usuario.apellidos}" maxlength="64" disabled>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="dni" class="col-lg-offset-1 col-lg-2 control-label">DNI:</label>
-                <div class="col-lg-3">
-                    <input type="text" class="form-control" id="dni" name="dni" value="${requestScope.usuario.dni}" placeholder="DNI">
+                <div class="form-group">
+                    <label for="dni" class="col-lg-offset-1 col-lg-2 control-label">DNI:</label>
+                    <div class="col-lg-3">
+                        <input type="text" class="form-control" id="dni" name="dni" value="${requestScope.usuario.dni}" placeholder="DNI" disabled>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="direccion" class="col-lg-offset-1 col-lg-2 control-label">Dirección:</label>
-                <div class="col-lg-3">
-                    <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección" value="${requestScope.usuario.direccion}" maxlength="45">
+                <div class="form-group">
+                    <label for="direccion" class="col-lg-offset-1 col-lg-2 control-label">Dirección:</label>
+                    <div class="col-lg-3">
+                        <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección" value="${requestScope.usuario.direccion}" maxlength="45" disabled>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="fecha_nacimiento" class="col-lg-offset-1 col-lg-2 control-label">Fecha de nacimiento:</label>
-                <div class="col-lg-3">
-                    <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" value="${requestScope.fechaNacimiento}" placeholder="Fecha de nacimiento">
+                <div class="form-group">
+                    <label for="fecha_nacimiento" class="col-lg-offset-1 col-lg-2 control-label">Fecha de nacimiento:</label>
+                    <div class="col-lg-3">
+                        <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" value="${requestScope.fechaNacimiento}" placeholder="Fecha de nacimiento" disabled>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="telefono" class="col-lg-offset-1 col-lg-2 control-label">Teléfono:</label>
-                <div class="col-lg-3">
-                    <input type="text" class="form-control" id="telefono" name="telefono" value="${requestScope.usuario.telefono}" placeholder="Teléfono" maxlength="9">
+                <div class="form-group">
+                    <label for="telefono" class="col-lg-offset-1 col-lg-2 control-label">Teléfono:</label>
+                    <div class="col-lg-3">
+                        <input type="text" class="form-control" id="telefono" name="telefono" value="${requestScope.usuario.telefono}" placeholder="Teléfono" maxlength="9" disabled>
+                    </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-offset-1 col-lg-2 control-label">Sexo:</label>
-                <div class="col-lg-3">
-                    <div class="radio">
-                        <label>
+                <div class="form-group">
+                    <label class="col-lg-offset-1 col-lg-2 control-label">Sexo:</label>
+                    <div class="col-lg-3">
+                        <div class="radio">
                             <c:choose>
                                 <c:when test="${requestScope.usuario.sexo eq 'hombre'}">
-                                    <input name="sexo" value="hombre" type="radio" checked>
+                                    Hombre <i class="fa fa-male" aria-hidden="true"></i>
                                 </c:when>
                                 <c:otherwise>
-                                    <input name="sexo" value="hombre" type="radio">
+                                    Mujer <i class="fa fa-female" aria-hidden="true"></i>
                                 </c:otherwise>
                             </c:choose>
-                            Hombre <i class="fa fa-male" aria-hidden="true"></i>
-                        </label>
+                        </div>
                     </div>
-                    <div class="radio">
-                        <label>
+                </div>
+                <div class="form-group">
+                    <label for="club" class="col-lg-offset-1 col-lg-2 control-label">Club al que pertenece:</label>
+                    <div class="col-lg-3">
+                        <c:choose>
+                            <c:when test="${empty requestScope.usuario.club}">
+                                <input type="text" class="form-control" id="club" name="club" value="Ninguno" maxlength="64" disabled>
+                            </c:when>
+                            <c:otherwise>
+                                <input type="text" class="form-control" id="club" name="club" value="${requestScope.usuario.club}" maxlength="64" disabled>
+                            </c:otherwise>
+                        </c:choose>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-lg-offset-1 col-lg-2 control-label">¿Es federado? </label>
+                    <div class="col-lg-3">
+                        <div class="radio">
                             <c:choose>
-                                <c:when test="${requestScope.usuario.sexo eq 'mujer'}">
-                                    <input name="sexo" value="mujer" type="radio" checked>
+                                <c:when test="${requestScope.usuario.federado}">
+                                    Sí
                                 </c:when>
                                 <c:otherwise>
-                                    <input name="sexo" value="mujer" type="radio">
+                                    No
                                 </c:otherwise>
                             </c:choose>
-                            Mujer <i class="fa fa-female" aria-hidden="true"></i>
-                        </label>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="club" class="col-lg-offset-1 col-lg-2 control-label">Club al que pertenece:</label>
-                <div class="col-lg-3">
-                    <input type="text" class="form-control" id="club" name="club" value="${requestScope.usuario.club}" maxlength="64">
-                </div>
-            </div>
-            <div class="form-group">
-                <label class="col-lg-offset-1 col-lg-2 control-label">Indique si es federado o no:</label>
-                <div class="col-lg-3">
-                    <c:choose>
-                        <c:when test="${requestScope.usuario.federado}">
-                            <div class="radio">
-                                <label>
-                                    <input name="federado" value="s" type="radio" checked>
-                                    Sí
-                                </label>
-                            </div>
-                            <div class="radio">
-                                <label>
-                                    <input name="federado" value="n" type="radio" required>
-                                    No
-                                </label>
-                            </div>
-                        </c:when>
-                        <c:otherwise>
-                            <div class="radio">
-                                <label>
-                                    <input name="federado" value="s" type="radio" required>
-                                    Sí
-                                </label>
-                            </div>
-                            <div class="radio">
-                                <label>
-                                    <input name="federado" value="n" type="radio" checked>
-                                    No
-                                </label>
-                            </div>
-                        </c:otherwise>
-                    </c:choose>
-                </div>
-            </div>
+            </form>  
         </div>
-            
+                    
         <!--Pie-->
         <%@include file="WEB-INF/jspf/pie.jspf"%>
 
