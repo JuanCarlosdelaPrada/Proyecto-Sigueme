@@ -519,8 +519,8 @@ public class ControladorAdministracion extends HttpServlet {
                 vista = "pruebas.jsp";
                 break;
             case "/rutas":
-                String[] columnas = {"Nombre de la ruta", "Descripcion", "Distancia", "Dificultad", "ficheroGPX", "minlatitud", "minlongitud", "maxlatitud", "maxlongitud", "Mas informacion", "Editar", "Borrar"};
-                String[] atributos = {"ruta_id", "descripcion", "distancia", "dificultad", "fichero_gpx", "lat_min", "lat_max", "long_min", "long_max"};
+                String[] columnas = {"Nombre de la ruta", "Descripcion", "Distancia", "Dificultad", "Mostrar", "Editar", "Borrar"};
+                String[] atributos = {"ruta_id", "descripcion", "distancia", "dificultad"};
                 tabla = "ruta";
                 resultado = new JsonObject();
                 array = new JsonArray();
@@ -601,8 +601,8 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 if (sCol != null) {
                     num_atributos = Integer.parseInt(sCol);
-                    if (num_atributos < 0 || num_atributos > 8)
-                        num_atributos = 0;
+                    if (num_atributos < 0 || num_atributos > (atributos.length - 1))
+                        num_atributos = 0; 
                 }
                 if (sdir != null) {
                     if (!sdir.equals("asc"))
@@ -653,7 +653,12 @@ public class ControladorAdministracion extends HttpServlet {
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
                         for (i = 0; i < atributos.length; i++) {
-                            ja.add(columnas[i], new JsonPrimitive(rs.getString(atributos[i])));                            
+                            if (! atributos[i].equals("distancia")) {
+                                ja.add(columnas[i], new JsonPrimitive(rs.getString(atributos[i])));   
+                            }
+                            else {
+                                ja.add(columnas[i], new JsonPrimitive(rs.getString(atributos[i]).replace(".", ",")+" m"));
+                            }
                         }
                         ja.add(columnas[atributos.length], new JsonPrimitive("<a href='ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
                         
@@ -699,6 +704,7 @@ public class ControladorAdministracion extends HttpServlet {
                     parseador = new ParserGPX(ficheroGpx);
                     JsonArray latlng = parseador.gpxToJson();
                     request.setAttribute("ruta", ruta);
+                    request.setAttribute("distancia", ruta.getDistancia().toString().replace(".", ","));
                     request.setAttribute("latlng", latlng);
                 }
                 vista = "ruta.jsp";

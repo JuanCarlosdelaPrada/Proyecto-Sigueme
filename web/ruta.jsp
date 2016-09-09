@@ -41,8 +41,22 @@
             </div>
             <div id="intro"></div>
             <div id="descripcion" class="panel panel-default col-xs-6" style="padding:0">
-                <div class="panel-heading">Descripción</div>
+                <div class="panel-heading"><b>Descripción</b></div>
                 <div class="panel-body">${requestScope.ruta.descripcion}</div>
+            </div>
+            <div id="intro2"></div>
+            <div id="masInformacion" class="panel panel-default col-xs-6" style="padding:0">
+                <div class="panel-heading"><b>Más información</b></div>
+                <div class="panel-body">
+                    <ul>
+                        <li>Pertenece a la <u>dificultad</u>: <mark><b>${requestScope.ruta.dificultad}</b></mark>.</li>
+                        <li>Tiene una <u>distancia</u> aproximada de <mark><b>${requestScope.distancia} m</b></mark>.</li>
+                        <li><u>Archivo GPX</u>:</br>
+                            <input class="btn btn-info" id="GPXactual" name="GPXactual" type="button" value="Ver" onclick="window.open('ficherosGPX/${requestScope.ruta.rutaId}.gpx', '_blank')"/>
+                            <a class="btn btn-danger " href="ficherosGPX/${requestScope.ruta.rutaId}.gpx" download>Descargar</a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <div class="row"></br></div>
@@ -57,14 +71,22 @@
                     $("#descripcion").removeClass("col-xs-6").addClass("col-xs-12");
                     $("#descripcion").css("marginLeft", $("#map-canvas").offset().left);
                     $("#descripcion").width($("#map-canvas").width() - 2);
+                    $("#masInformacion").removeClass("col-xs-6").addClass("col-xs-12");
+                    $("#masInformacion").css("marginLeft", $("#map-canvas").offset().left);
+                    $("#masInformacion").width($("#map-canvas").width() - 2);
                     $("#intro").html("&nbsp");
+                    $("#intro2").html("&nbsp");
                 }
                 else {
                     $("#map-canvas").removeClass("col-xs-12").addClass("col-xs-offset-1 col-xs-4");
                     $("#descripcion").removeClass("col-xs-12").addClass("col-xs-6");
                     $("#descripcion").css("marginLeft", "initial");
                     $("#descripcion").width("");
+                    $("#masInformacion").removeClass("col-xs-12").addClass("col-xs-6");
+                    $("#masInformacion").css("marginLeft", "initial");
+                    $("#masInformacion").width("");
                     $("#intro").html("");
+                    $("#intro2").html("");
                 }
                 
                 $("#map").height($("#map").width());

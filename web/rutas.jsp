@@ -52,12 +52,7 @@
                             <th>Descripción</th>
                             <th>Distancia</th>
                             <th>Dificultad</th>
-                            <th>ficheroGPX</th>
-                            <th>minlatitud</th>
-                            <th>minlongitud</th>
-                            <th>maxlatitud</th>
-                            <th>maxlongitud</th>
-                            <th>Más información</th>
+                            <th>Mostrar</th>
                             <c:if test="${sessionScope.permiso}">
                                 <th>Editar</th>
                                 <th>Borrar</th>
@@ -70,12 +65,7 @@
                             <th>Descripción</th>
                             <th>Distancia</th>
                             <th>Dificultad</th>
-                            <th>ficheroGPX</th>
-                            <th>minlatitud</th>
-                            <th>minlongitud</th>
-                            <th>maxlatitud</th>
-                            <th>maxlongitud</th>
-                            <th>Más información</th>
+                            <th>Mostrar</th>
                             <c:if test="${sessionScope.permiso}">
                                 <th>Editar</th>
                                 <th>Borrar</th>
@@ -119,12 +109,7 @@
                             ,{"data": "Descripcion"}
                             ,{"data": "Distancia"}
                             ,{"data": "Dificultad"}
-                            ,{"data": "ficheroGPX"}
-                            ,{"data": "minlatitud"}
-                            ,{"data": "minlongitud"}
-                            ,{"data": "maxlatitud"}
-                            ,{"data": "maxlongitud"}
-                            ,{"data": "Mas informacion"}
+                            ,{"data": "Mostrar"}
                             <c:if test="${sessionScope.permiso}"> 
                                 ,{"data": "Editar"}
                                 ,{"data": "Borrar"}
