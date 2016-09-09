@@ -12,7 +12,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Inicio</title>
+        <title>Pruebas</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
         <!--Importaciones .css-->

@@ -89,7 +89,7 @@ import org.jdom.output.XMLOutputter;
     "/seguir-prueba",
     "/seguimiento_prueba",
     "/usuarios",
-    "/usuario", //--
+    "/usuario", 
     "/crearUsuario",
     "/editar-usuario",
     "/editarUsuario",
@@ -913,22 +913,54 @@ public class ControladorAdministracion extends HttpServlet {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 break;
-                case "/editar-prueba":
-                    prueba_id = request.getParameter("prueba_id");
-                    prueba = em.find(Prueba.class, prueba_id);
-                    permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
-                    if (prueba != null && permiso) {
-                        SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
-                        request.setAttribute("fechaCel", formateador.format(prueba.getFechaCel()));
-                        request.setAttribute("fechaInscripMin", formateador.format(prueba.getFechaInscripMin()));
-                        request.setAttribute("fechaInscripMax", formateador.format(prueba.getFechaInscripMax()));
-                        formateador = new SimpleDateFormat("HH:mm");
-                        request.setAttribute("horaCel", formateador.format(prueba.getHoraCel()));
-                        request.setAttribute("prueba", prueba);
-                    }
-                    vista = "editarPrueba.jsp";
-                    break;
-                case "/eliminar-prueba":
+            case "/prueba":
+                prueba_id = request.getParameter("prueba_id");
+                prueba = em.find(Prueba.class, prueba_id);
+                if (prueba != null) {
+                    request.setAttribute("prueba", prueba);
+                    
+                    File ficheroGpx = new File(prueba.getRutaId().getFicheroGpx());
+                    parseador = new ParserGPX(ficheroGpx);
+                    JsonArray latlng = parseador.gpxToJson();
+                    request.setAttribute("latlng", latlng);
+                    
+                    Date fechaActual = new Date();
+                    Calendar fechaMaxima = Calendar.getInstance();
+                    fechaMaxima.setTime(prueba.getFechaInscripMax());
+                    fechaMaxima.add(Calendar.DATE, 1);
+                    request.setAttribute("periodoInscripcion",(fechaActual.compareTo(prueba.getFechaInscripMin()) >= 0 && fechaActual.compareTo(fechaMaxima.getTime()) <= 0));
+                    
+                    consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaId", Inscrito.class);
+                    consultaInscritos.setParameter("pruebaId", prueba.getPruebaId());
+                    inscritos = consultaInscritos.getResultList();
+                    request.setAttribute("maximoinscritos", inscritos.size() == prueba.getMaximoInscritos());
+                    
+                    formato = new SimpleDateFormat("dd/MM/yyyy");
+                    request.setAttribute("fechaCel", formato.format(prueba.getFechaCel()));
+                    request.setAttribute("fechaInscripMin", formato.format(prueba.getFechaInscripMin()));
+                    request.setAttribute("fechaInscripMax", formato.format(prueba.getFechaInscripMax()));
+                    
+                    formato = new SimpleDateFormat("hh:mm");
+                    request.setAttribute("horaCel", formato.format(prueba.getHoraCel()));
+                }
+                vista = "prueba.jsp";
+                break;
+            case "/editar-prueba":
+                prueba_id = request.getParameter("prueba_id");
+                prueba = em.find(Prueba.class, prueba_id);
+                permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
+                if (prueba != null && permiso) {
+                    SimpleDateFormat formateador = new SimpleDateFormat("yyyy-MM-dd");
+                    request.setAttribute("fechaCel", formateador.format(prueba.getFechaCel()));
+                    request.setAttribute("fechaInscripMin", formateador.format(prueba.getFechaInscripMin()));
+                    request.setAttribute("fechaInscripMax", formateador.format(prueba.getFechaInscripMax()));
+                    formateador = new SimpleDateFormat("HH:mm");
+                    request.setAttribute("horaCel", formateador.format(prueba.getHoraCel()));
+                    request.setAttribute("prueba", prueba);
+                }
+                vista = "editarPrueba.jsp";
+                break;
+            case "/eliminar-prueba":
                 prueba_id = request.getParameter("prueba_id");
                 prueba = em.find(Prueba.class, prueba_id);
                 if (prueba != null) {

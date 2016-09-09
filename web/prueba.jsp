@@ -12,7 +12,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Ruta</title>
+        <title>${prueba.pruebaId}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
         <!--Importaciones .css-->
@@ -31,7 +31,7 @@
               
         <div class="page-header">
             <div class="col-sm-offset-1">
-                <h1>${requestScope.ruta.rutaId}</h1> 
+                <h1>${prueba.pruebaId}</h1> 
             </div>
         </div>
         
@@ -39,10 +39,59 @@
             <div id="map-canvas" class="col-xs-offset-1 col-xs-4">
                 <div id="map" style="width:100%;height:400px"></div>
             </div>
+            <div class="col-xs-6"> 
+                
             <div id="intro"></div>
-            <div id="descripcion" class="panel panel-default col-xs-6" style="padding:0">
-                <div class="panel-heading">Descripción</div>
-                <div class="panel-body">${requestScope.ruta.descripcion}</div>
+            <div id="descripcion" class="panel panel-default col-xs-12" style="padding:0;display:block;clear:both">
+                <div class="panel-heading"><b>Descripción</b></div>
+                <div class="panel-body">${prueba.descripcion}</div>
+            </div>
+            <div id="intro2"></div>
+            <div id="datosInteres" class="panel panel-default" style="padding:0;display:block;clear:both">
+                <div class="panel-heading"><b>Datos de interés</b></div>
+                <div class="panel-body">
+                    Se celebrará en ${prueba.lugar} el día ${fechaCel} a las ${horaCel}. Fechas a tener en cuenta:
+                    <ul>
+                        <li>Apertura del plazo de inscripciones ${fechaInscripMin}.</li>
+                        <li>Cierre del plazo de inscripciones ${fechaInscripMax}.</li>
+                    </ul>
+                    <c:choose>
+                        <c:when test="${periodoInscripcion and not maximoinscritos}">
+                            <c:choose>
+                                <c:when test="${usuario ne null}">
+                                    <input class="btn btn-success" type="button" value="Inscribirse" onclick="window.open('inscribirse?prueba_id=${prueba.pruebaId}')"/></br>
+                                </c:when>
+                                <c:otherwise>
+                                    ¿Desea inscribirse?</br>
+                                    <input class="btn btn-success" type="button" value="¡Registrate ya!" onclick="window.open('crearUsuario.jsp', '_self')"/></br>
+                                </c:otherwise>
+                            </c:choose>
+                            ABIERTO EL PLAZO DE INSCRIPCIONES</br>
+                        </c:when>
+                        <c:when test="${not periodoInscripcion}">
+                            <input class="btn btn-default" type="button" value="Inscribirse" disabled/></br>
+                            <font color="orange">ACTUALMENTE EL PLAZO DE INSCRIPCIONES ESTÁ CERRADO</font></br>
+                        </c:when>      
+                        <c:when test="${maximoinscritos}">
+                            <input class="btn btn-default" type="button" value="Inscribirse" disabled/></br>
+                            <font color="red">EL CUPO DE PLAZAS ESTÁ CUBIERTO</font></br>
+                        </c:when> 
+                        <c:otherwise>
+                            <input class="btn btn-default" type="button" value="Inscribirse" disabled/></br>
+                        </c:otherwise>
+                    </c:choose>
+                    <mark>Nota</mark>: el número máximo de plazas son ${prueba.maximoInscritos}.
+                </div>
+            </div>
+            <div id="intro3"></div>
+            <div id="masInformacion" class="panel panel-default" style="padding:0;display:block;clear:both">
+                <div class="panel-heading"><b>Más información</b></div>
+                <div class="panel-body">
+                    Si desea obtener más información acerca de la ruta asociada a dicha prueba proceda a pulsar el siguiente botón:</br>
+                    <a class="btn btn-info col-xs-offset-5" href="ruta?ruta_id=${prueba.rutaId.rutaId}">Mostrar ruta</a>
+                </div>
+            </div>
+                
             </div>
         </div>
         <div class="row"></br></div>
@@ -70,7 +119,7 @@
                 $("#map").height($("#map").width());
                 
                 // camino
-                var path = ${requestScope.latlng};
+                var path = ${latlng};
 
                 // mapa
                 var map = new google.maps.Map(document.getElementById('map'), {
@@ -81,10 +130,10 @@
 
                 // Incluir los límites
                 var bounds = new google.maps.LatLngBounds();
-                bounds.extend(new google.maps.LatLng(${ruta.latMin}, ${ruta.longMin}));
-                bounds.extend(new google.maps.LatLng(${ruta.latMin}, ${ruta.longMax}));
-                bounds.extend(new google.maps.LatLng(${ruta.latMax}, ${ruta.longMin}));
-                bounds.extend(new google.maps.LatLng(${ruta.latMax}, ${ruta.longMax}));
+                bounds.extend(new google.maps.LatLng(${prueba.rutaId.latMin}, ${prueba.rutaId.longMin}));
+                bounds.extend(new google.maps.LatLng(${prueba.rutaId.latMin}, ${prueba.rutaId.longMax}));
+                bounds.extend(new google.maps.LatLng(${prueba.rutaId.latMax}, ${prueba.rutaId.longMin}));
+                bounds.extend(new google.maps.LatLng(${prueba.rutaId.latMax}, ${prueba.rutaId.longMax}));
                 map.fitBounds(bounds);
 
                 // Dibujar el camino
@@ -100,13 +149,13 @@
                     position: path[0],
                     map: map,
                     icon: 'markers/start-flag.png',
-                    title: 'Comienzo de la ruta'
+                    title: 'Comienzo de la prueba'
                 });
                 new google.maps.Marker({
                     position: path[path.length - 1],
                     map: map,
                     icon: 'markers/finish.png',
-                    title: 'Final de la ruta'
+                    title: 'Final de la prueba'
                 });
                 /*
                 //Distancia
@@ -122,7 +171,7 @@
             async defer></script>
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
         <script type="text/javascript" src="js/Bootstrap/bootstrap.min.js" charset="utf-8"></script>
-        <c:if test="${sessionScope.usuario ne null}">
+        <c:if test="${usuario ne null}">
             <script type="text/javascript" src="js/menuUsuario.js" charset="utf-8"></script>
         </c:if>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>

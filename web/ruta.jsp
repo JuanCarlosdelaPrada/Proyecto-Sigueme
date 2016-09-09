@@ -12,7 +12,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Ruta</title>
+        <title>${requestScope.ruta.rutaId}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
         <!--Importaciones .css-->
@@ -52,8 +52,10 @@
                         <li>Pertenece a la <u>dificultad</u>: <mark><b>${requestScope.ruta.dificultad}</b></mark>.</li>
                         <li>Tiene una <u>distancia</u> aproximada de <mark><b>${requestScope.distancia} m</b></mark>.</li>
                         <li><u>Archivo GPX</u>:</br>
-                            <input class="btn btn-info" id="GPXactual" name="GPXactual" type="button" value="Ver" onclick="window.open('ficherosGPX/${requestScope.ruta.rutaId}.gpx', '_blank')"/>
-                            <a class="btn btn-danger " href="ficherosGPX/${requestScope.ruta.rutaId}.gpx" download>Descargar</a>
+                            <div class="col-xs-offset-4">
+                                <input class="btn btn-info" id="GPXactual" name="GPXactual" type="button" value="Ver" onclick="window.open('ficherosGPX/${requestScope.ruta.rutaId}.gpx', '_blank')"/>
+                                <a class="btn btn-danger " href="ficherosGPX/${requestScope.ruta.rutaId}.gpx" download>Descargar</a>
+                            </div>
                         </li>
                     </ul>
                 </div>
