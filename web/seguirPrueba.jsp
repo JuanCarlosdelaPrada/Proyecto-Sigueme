@@ -48,37 +48,33 @@
                         Selecciona un competidor:</br>
                         <div class="text-center">
                             <div class="fom-group">
-                                <input list="competidores" class="form-control">
-                                <datalist id="competidores">
-                                    <option value="Internet Explorer">
-                                    <option value="Firefox">
-                                    <option value="Chrome">
-                                    <option value="Opera">
-                                    <option value="Safari">
+                                <input id="seleccion" list="inscritos" class="form-control">
+                                <datalist id="inscritos">
+                                    <c:forEach var="inscrito" items="${inscritos}">
+                                        <option value="${inscrito.inscritoPK.usuarioId}"></option>
+                                    </c:forEach>
                                 </datalist>
                             </div>
                             <div class="fom-group" style="margin-top:0.5%">
-                                <input type="submit" class="form-control btn btn-default" value="Buscar"/>
+                                <a id="buscar" class="form-control btn btn-default">Buscar</a>
                             </div>
                         </div>
                         <hr/>
                         Selección múltiple de competidores (mantén shift para seleccionar más de uno):</label>
                         <div class="text-center">
                             <div class="fom-group">
-                                <select multiple class="form-control">
-                                    <option>1</option>
-                                    <option>2</option>
-                                    <option>3</option>
-                                    <option>4</option>
-                                    <option>5</option>
+                                <select id="seleccionMultiple" class="form-control" multiple>
+                                    <c:forEach var="inscrito" items="${inscritos}">
+                                        <option value="${inscrito.inscritoPK.usuarioId}">${inscrito.dorsal}. ${inscrito.inscritoPK.usuarioId}</option>
+                                    </c:forEach>
                                 </select>
                             </div>
                             <div class="fom-group" style="margin-top:0.5%">
-                                <input type="submit" class="form-control btn btn-default" value="Mostrar seleccionados"/>
+                                <a id="mostrarSeleccionados" class="form-control btn btn-default">Mostrar seleccionados</a>
                             </div>
                             <hr/>
                             <div class="fom-group" style="margin-top:0.5%">
-                                <input type="submit" class="form-control btn btn-default" value="Mostrar todos"/>
+                                <a id="mostrarTodos" class="form-control btn btn-default">Mostrar todos</a>
                             </div>
                         </div>
                     </div>
@@ -116,6 +112,26 @@
         
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
         <script type="text/javascript">
+                var competidores = null;
+                
+                $("#buscar").click(function() {
+                    competidores = [];
+                    competidores.push($("#seleccion").val());
+                });
+                
+                $("#mostrarSeleccionados").click(function() {
+                    competidores = [];
+                    $('#seleccionMultiple option').each(function() {
+                        if(this.selected) {
+                            competidores.push(this.value);
+                        }
+                    });
+                }); 
+                
+                $("#mostrarTodos").click(function() {
+                    competidores = null;
+                }); 
+                
                 var path = ${requestScope.latlng};
                 var inicio;
                 var fin;
@@ -198,21 +214,40 @@
                 }
 
                 function create_markers() {
-                    $.get("seguimiento_prueba?prueba_id=${requestScope.prueba.pruebaId}", function (data) {
-                        if (markers.length !== 0) {
-                            delete_names();
-                            delete_markers();
-                        }
-                        $(data).find("marker").each(function () {
-                            //Get user input values for the marker from the form
-                            var title = $(this).attr('dorsal');
-                            var name = $(this).attr('usuario_id');
-                            //var address   = '<p>'+ $(this).attr('address') +'</p>';
-                            var point = new google.maps.LatLng(parseFloat($(this).attr('latitud')), parseFloat($(this).attr('longitud')));
-                            //call create_marker() function for xml loaded maker
-                            create_marker(point, name, title, false, false, false/*, "http://PATH-TO-YOUR-WEBSITE-ICON/icons/pin_blue.png"*/);
+                    if (competidores === null) {
+                        $.post("seguimiento_prueba",{prueba_id: "${requestScope.prueba.pruebaId}"}, function(data) {
+                            if (markers.length !== 0) {
+                                delete_names();
+                                delete_markers();
+                            }
+                            $(data).find("marker").each(function () {
+                                //Get user input values for the marker from the form
+                                var title = $(this).attr('dorsal');
+                                var name = $(this).attr('usuario_id');
+                                //var address   = '<p>'+ $(this).attr('address') +'</p>';
+                                var point = new google.maps.LatLng(parseFloat($(this).attr('latitud')), parseFloat($(this).attr('longitud')));
+                                //call create_marker() function for xml loaded maker
+                                create_marker(point, name, title, false, false, false/*, "http://PATH-TO-YOUR-WEBSITE-ICON/icons/pin_blue.png"*/);
+                            });
                         });
-                    });
+                    }
+                    else {
+                        $.post("seguimiento_prueba",{prueba_id: "${requestScope.prueba.pruebaId}", 'competidores_id[]': competidores }, function(data) {
+                            if (markers.length !== 0) {
+                                delete_names();
+                                delete_markers();
+                            }
+                            $(data).find("marker").each(function () {
+                                //Get user input values for the marker from the form
+                                var title = $(this).attr('dorsal');
+                                var name = $(this).attr('usuario_id');
+                                //var address   = '<p>'+ $(this).attr('address') +'</p>';
+                                var point = new google.maps.LatLng(parseFloat($(this).attr('latitud')), parseFloat($(this).attr('longitud')));
+                                //call create_marker() function for xml loaded maker
+                                create_marker(point, name, title, false, false, false/*, "http://PATH-TO-YOUR-WEBSITE-ICON/icons/pin_blue.png"*/);
+                            });
+                        });
+                    }
                 }
 
                 function delete_markers() {

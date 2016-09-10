@@ -1306,16 +1306,23 @@ public class ControladorAdministracion extends HttpServlet {
                 prueba_id = request.getParameter("prueba_id");
                 prueba = em.find(Prueba.class, prueba_id);
                 if (prueba != null) {
+                    request.setAttribute("prueba", prueba);
+                    
                     File ficheroGpx = new File(prueba.getRutaId().getFicheroGpx());
                     parseador = new ParserGPX(ficheroGpx);
                     JsonArray latlng = parseador.gpxToJson();
-                    request.setAttribute("prueba", prueba);
                     request.setAttribute("latlng", latlng);
+                    
+                    consultaInscritos = em.createNamedQuery("Inscrito.findByPruebaIdPagadoOrderingByDorsal", Inscrito.class);
+                    consultaInscritos.setParameter("pruebaId", prueba.getPruebaId());
+                    inscritos = consultaInscritos.getResultList();
+                    request.setAttribute("inscritos", inscritos);
                 }
                 vista = "seguirPrueba.jsp";
                 break;
             case "/seguimiento_prueba":
                 prueba_id = request.getParameter("prueba_id");
+                String[] competidores_id = request.getParameterValues("competidores_id[]");
                 try (Connection con = myDatasource.getConnection()) {
                     PreparedStatement ps = con.prepareStatement("SELECT i.dorsal, p.* "+
                                                                 "FROM posicion p INNER JOIN inscrito i "+
@@ -1336,7 +1343,8 @@ public class ControladorAdministracion extends HttpServlet {
                     doc.setRootElement(markers);
                     
                     String[] attributes = {"dorsal", "usuario_id", "latitud", "longitud"};
-                    System.out.println("Estoy aki");
+                    System.out.println("Estoy aki, esta es la prueba " + prueba_id);
+                    System.out.println(Arrays.toString(competidores_id));
                     while(posiciones.next()) {
                         int dorsal = posiciones.getInt("dorsal");
                         if(dorsales.add(dorsal)) {
