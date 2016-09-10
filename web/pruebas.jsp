@@ -14,7 +14,8 @@
     <head>
         <title>Pruebas</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+        <link href='img/favicon.ico' rel='shortcut icon' type='image/x-icon'>
+        
         <!--Importaciones .css-->
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/bootstrap-theme.min.css" rel="stylesheet"> 

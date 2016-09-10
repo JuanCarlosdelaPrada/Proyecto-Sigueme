@@ -14,7 +14,8 @@
     <head>
         <title>${requestScope.prueba.pruebaId}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+        <link href='img/favicon.ico' rel='shortcut icon' type='image/x-icon'>
+        
         <!--Importaciones .css-->
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/bootstrap-theme.min.css" rel="stylesheet">
@@ -39,56 +40,72 @@
             <div id="map-canvas" class="col-xs-offset-1 col-xs-6">
                 <div id="map" style="width:100%;height:400px"></div>
             </div>
-            <div id="intro"></div>
-            <div id="listado_competidores" class="panel panel-default col-xs-4" style="padding:0">
-                <div class="panel-heading"><b>Competidores</b></div>
-                <div class="panel-body">
-                    Selecciona un competidor:</br>
-                    <div class="text-center">
-                        <input list="competidores">
-                        <datalist id="competidores">
-                            <option value="Internet Explorer">
-                            <option value="Firefox">
-                            <option value="Chrome">
-                            <option value="Opera">
-                            <option value="Safari">
-                        </datalist>
-                        <input type="submit" value="Buscar"/>
+            <div class="col-xs-4">
+                <div id="intro"></div>
+                <div id="listado_competidores" class="panel panel-default" style="padding:0">
+                    <div class="panel-heading"><b>Competidores</b></div>
+                    <div class="panel-body">
+                        Selecciona un competidor:</br>
+                        <div class="text-center">
+                            <div class="fom-group">
+                                <input list="competidores" class="form-control">
+                                <datalist id="competidores">
+                                    <option value="Internet Explorer">
+                                    <option value="Firefox">
+                                    <option value="Chrome">
+                                    <option value="Opera">
+                                    <option value="Safari">
+                                </datalist>
+                            </div>
+                            <div class="fom-group" style="margin-top:0.5%">
+                                <input type="submit" class="form-control btn btn-default" value="Buscar"/>
+                            </div>
+                        </div>
+                        <hr/>
+                        Selección múltiple de competidores (mantén shift para seleccionar más de uno):</label>
+                        <div class="text-center">
+                            <div class="fom-group">
+                                <select multiple class="form-control">
+                                    <option>1</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                </select>
+                            </div>
+                            <div class="fom-group" style="margin-top:0.5%">
+                                <input type="submit" class="form-control btn btn-default" value="Mostrar seleccionados"/>
+                            </div>
+                            <hr/>
+                            <div class="fom-group" style="margin-top:0.5%">
+                                <input type="submit" class="form-control btn btn-default" value="Mostrar todos"/>
+                            </div>
+                        </div>
                     </div>
-                    Selección múltiple de competidores (mantén shift para seleccionar más de uno):</label>
-                    <select multiple class="form-control">
-                      <option>1</option>
-                      <option>2</option>
-                      <option>3</option>
-                      <option>4</option>
-                      <option>5</option>
-                    </select>
-                    <input type="submit" value="Mostrar seleccionados"/>
-                    <input type="submit" value="Mostrar todos"/>
                 </div>
-            </div>
-            <div id="opciones" class="panel panel-default col-xs-4" style="padding:0">
-                <div class="panel-heading"><b>Opciones</b></div>
-                <div class="panel-body">
-                    <div class="checkbox">
-                        <label>
-                            <input id="inicio" type="checkbox" onclick="show_start();">Mostrar inicio
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input id="fin" type="checkbox" onclick="show_finish();">Mostrar meta
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input id="circuito" type="checkbox" onclick="show_way();">Mostrar circuito
-                        </label>
-                    </div>
-                    <div class="checkbox">
-                        <label>
-                            <input id="nombres" type="checkbox" onclick="show_names();">Mostrar nombres
-                        </label>
+                <div id="opciones" class="panel panel-default" style="padding:0">
+                    <div class="panel-heading"><b>Opciones</b></div>
+                    <div class="panel-body">
+                        <div class="checkbox">
+                            <label>
+                                <input id="inicio" type="checkbox" onclick="show_start();">Mostrar inicio
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input id="fin" type="checkbox" onclick="show_finish();">Mostrar meta
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input id="circuito" type="checkbox" onclick="show_way();">Mostrar circuito
+                            </label>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input id="nombres" type="checkbox" onclick="show_names();">Mostrar nombres
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
