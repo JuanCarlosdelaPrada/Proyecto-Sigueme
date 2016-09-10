@@ -1324,17 +1324,29 @@ public class ControladorAdministracion extends HttpServlet {
                 prueba_id = request.getParameter("prueba_id");
                 String[] competidores_id = request.getParameterValues("competidores_id[]");
                 try (Connection con = myDatasource.getConnection()) {
-                    PreparedStatement ps = con.prepareStatement("SELECT i.dorsal, p.* "+
-                                                                "FROM posicion p INNER JOIN inscrito i "+
-                                                                    "ON (p.usuario_id = i.usuario_id and p.prueba_id = i.prueba_id) "+
-                                                                "WHERE ("+
-                                                                    "p.prueba_id = ? "+
-                                                                    "AND "+
-                                                                    "hora BETWEEN DATE_SUB(CURTIME(), INTERVAL 10 SECOND) "+
-                                                                    "AND "+
-                                                                    "CURTIME()"+
-                                                                ") "+
-                                                                "ORDER BY hora DESC;");
+                    String consulta =   "SELECT i.dorsal, p.* "+
+                                        "FROM posicion p INNER JOIN inscrito i "+
+                                            "ON (p.usuario_id = i.usuario_id and p.prueba_id = i.prueba_id) "+
+                                        "WHERE ("+
+                                            "p.prueba_id = ? "+
+                                            "AND "+
+                                            "hora BETWEEN DATE_SUB(CURTIME(), INTERVAL 10 SECOND) "+
+                                            "AND "+
+                                            "CURTIME()";
+                    if (competidores_id != null) {
+                        consulta += " AND (";
+                        for (i = 0; i < competidores_id.length; i++) {
+                            if (competidores_id.length > 1 && i < (competidores_id.length - 1)) {
+                                consulta += "p.usuario_id = '" + competidores_id[i] + "' OR ";
+                            }
+                            else {
+                                consulta += "p.usuario_id = '" + competidores_id[i] + "')";
+                            }
+                        }
+                    }
+                    consulta += ") "+
+                                "ORDER BY hora DESC;";
+                    PreparedStatement ps = con.prepareStatement(consulta);
                     ps.setString(1, prueba_id);
                     ResultSet posiciones = ps.executeQuery();
                     Set<Integer> dorsales = new HashSet<>();
@@ -1343,8 +1355,6 @@ public class ControladorAdministracion extends HttpServlet {
                     doc.setRootElement(markers);
                     
                     String[] attributes = {"dorsal", "usuario_id", "latitud", "longitud"};
-                    System.out.println("Estoy aki, esta es la prueba " + prueba_id);
-                    System.out.println(Arrays.toString(competidores_id));
                     while(posiciones.next()) {
                         int dorsal = posiciones.getInt("dorsal");
                         if(dorsales.add(dorsal)) {
