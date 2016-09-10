@@ -16,7 +16,6 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
         <!--Importaciones .css-->
-        <link href="css/jquery-ui.css" rel="stylesheet">
         <link href="css/bootstrap.min.css" rel="stylesheet">
         <link href="css/bootstrap-theme.min.css" rel="stylesheet">
         <link href="css/font-awesome.min.css" rel="stylesheet">
@@ -37,30 +36,39 @@
         </div>
         
         <div class="container-fluid">
-            <!--MODIFICAR A MI GUSTO-->
-            <label for="autocomplete">Select a programming language: </label>
-            <input id="autocomplete">
-            
             <div id="map-canvas" class="col-xs-offset-1 col-xs-6">
                 <div id="map" style="width:100%;height:400px"></div>
             </div>
             <div id="intro"></div>
             <div id="listado_competidores" class="panel panel-default col-xs-4" style="padding:0">
-                <div class="panel-heading">Listado competidores</div>
+                <div class="panel-heading"><b>Competidores</b></div>
                 <div class="panel-body">
-                    <label for="sel2">Mutiple select list (hold shift to select more than one):</label>
-                    <select multiple class="form-control" id="sel2">
+                    Selecciona un competidor:</br>
+                    <div class="text-center">
+                        <input list="competidores">
+                        <datalist id="competidores">
+                            <option value="Internet Explorer">
+                            <option value="Firefox">
+                            <option value="Chrome">
+                            <option value="Opera">
+                            <option value="Safari">
+                        </datalist>
+                        <input type="submit" value="Buscar"/>
+                    </div>
+                    Selección múltiple de competidores (mantén shift para seleccionar más de uno):</label>
+                    <select multiple class="form-control">
                       <option>1</option>
                       <option>2</option>
                       <option>3</option>
                       <option>4</option>
                       <option>5</option>
                     </select>
+                    <input type="submit" value="Mostrar seleccionados"/>
+                    <input type="submit" value="Mostrar todos"/>
                 </div>
             </div>
-            <div id="intro"></div>
             <div id="opciones" class="panel panel-default col-xs-4" style="padding:0">
-                <div class="panel-heading">Opciones</div>
+                <div class="panel-heading"><b>Opciones</b></div>
                 <div class="panel-body">
                     <div class="checkbox">
                         <label>
@@ -90,19 +98,6 @@
         <%@include file="WEB-INF/jspf/pie.jspf"%>
         
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
-        <script type="text/javascript" src="js/jQuery UI/jquery-ui.js" charset="utf-8"></script>
-        <!-- MODIFICAR A MI GUSTO -->
-        <script>
-            var tags = [ "c++", "java", "php", "coldfusion", "javascript", "asp", "ruby" ];
-            $( "#autocomplete" ).autocomplete({
-              source: function( request, response ) {
-                      var matcher = new RegExp( "^" + $.ui.autocomplete.escapeRegex( request.term ), "i" );
-                      response( $.grep( tags, function( item ){
-                          return matcher.test( item );
-                      }) );
-                  }
-            });
-        </script>
         <script type="text/javascript">
                 var path = ${requestScope.latlng};
                 var inicio;
