@@ -12,7 +12,21 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Inicio</title>
+        <c:choose>
+            <c:when test="${empty requestScope.prueba_id}">
+                <c:choose>
+                    <c:when test="${sessionScope.correo eq requestScope.usuario_id}">
+                        <title>Mis inscripciones</title>
+                    </c:when>
+                    <c:otherwise>
+                        <title>Inscripciones de ${requestScope.usuario_id}</title>
+                    </c:otherwise>
+                </c:choose>
+            </c:when>
+            <c:otherwise>
+                <title>Inscripciones en ${requestScope.prueba_id}</title>
+            </c:otherwise> 
+        </c:choose>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
         <!--Importaciones .css-->

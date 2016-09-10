@@ -36,62 +36,64 @@
         </div>
         
         <div class="container-fluid">
-            <div id="map-canvas" class="col-xs-offset-1 col-xs-4">
+            <div id="map-canvas" class="col-xs-offset-1 col-xs-4" style="padding:0">
                 <div id="map" style="width:100%;height:400px"></div>
             </div>
-            <div class="col-xs-6"> 
-                
-            <div id="intro"></div>
-            <div id="descripcion" class="panel panel-default col-xs-12" style="padding:0;display:block;clear:both">
-                <div class="panel-heading"><b>Descripción</b></div>
-                <div class="panel-body">${prueba.descripcion}</div>
-            </div>
-            <div id="intro2"></div>
-            <div id="datosInteres" class="panel panel-default" style="padding:0;display:block;clear:both">
-                <div class="panel-heading"><b>Datos de interés</b></div>
-                <div class="panel-body">
-                    Se celebrará en ${prueba.lugar} el día ${fechaCel} a las ${horaCel}. Fechas a tener en cuenta:
-                    <ul>
-                        <li>Apertura del plazo de inscripciones ${fechaInscripMin}.</li>
-                        <li>Cierre del plazo de inscripciones ${fechaInscripMax}.</li>
-                    </ul>
-                    <c:choose>
-                        <c:when test="${periodoInscripcion and not maximoinscritos}">
+            <div id="columna" class="col-xs-6"> 
+                <div id="intro"></div>
+                <div id="descripcion" class="panel panel-default" style="padding:0;display:block;clear:both">
+                    <div class="panel-heading"><b>Descripción</b></div>
+                    <div class="panel-body">${prueba.descripcion}</div>
+                </div>
+                <div id="datosInteres" class="panel panel-default" style="padding:0;display:block;clear:both">
+                    <div class="panel-heading"><b>Datos de interés</b></div>
+                    <div class="panel-body">
+                        Se celebrará en ${prueba.lugar} el día ${fechaCel} a las ${horaCel}. Fechas a tener en cuenta:
+                        <ul>
+                            <li>Apertura del plazo de inscripciones ${fechaInscripMin}.</li>
+                            <li>Cierre del plazo de inscripciones ${fechaInscripMax}.</li>
+                        </ul>
+                        <div class="text-center">
                             <c:choose>
-                                <c:when test="${usuario ne null}">
-                                    <input class="btn btn-success" type="button" value="Inscribirse" onclick="window.open('inscribirse?prueba_id=${prueba.pruebaId}')"/></br>
+                                <c:when test="${permiso}">
                                 </c:when>
+                                <c:when test="${periodoInscripcion and not maximoinscritos}">
+                                    <c:choose>
+                                        <c:when test="${usuario ne null}">
+                                            <input class="btn btn-success" type="button" value="Inscribirse" onclick="window.open('inscribirse?prueba_id=${prueba.pruebaId}')"/></br>
+                                        </c:when>
+                                        <c:otherwise>
+                                            ¿Desea inscribirse?</br>
+                                            <input class="btn btn-success" type="button" value="¡Regístrate ya!" onclick="window.open('crearUsuario.jsp', '_self')"/></br>
+                                        </c:otherwise>
+                                    </c:choose>
+                                    ABIERTO EL PLAZO DE INSCRIPCIONES</br>
+                                </c:when>
+                                <c:when test="${not periodoInscripcion}">
+                                    <input class="btn btn-default" type="button" value="Inscribirse" disabled/></br>
+                                    <font color="orange">ACTUALMENTE EL PLAZO DE INSCRIPCIONES ESTÁ CERRADO</font></br>
+                                </c:when>      
+                                <c:when test="${maximoinscritos}">
+                                    <input class="btn btn-default" type="button" value="Inscribirse" disabled/></br>
+                                    <font color="red">EL CUPO DE PLAZAS ESTÁ CUBIERTO</font></br>
+                                </c:when> 
                                 <c:otherwise>
-                                    ¿Desea inscribirse?</br>
-                                    <input class="btn btn-success" type="button" value="¡Registrate ya!" onclick="window.open('crearUsuario.jsp', '_self')"/></br>
+                                    <input class="btn btn-default" type="button" value="Inscribirse" disabled/></br>
                                 </c:otherwise>
                             </c:choose>
-                            ABIERTO EL PLAZO DE INSCRIPCIONES</br>
-                        </c:when>
-                        <c:when test="${not periodoInscripcion}">
-                            <input class="btn btn-default" type="button" value="Inscribirse" disabled/></br>
-                            <font color="orange">ACTUALMENTE EL PLAZO DE INSCRIPCIONES ESTÁ CERRADO</font></br>
-                        </c:when>      
-                        <c:when test="${maximoinscritos}">
-                            <input class="btn btn-default" type="button" value="Inscribirse" disabled/></br>
-                            <font color="red">EL CUPO DE PLAZAS ESTÁ CUBIERTO</font></br>
-                        </c:when> 
-                        <c:otherwise>
-                            <input class="btn btn-default" type="button" value="Inscribirse" disabled/></br>
-                        </c:otherwise>
-                    </c:choose>
-                    <mark>Nota</mark>: el número máximo de plazas son ${prueba.maximoInscritos}.
+                        </div>
+                        <mark>Nota</mark>: el número máximo de plazas son ${prueba.maximoInscritos}.
+                    </div>
                 </div>
-            </div>
-            <div id="intro3"></div>
-            <div id="masInformacion" class="panel panel-default" style="padding:0;display:block;clear:both">
-                <div class="panel-heading"><b>Más información</b></div>
-                <div class="panel-body">
-                    Si desea obtener más información acerca de la ruta asociada a dicha prueba proceda a pulsar el siguiente botón:</br>
-                    <a class="btn btn-info col-xs-offset-5" href="ruta?ruta_id=${prueba.rutaId.rutaId}">Mostrar ruta</a>
+                <div id="masInformacion" class="panel panel-default" style="padding:0;display:block;clear:both">
+                    <div class="panel-heading"><b>Más información</b></div>
+                    <div class="panel-body">
+                        Si desea obtener más información acerca de la ruta asociada a dicha prueba proceda a pulsar el siguiente botón:</br>
+                        <div class="text-center">
+                            <a class="btn btn-info" href="ruta?ruta_id=${prueba.rutaId.rutaId}">Mostrar ruta</a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-                
             </div>
         </div>
         <div class="row"></br></div>
@@ -103,16 +105,16 @@
             function initMap() {
                 if (window.innerWidth <= 767) {
                     $("#map-canvas").removeClass("col-xs-offset-1 col-xs-4").addClass("col-xs-12");
-                    $("#descripcion").removeClass("col-xs-6").addClass("col-xs-12");
-                    $("#descripcion").css("marginLeft", $("#map-canvas").offset().left);
-                    $("#descripcion").width($("#map-canvas").width() - 2);
+                    $("#columna").removeClass("col-xs-6").addClass("col-xs-12");
+                    $("#columna").css("marginLeft", $("#map-canvas").offset().left - 30);
+                    $("#columna").width($("#map-canvas").width() + 1);
                     $("#intro").html("&nbsp");
                 }
                 else {
                     $("#map-canvas").removeClass("col-xs-12").addClass("col-xs-offset-1 col-xs-4");
-                    $("#descripcion").removeClass("col-xs-12").addClass("col-xs-6");
-                    $("#descripcion").css("marginLeft", "initial");
-                    $("#descripcion").width("");
+                    $("#columna").removeClass("col-xs-12").addClass("col-xs-6");
+                    $("#columna").css("marginLeft", "initial");
+                    $("#columna").width("");
                     $("#intro").html("");
                 }
                 

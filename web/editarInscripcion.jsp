@@ -12,7 +12,14 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Editar ruta</title>
+        <c:choose>
+            <c:when test="${empty requestScope.prueba_id}">
+                <title>Editar inscripción de ${requestScope.usuario_id} en "${requestScope.inscrito.inscritoPK.pruebaId}"</title>
+            </c:when>
+            <c:otherwise>
+                <title>Editar inscripción en "${requestScope.prueba_id}" de ${requestScope.inscrito.inscritoPK.usuarioId}</title>
+            </c:otherwise> 
+        </c:choose>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
         <!--Importaciones .css-->

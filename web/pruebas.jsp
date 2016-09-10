@@ -60,7 +60,7 @@
                             <c:if test="${empty sessionScope.permiso or !sessionScope.permiso}">
                                 <th>Inscribirse</th>
                             </c:if>
-                            <th>Más información</th>
+                            <th>Mostrar</th>
                             <c:if test="${sessionScope.permiso}">
                                 <th>Editar</th>
                                 <th>Borrar</th>
@@ -82,7 +82,7 @@
                             <c:if test="${empty sessionScope.permiso or !sessionScope.permiso}">
                                 <th>Inscribirse</th>
                             </c:if>
-                            <th>Más información</th>
+                            <th>Mostrar</th>
                             <c:if test="${sessionScope.permiso}">
                                 <th>Editar</th>
                                 <th>Borrar</th>
@@ -134,7 +134,7 @@
                              <c:if test="${empty sessionScope.permiso or !sessionScope.permiso}">
                                 ,{"data": "Inscribirse"}
                             </c:if>
-                            ,{"data": "Mas informacion"}
+                            ,{"data": "Mostrar"}
                             <c:if test="${sessionScope.permiso}"> 
                                 ,{"data": "Editar"}
                                 ,{"data": "Borrar"}

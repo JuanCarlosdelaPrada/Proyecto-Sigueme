@@ -17,7 +17,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Editar prueba</title>
+        <title>Editar prueba: ${requestScope.prueba.pruebaId}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
         <!--Importaciones .css-->

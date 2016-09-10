@@ -802,7 +802,7 @@ public class ControladorAdministracion extends HttpServlet {
                 vista = "rutas.jsp";
                 break;
             case "/pruebas":
-                String[] columnasP = {"Nombre de la prueba", "Descripcion", "Ruta", "Lugar", "Fecha celebracion", "Hora celebracion", "Fecha apertura inscripcion", "Fecha limite inscripcion", "Nº Maximo inscritos", "Inscribirse", "Mas informacion", "Editar", "Borrar", "Ver inscripciones"};
+                String[] columnasP = {"Nombre de la prueba", "Descripcion", "Ruta", "Lugar", "Fecha celebracion", "Hora celebracion", "Fecha apertura inscripcion", "Fecha limite inscripcion", "Nº Maximo inscritos", "Inscribirse", "Mostrar", "Editar", "Borrar", "Ver inscripciones"};
                 String[] atributosP = {"prueba_id", "descripcion", "ruta_id", "lugar", "fecha_cel", "hora_cel", "fecha_inscrip_min", "fecha_inscrip_max", "maximo_inscritos"};
                 tabla = "prueba";
                 resultado = new JsonObject();
@@ -833,7 +833,7 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 if (sCol != null) {
                     num_atributos = Integer.parseInt(sCol);
-                    if (num_atributos < 0 || num_atributos > 8)
+                    if (num_atributos < 0 || num_atributos > (atributosP.length - 1))
                         num_atributos = 0;
                 }
                 if (sdir != null) {
@@ -868,7 +868,18 @@ public class ControladorAdministracion extends HttpServlet {
                     while (rs.next()) {
                         JsonObject ja = new JsonObject();
                         for (i = 0; i < atributosP.length; i++) {
-                            ja.add(columnasP[i], new JsonPrimitive(rs.getString(atributosP[i])));
+                            if (!(atributosP[i].equals("fecha_cel") || atributosP[i].equals("hora_cel") || atributosP[i].equals("fecha_inscrip_min") || atributosP[i].equals("fecha_inscrip_max"))) {
+                                ja.add(columnasP[i], new JsonPrimitive(rs.getString(atributosP[i])));
+                            }
+                            else if (atributosP[i].equals("fecha_cel") || atributosP[i].equals("fecha_inscrip_min") || atributosP[i].equals("fecha_inscrip_max")) {
+                                formato = new SimpleDateFormat("dd/MM/yyyy");
+                                ja.add(columnasP[i], new JsonPrimitive(formato.format(rs.getDate(atributosP[i]))));
+                            }
+                            else if (atributosP[i].equals("hora_cel")){
+                                System.out.println(rs.getTime(atributosP[i]).toString());
+                                formato = new SimpleDateFormat("HH:mm"); 
+                                ja.add(columnasP[i], new JsonPrimitive(formato.format(rs.getTime(atributosP[i])) + " h"));
+                            }
                         }
                         if (!permiso) {
                             if (user) {
@@ -940,8 +951,8 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("fechaInscripMin", formato.format(prueba.getFechaInscripMin()));
                     request.setAttribute("fechaInscripMax", formato.format(prueba.getFechaInscripMax()));
                     
-                    formato = new SimpleDateFormat("hh:mm");
-                    request.setAttribute("horaCel", formato.format(prueba.getHoraCel()));
+                    formato = new SimpleDateFormat("HH:mm");
+                    request.setAttribute("horaCel", formato.format(prueba.getHoraCel()) + " h");
                 }
                 vista = "prueba.jsp";
                 break;

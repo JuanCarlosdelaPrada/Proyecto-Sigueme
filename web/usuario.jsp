@@ -12,7 +12,14 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Crear usuario</title>
+         <c:choose>
+            <c:when test="${sessionScope.correo eq requestScope.usuario.usuarioId}">
+                <title>Mi perfil</title>
+            </c:when>
+            <c:otherwise>
+                <title>Perfil de ${requestScope.usuario.usuarioId}</title> 
+            </c:otherwise>
+        </c:choose>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
         <!--Importaciones .css-->
