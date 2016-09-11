@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 @NamedQueries({
     @NamedQuery(name = "Prueba.findAll", query = "SELECT p FROM Prueba p"),
     @NamedQuery(name = "Prueba.findByPruebaId", query = "SELECT p FROM Prueba p WHERE p.pruebaId = :pruebaId"),
+    @NamedQuery(name = "Prueba.findByRutaId", query = "SELECT p FROM Prueba p WHERE p.rutaId = :rutaId"),
     @NamedQuery(name = "Prueba.findByDescripcion", query = "SELECT p FROM Prueba p WHERE p.descripcion = :descripcion"),
     @NamedQuery(name = "Prueba.findByLugar", query = "SELECT p FROM Prueba p WHERE p.lugar = :lugar"),
     @NamedQuery(name = "Prueba.findByFechaCel", query = "SELECT p FROM Prueba p WHERE p.fechaCel = :fechaCel"),

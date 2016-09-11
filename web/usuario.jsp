@@ -36,7 +36,12 @@
 
         <!--Menú-->
         <%@include file="WEB-INF/jspf/menu.jspf"%>
-
+        
+        <ul class="breadcrumb" style="margin-bottom:0; background: #FFF7C8; border-radius:0">
+            <li><a href="usuarios.jsp">Usuarios</a></li>
+            <li class="active">Usuario</li>
+        </ul>
+        
         <!--Contenido-->
         <div class="page-header">
             <div class="col-sm-offset-1">

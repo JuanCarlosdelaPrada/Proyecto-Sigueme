@@ -30,6 +30,11 @@
         <!--Menú-->
         <%@include file="WEB-INF/jspf/menu.jspf"%>
               
+        <ul class="breadcrumb" style="margin-bottom:0; background: #FFF7C8; border-radius:0">
+            <li><a href="pruebas.jsp">Pruebas</a></li>
+            <li class="active">Prueba</li>
+        </ul>
+        
         <div class="page-header">
             <div class="col-sm-offset-1">
                 <h1>${prueba.pruebaId}</h1> 

@@ -1,6 +1,6 @@
 <footer>
     <!--navbar-fixed-bottom-->
-    <div class="navbar navbar-inverse">
+    <div class="navbar navbar-inverse" style="border-radius: 0">
         <div class="container-fluid">
             <div class="navbar-text pull-left">
                 &copy; 2016 Sígueme. Todos los derechos reservados.

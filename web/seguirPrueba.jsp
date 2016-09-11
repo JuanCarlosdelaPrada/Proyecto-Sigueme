@@ -29,7 +29,12 @@
 
         <!--Menú-->
         <%@include file="WEB-INF/jspf/menu.jspf"%>
-              
+        
+        <ul class="breadcrumb" style="margin-bottom:0; background: #FFF7C8; border-radius:0">
+            <li><a href="seguimientoPruebas.jsp">Seguimiento de pruebas</a></li>
+            <li class="active">Seguir prueba</li>
+        </ul>
+        
         <div class="page-header">
             <div class="col-sm-offset-1">
                 <h1>${requestScope.prueba.pruebaId}</h1> 
@@ -58,7 +63,10 @@
                             <div class="fom-group" style="margin-top:0.5%">
                                 <a id="buscar" class="form-control btn btn-default">Buscar</a>
                             </div>
-                            <div id="mensaje1"></div>
+                            <div id="mensaje1" style="margin-top:0.5%;display: none">
+                                <a id="msj1" class="close">&times;</a>
+                                <div id="text1"></div>
+                            </div>
                         </div>
                         <hr/>
                         Selección múltiple de competidores (mantén shift para seleccionar más de uno):</label>
@@ -73,12 +81,18 @@
                             <div class="fom-group" style="margin-top:0.5%">
                                 <a id="mostrarSeleccionados" class="form-control btn btn-default">Mostrar seleccionados</a>
                             </div>
-                            <div id="mensaje2"></div>
+                            <div id="mensaje2" style="margin-top:0.5%;display: none">
+                                <a id="msj2" class="close">&times;</a>
+                                <div id="text2"></div>
+                            </div>
                             <hr/>
                             <div class="fom-group" style="margin-top:0.5%">
                                 <a id="mostrarTodos" class="form-control btn btn-default">Mostrar todos</a>
                             </div>
-                            <div id="mensaje3"></div>
+                            <div id="mensaje3" class="alert alert-success" style="margin-top:0.5%;display: none">
+                                <a id="msj3" class="close">&times;</a>
+                                <div>La búsqueda ha sido realizada exitósamente.</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -128,23 +142,22 @@
             $("#fin").data("clicked",false);
             $("#circuito").data("clicked",false);
             $("#nombres").data("clicked",false);
-
+            
+            $("#msj1").click(function(){
+                $("#mensaje1").hide();
+            });
+            $("#msj2").click(function(){
+                $("#mensaje2").hide();
+            });
+            $("#msj3").click(function(){
+                $("#mensaje3").hide();
+            });
+            
             $("#buscar").click(function() {
                 competidores = [];
                 competidores.push($("#seleccion").val());
                 $("#seleccion").val("");
-                if (competidores[0] === "" || competidores.length === 0) {
-                    $("#mensaje1").addClass("alert alert-danger");
-                    $("#mensaje1").html(
-                        '<a href="#" id="msg1" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                            '<strong>Error</strong>: no se ha definido ningún competidor.');
-                }
-                else {
-                    $("#mensaje1").addClass("alert alert-success");
-                    $("#mensaje1").html(
-                        '<a href="#" id="msg1" class="close" data-dismiss="alert" aria-label="close">&times;</a>' +
-                            'La búsqueda ha sido realizada exitósamente.');
-                }
+                message("#mensaje1", "#text1", false);
             });
 
             $("#mostrarSeleccionados").click(function() {
@@ -155,44 +168,61 @@
                         this.selected = false;
                     }
                 });
-                if (competidores.length === 0) {
-                    $("#mensaje2").addClass("alert alert-danger");
-                    $("#mensaje2").html(
-                        '<button href="#" id="msg2" class="close" data-dismiss="alert" aria-label="close">&times;</button>' +
-                            '<strong>Error</strong>: no se ha definido ningún competidor.');
-                }
-                else {
-                    $("#mensaje2").addClass("alert alert-success");
-                    $("#mensaje2").html(
-                        '<button href="#" id="msg2" class="close" data-dismiss="alert" aria-label="close">&times;</button>' +
-                            'La búsqueda ha sido realizada exitósamente.');
-                }
+                message("#mensaje2", "#text2", false);
             }); 
 
             $("#mostrarTodos").click(function() {
                 competidores = [];
-                if ($("mensaje3").hasClass("alert alert-success")) {
-                    remove_message("#mensaje3");
-                }
-                $("#mensaje3").addClass("alert alert-success");
-                $("#mensaje3").html(
-                    '<button href="#" id="msg3" class="close" data-dismiss="alert" ng-click="remove_message("#mensaje3")">×</button>' +
-                        'La búsqueda ha sido realizada exitósamente.');
+                message("#mensaje3", "", true); 
             }); 
-            /*
-            $("#msg1").click(remove_message("#mensaje1"));
             
-            $("#msg2").click(remove_message("#mensaje2"));
-            */
-            function remove_message(msg) {
-                alert("TU GRAN PUTA MADRE");
-                if ($(msg).hasClass("alert alert-success")) {
-                    $(msg).removeClass("alert alert-success");
+            function message(message, text, shDir) {
+                delete_message(message);
+                if ($(message).css("display") === "block") {
+                    $(message).fadeOut("fast", function() {
+                        if (!shDir) {
+                            create_message(message, text);
+                        }
+                        else {
+                            $(message).show();
+                        }
+                    });
                 }
                 else {
-                    $(msg).removeClass("alert alert-danger");
+                    if (!shDir) {
+                        create_message(message, text);
+                    }
+                    else {
+                        $(message).show();
+                    }
                 }
-                $(msg).html("");
+            }
+            
+            function create_message(message, text) {
+                if ($(message).hasClass("alert alert-danger")) {
+                    $(message).removeClass("alert alert-danger");
+                }
+                else if ($(message).hasClass("alert alert-success")) {
+                    $(message).removeClass("alert alert-success");
+                }
+                if (competidores[0] === "" || competidores.length === 0) {
+                    $(message).addClass("alert alert-danger");
+                    $(text).html('<strong>Error</strong>: no se ha definido ningún competidor.');
+                }
+                else {
+                    $(message).addClass("alert alert-success");
+                    $(text).html('La búsqueda ha sido realizada exitósamente.');
+                }
+                $(message).show();
+            }
+            
+            function delete_message(message) {
+                var mensajes = ["#mensaje1", "#mensaje2", "#mensaje3"];
+                for (var i = 0; i < mensajes.length; i++) {
+                    if (mensajes[i] !== message) {
+                        $(mensajes[i]).hide();
+                    }
+                }
             }
             
             //############### Google Map Initialize ##############

@@ -36,15 +36,14 @@
 
         <!--Menú-->
         <%@include file="WEB-INF/jspf/menu.jspf"%>
-              
+        
         <!--Jumbotron-->
-        <div class="container-fluid" style="margin-top:0.35%; margin-left:-0.65%; margin-right:-0.85%"> <!-- border-color: purple; border-style: solid-->
+        <div class="container-fluid" style="margin-top: 0.35%;margin-left:-0.65%; margin-right:-0.85%"> <!-- border-color: purple; border-style: solid-->
             <div class="text-justify jumbotron" style="padding-top: 0.25%; padding-bottom: 0.15%;background-color:  violet; color: purple">
                 <h3 style="font-size: 135%"><u><b>Proyecto "Sígueme"</b></u></h3>
                 <p style="font-size: 115%">
                     &nbsp;&nbsp;&nbsp;&nbsp;El proyecto "Sígueme" surge como necesidad de realizar un seguimiento de las personas
                    que llevan a cabo una actividad deportiva al aire libre en un evento determinado.
-                ${requestScope.usuario}
                 </p>
                 
                 <blockquote class="blockquote-reverse text-right" style="margin-top: -1.5%;padding-top: 0.25%; padding-bottom: 0.15%">
@@ -122,6 +121,19 @@
                 <span class="sr-only">Siguiente</span>
             </a>
         </div>
+        
+        <!--
+        <div class="container-fluid" style="margin-top: 0.35%; margin-left:-0.65%; margin-right:-0.85%; margin-bottom: 0%"> 
+            <div class="text-justify jumbotron" style="background-color: chartreuse; border-color: #B40431; color: #FAEDED; padding-top: 0.95%; padding-bottom: 0.1%">
+                <p class="text-center" style="font-size: 115%">
+                    Ya se encuentra disponible nuestra nueva app </br>
+                    <a href="#" class="btn btn-info btn-lg">
+                        <span class="glyphicon glyphicon-download-alt"></span> Descargar
+                    </a>
+                </p>
+            </div>
+        </div>
+        -->
         
         <!--Noticias-->
         <c:choose>
