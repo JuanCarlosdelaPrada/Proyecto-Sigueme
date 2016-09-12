@@ -1689,7 +1689,7 @@ public class ControladorAdministracion extends HttpServlet {
                 
                 miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                if (navegacion.contains("usuario?usuario_id=" + miUsuario) || navegacion.contains("editar-usuario?usuario_id=" + miUsuario) || navegacion.contains("inscripciones?usuario_id=" + miUsuario)) {
+                if (navegacion.contains("usuario?usuario_id=" + miUsuario) || navegacion.contains("editar-usuario?usuario_id=" + miUsuario)) {
                     enlaces = new String[]{"usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
                     for (String enl: enlaces) {
                         if (navegacion.contains(enl)) {
@@ -1699,7 +1699,7 @@ public class ControladorAdministracion extends HttpServlet {
                         }
                     }
                 }
-                if (navegacion.contains("Editar inscripción") && !navegacion.contains("inscripciones?usuario_id=" + miUsuario)) {
+                if (navegacion.contains("Editar inscripción")) {
                     i = navegacion.lastIndexOf("Editar inscripción");
                     navegacion.remove(i);
                     navegacion.remove(i - 1);

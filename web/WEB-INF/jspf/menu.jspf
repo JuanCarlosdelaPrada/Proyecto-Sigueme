@@ -67,7 +67,9 @@
                             <ul id="def_usuario" class="dropdown-menu">
                                 <li><a href="usuario?usuario_id=${sessionScope.correo}">Mi perfil</a></li>
                                 <li><a href="editar-usuario?usuario_id=${sessionScope.correo}">Editar mi perfil</a></li>
-                                <li><a href="inscripciones?usuario_id=${sessionScope.correo}">Mis inscripciones</a></li>
+                                <c:if test="${not sessionScope.permiso}">
+                                    <li><a href="inscripciones?usuario_id=${sessionScope.correo}">Mis inscripciones</a></li>
+                                </c:if>
                                 <li><a href="logout">Cerrar sesión <span class="btn btn-danger btn-xs glyphicon glyphicon-off" style="color:white; padding:0"></span></a></li>
                             </ul>            
                         </li>
