@@ -52,7 +52,7 @@
                                             </form>
                                         </div>
                                         <div class="bottom text-center" style="background-color: #222;border-color: #080808;color:white">
-                                            ¿Eres nuevo aquí? <a href="crearUsuario.jsp"><b>Unete a nosotros</b></a>
+                                            ¿Eres nuevo aquí? <a href="CrearUsuario"><b>Unete a nosotros</b></a>
                                         </div>
                                     </div>
                                 </li>

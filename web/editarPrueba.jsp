@@ -22,6 +22,7 @@
         <link href="css/font-awesome.min.css" rel="stylesheet">
         <link href="css/cabecera.css" rel="stylesheet">
         <link href="css/login.css" rel="stylesheet">
+        <link href="css/breadcrumb.css" rel="stylesheet">
     </head>
     <body>
         <!--Cabecera-->       

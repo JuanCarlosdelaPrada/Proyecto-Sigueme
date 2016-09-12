@@ -149,7 +149,7 @@
                             ,buttons: [
                                 {
                                     text: "Añadir usuario",
-                                    action: function() {window.location.href = "crearUsuario.jsp";}
+                                    action: function() {window.location.href = "CrearUsuario";}
                                 }
                             ]    
                        </c:if>

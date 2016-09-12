@@ -38,6 +38,7 @@
         <link href="css/responsive.bootstrap.min.css" rel="stylesheet">
         <link href="css/cabecera.css" rel="stylesheet">
         <link href="css/login.css" rel="stylesheet">
+        <link href="css/breadcrumb.css" rel="stylesheet">
     </head>
     <body>
         <!--Cabecera-->       

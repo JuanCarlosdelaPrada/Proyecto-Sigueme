@@ -149,7 +149,7 @@
                             ,buttons: [
                                 {
                                     text: "Añadir prueba",
-                                    action: function() {window.location.href = "crearPrueba.jsp";}
+                                    action: function() {window.location.href = "CrearPrueba";}
                                 }
                             ]
                        </c:if>

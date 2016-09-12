@@ -123,7 +123,7 @@
                             ,buttons: [
                                 {
                                     text: "Añadir ruta",
-                                    action: function() {window.location.href = "subirRuta.jsp";}
+                                    action: function() {window.location.href = "SubirRuta";}
                                 }
                             ]    
                        </c:if>

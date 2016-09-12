@@ -22,6 +22,7 @@
         <link href="css/font-awesome.min.css" rel="stylesheet">
         <link href="css/cabecera.css" rel="stylesheet">
         <link href="css/login.css" rel="stylesheet">
+        <link href="css/breadcrumb.css" rel="stylesheet">
     </head>
     <body>
         <!--Cabecera-->       
@@ -112,7 +113,7 @@
                     </form>
                 </c:when>
                 <c:otherwise>
-                    <p><a href="subirRuta.jsp">Para poder crear una prueba necesita que exista al menos una ruta subida.</a></p>
+                    <p><a href="SubirRuta">Para poder crear una prueba necesita que exista al menos una ruta subida.</a></p>
                 </c:otherwise>
             </c:choose>
         </div>

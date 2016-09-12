@@ -17,6 +17,7 @@
         <link href="css/font-awesome.min.css" rel="stylesheet">
         <link href="css/cabecera.css" rel="stylesheet">
         <link href="css/login.css" rel="stylesheet">
+        <link href="css/breadcrumb.css" rel="stylesheet">
     </head>
     <body onresize="initMap()">
         <!--Cabecera-->       
@@ -59,11 +60,11 @@
                                 <c:when test="${periodoInscripcion and not maximoinscritos}">
                                     <c:choose>
                                         <c:when test="${usuario ne null}">
-                                            <input class="btn btn-success" type="button" value="Inscribirse" onclick="window.open('inscribirse?prueba_id=${prueba.pruebaId}')"/></br>
+                                            <input class="btn btn-success" type="button" value="Inscribirse" onclick="window.open('inscribirse?prueba_id=${prueba.pruebaId}', '_self')"/></br>
                                         </c:when>
                                         <c:otherwise>
                                             ¿Desea inscribirse?</br>
-                                            <input class="btn btn-success" type="button" value="¡Regístrate ya!" onclick="window.open('crearUsuario.jsp', '_self')"/></br>
+                                            <input class="btn btn-success" type="button" value="¡Regístrate ya!" onclick="window.open('CrearUsuario', '_self')"/></br>
                                         </c:otherwise>
                                     </c:choose>
                                     ABIERTO EL PLAZO DE INSCRIPCIONES</br>
