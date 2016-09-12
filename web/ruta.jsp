@@ -17,6 +17,7 @@
         <link href="css/font-awesome.min.css" rel="stylesheet">
         <link href="css/cabecera.css" rel="stylesheet">
         <link href="css/login.css" rel="stylesheet">
+        <link href="css/breadcrumb.css" rel="stylesheet">
     </head>
     <body onresize="initMap()">
         <!--Cabecera-->       
@@ -25,11 +26,8 @@
         <!--Menú-->
         <%@include file="WEB-INF/jspf/menu.jspf"%>
               
-        <!--Breadcumb-->
-        <ul class="breadcrumb" style="margin-bottom:0; background: #FFF7C8; border-radius:0">
-            <li><a href="rutas.jsp">Rutas</a></li>
-            <li class="active">Ruta</li>
-        </ul>
+        <!--Breadcrumb-->
+        <%@include file="WEB-INF/jspf/breadcrumb.jspf"%>
         
         <div class="page-header">
             <div class="col-sm-offset-1">

@@ -35,13 +35,14 @@
         
         <!--Breadcrumb-->
         <%@include file="WEB-INF/jspf/breadcrumb.jspf"%>
+        
         <!--
         <div class="breadcrumb container-fluid" style="padding-top: 0.35%; padding-bottom: 0.01%; margin-bottom: 0%">
             <ul class="crumbs">
-                <li class="first"><a href="#" style="z-index:3;"><span></span>Blog Home</a></li>
-                <li><a id="active" style="z-index:2;">Archives</a></li>
+                <li class="first"><a  href="#" style="z-index:3;"><span></span>Blog Home</a></li>
+                <li><a href="#" style="z-index:2;">Archives</a></li>
                 <li><a href="#" style="z-index:1;">2011 Writing</a></li>
-                <li><a href="#" style="z-index:0;">Tips for jQuery Development in HTML5</a></li>
+                <li><a id="active" href="#" style="z-index:0;">Tips for jQuery Development in HTML5</a></li>
             </ul>
         </div>
         -->

@@ -73,21 +73,25 @@ import org.jdom.output.XMLOutputter;
     "",
     "/login",
     "/logout",
+    "/Rutas",
     "/rutas", 
     "/ruta",
     "/subirRuta",
     "/editar-ruta",
     "/editarRuta",
     "/eliminar-ruta",
+    "/Pruebas",
     "/pruebas", 
-    "/prueba", //--
+    "/prueba", 
     "/crearPrueba",
     "/editar-prueba",
     "/editarPrueba",
     "/eliminar-prueba",
+    "/SeguimientoPruebas",
     "/seguimientoPruebas", 
     "/seguir-prueba",
     "/seguimiento_prueba",
+    "/Usuarios",
     "/usuarios",
     "/usuario", 
     "/crearUsuario",
@@ -262,8 +266,214 @@ public class ControladorAdministracion extends HttpServlet {
                 session.setAttribute("correo", null);
                 session.setAttribute("usuario", null);
                 session.setAttribute("permiso", null);
-                session.invalidate();
                 vista = "";
+                break;
+            case "/Rutas":
+                navegacion = new ArrayList<>();
+                navegacion.add("Rutas");
+                navegacion.add("Rutas");
+                session.setAttribute("navegacion", navegacion);
+                
+                vista = "rutas.jsp";
+                break;
+            case "/rutas":
+                String[] columnas = {"Nombre de la ruta", "Descripcion", "Distancia", "Dificultad", "Mostrar", "Editar", "Borrar"};
+                String[] atributos = {"ruta_id", "descripcion", "distancia", "dificultad"};
+                tabla = "ruta";
+                resultado = new JsonObject();
+                array = new JsonArray();
+                cantidad = 10;
+                comienzo = 0;
+                idraw = 0;
+                num_atributos = 0;
+                
+                dir = "asc";
+                sStart = request.getParameter("start");
+                sAmount = request.getParameter("length"); 
+                draw = request.getParameter("draw");
+                sCol = request.getParameter("order[0][column]"); 
+                sdir = request.getParameter("order[0][dir]"); 
+                
+                /*
+                String sdistancia = request.getParameter("columns[2][search][value]"),
+                       fichero_gpx = request.getParameter("columns[4][search][value]"),
+                       lat_min = request.getParameter("columns[5][search][value]"),
+                       lat_max = request.getParameter("columns[6][search][value]"),
+                       long_min = request.getParameter("columns[7][search][value]"),
+                       long_max = request.getParameter("columns[8][search][value]");
+                ruta_id = request.getParameter("columns[0][search][value]");
+                descripcion = request.getParameter("columns[1][search][value]");
+                dificultad = request.getParameter("columns[3][search][value]");
+                
+                List<String> sArray = new ArrayList<>();
+                if (!"".equals(ruta_id)) {
+                    sArray.add(" ruta_id like '%" + ruta_id + "%'");
+                }
+                if (!"".equals(descripcion)) {
+                    sArray.add(" descripcion like '%" + descripcion + "%'");
+                }
+                if (!"".equals(sdistancia)) {
+                    sArray.add(" distancia like '%" + sdistancia + "%'");
+                }
+                if (!"".equals(dificultad)) {
+                    sArray.add(" dificultad like '%" + dificultad + "%'");
+                }
+                if (!"".equals(fichero_gpx)) {
+                    sArray.add(" fichero_gpx like '%" + fichero_gpx + "%'");
+                }
+                if (!"".equals(lat_min)) {
+                    sArray.add(" lat_min like '%" + lat_min + "%'");
+                }
+                if (!"".equals(lat_max)) {
+                    sArray.add(" lat_max like '%" + lat_max + "%'");
+                }
+                if (!"".equals(long_min)) {
+                    sArray.add(" long_min like '%" + long_min + "%'");
+                }
+                if (!"".equals(long_max)) {
+                    sArray.add(" long_max like '%" + long_max + "%'");
+                }
+                
+                String individualSearch = "";
+                if(sArray.size()==1){
+                    individualSearch = sArray.get(0);
+                }else if(sArray.size() > 1){
+                    for(int i = 0; i < sArray.size() - 1; i++){
+                        individualSearch += sArray.get(i) + " and ";
+                    }
+                    individualSearch += sArray.get(sArray.size()-1);
+                }
+                */
+                if (sStart != null) {
+                    comienzo = Integer.parseInt(sStart);
+                    if (comienzo < 0)
+                        comienzo = 0;
+                }
+                if (sAmount != null) {
+                    cantidad = Integer.parseInt(sAmount);
+                    if (cantidad < 10 || cantidad > 100)
+                        cantidad = 10;
+                }
+                if (draw != null) {
+                    idraw = Integer.parseInt(draw);
+                }
+                if (sCol != null) {
+                    num_atributos = Integer.parseInt(sCol);
+                    if (num_atributos < 0 || num_atributos > (atributos.length - 1))
+                        num_atributos = 0; 
+                }
+                if (sdir != null) {
+                    if (!sdir.equals("asc"))
+                        dir = "desc";
+                }
+                nombreAtributo = atributos[num_atributos];
+                total = 0;
+                
+                try (Connection conn = myDatasource.getConnection()) {
+                    String sql = "SELECT count(*) FROM " + tabla;
+                    PreparedStatement ps = conn.prepareStatement(sql);
+                    ResultSet rs = ps.executeQuery();
+                    if(rs.next()){
+                        total = rs.getInt("count(*)");
+                    }
+                    int totalAfterFilter = total;
+                    String searchSQL = "",
+                            searchTerm = request.getParameter("search[value]"), 
+                            globeSearch = " where (ruta_id like '%" + searchTerm +"%')";
+                            /*+ " or descripcion like '%" + searchTerm +"%'"
+                            + " or distancia like '%" + searchTerm +"%'"
+                            + " or dificultad like '%" + searchTerm +"%'"
+                            + " or fichero_gpx like '%" + searchTerm +"%'"
+                            + " or lat_min like '%" + searchTerm +"%'"
+                            + " or lat_max like '%" + searchTerm +"%'"
+                            + " or long_min like '%" + searchTerm +"%'"
+                            + " or long_max like '%" + searchTerm + "%')";*/
+                    sql = "SELECT * FROM " + tabla;
+                    
+                    /*if(!"".equals(searchTerm) && !"".equals(individualSearch)){
+                        searchSQL = globeSearch + " and " + individualSearch;
+                    }
+                    else if(!"".equals(individualSearch)){
+                        searchSQL = " where " + individualSearch;
+                    }else if(!"".equals(searchTerm)){
+                        searchSQL = globeSearch;
+                    }*/
+                    
+                    if(!"".equals(searchTerm)){
+                        searchSQL = globeSearch;
+                    }
+                    sql += searchSQL;
+                    sql += " order by " + nombreAtributo + " " + dir;
+                    sql += " limit " + comienzo + ", " + cantidad;
+                    System.out.println(sql);
+                    ps = conn.prepareStatement(sql);
+                    rs = ps.executeQuery();
+                    while (rs.next()) {
+                        JsonObject ja = new JsonObject();
+                        for (i = 0; i < atributos.length; i++) {
+                            if (! atributos[i].equals("distancia")) {
+                                ja.add(columnas[i], new JsonPrimitive(rs.getString(atributos[i])));   
+                            }
+                            else {
+                                ja.add(columnas[i], new JsonPrimitive(rs.getString(atributos[i]).replace(".", ",")+" m"));
+                            }
+                        }
+                        ja.add(columnas[atributos.length], new JsonPrimitive("<a href='ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                        
+                        permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
+                        if (permiso == true) {
+                            ja.add(columnas[atributos.length + 1], new JsonPrimitive("<a href='editar-ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
+                            ja.add(columnas[atributos.length + 2], new JsonPrimitive("<a href='eliminar-ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>")); 
+                        }
+                        array.add(ja);
+                    }
+                    
+                    String sql2 = "SELECT count(*) FROM " + tabla;
+                    if (searchTerm != null) {
+                        sql2 += searchSQL;
+                        PreparedStatement ps2 = conn.prepareStatement(sql2);
+                        ResultSet rs2 = ps2.executeQuery();
+                        if (rs2.next()) {
+                            totalAfterFilter = rs2.getInt("count(*)");
+                        }
+                    }
+                    resultado.add("draw", new JsonPrimitive(idraw));
+                    resultado.add("recordsTotal", new JsonPrimitive(total));
+                    resultado.add("recordsFiltered", new JsonPrimitive(totalAfterFilter));
+                    resultado.add("data", array);
+                    System.out.println(resultado);
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setHeader("Cache-Control", "no-store");
+                    out = response.getWriter();
+                    out.print(resultado);
+                    out.flush();
+                    conn.close();
+                    return;
+                } catch (SQLException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                break;
+            case "/ruta":
+                ruta_id = request.getParameter("ruta_id");
+                
+                ruta = em.find(Ruta.class, ruta_id);
+                if (ruta != null) {
+                    File ficheroGpx = new File(ruta.getFicheroGpx());
+                    parseador = new ParserGPX(ficheroGpx);
+                    JsonArray latlng = parseador.gpxToJson();
+                    request.setAttribute("ruta", ruta);
+                    request.setAttribute("distancia", ruta.getDistancia().toString().replace(".", ","));
+                    request.setAttribute("latlng", latlng);
+                }
+                
+                navegacion = (ArrayList<String>) session.getAttribute("navegacion");
+                if (!navegacion.contains("ruta?ruta_id=" + ruta_id)) {
+                    navegacion.add("ruta?ruta_id=" + ruta_id);
+                    navegacion.add("Ruta");
+                    session.setAttribute("navegacion", navegacion);
+                }
+                vista = "ruta.jsp";
                 break;
             case "/crearUsuario":
                 permiso = session.getAttribute("permiso") == null? false: (Boolean) session.getAttribute("permiso");
@@ -525,198 +735,6 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 vista = "pruebas.jsp";
                 break;
-            case "/rutas":
-                String[] columnas = {"Nombre de la ruta", "Descripcion", "Distancia", "Dificultad", "Mostrar", "Editar", "Borrar"};
-                String[] atributos = {"ruta_id", "descripcion", "distancia", "dificultad"};
-                tabla = "ruta";
-                resultado = new JsonObject();
-                array = new JsonArray();
-                cantidad = 10;
-                comienzo = 0;
-                idraw = 0;
-                num_atributos = 0;
-                
-                dir = "asc";
-                sStart = request.getParameter("start");
-                sAmount = request.getParameter("length"); 
-                draw = request.getParameter("draw");
-                sCol = request.getParameter("order[0][column]"); 
-                sdir = request.getParameter("order[0][dir]"); 
-                
-                /*
-                String sdistancia = request.getParameter("columns[2][search][value]"),
-                       fichero_gpx = request.getParameter("columns[4][search][value]"),
-                       lat_min = request.getParameter("columns[5][search][value]"),
-                       lat_max = request.getParameter("columns[6][search][value]"),
-                       long_min = request.getParameter("columns[7][search][value]"),
-                       long_max = request.getParameter("columns[8][search][value]");
-                ruta_id = request.getParameter("columns[0][search][value]");
-                descripcion = request.getParameter("columns[1][search][value]");
-                dificultad = request.getParameter("columns[3][search][value]");
-                
-                List<String> sArray = new ArrayList<>();
-                if (!"".equals(ruta_id)) {
-                    sArray.add(" ruta_id like '%" + ruta_id + "%'");
-                }
-                if (!"".equals(descripcion)) {
-                    sArray.add(" descripcion like '%" + descripcion + "%'");
-                }
-                if (!"".equals(sdistancia)) {
-                    sArray.add(" distancia like '%" + sdistancia + "%'");
-                }
-                if (!"".equals(dificultad)) {
-                    sArray.add(" dificultad like '%" + dificultad + "%'");
-                }
-                if (!"".equals(fichero_gpx)) {
-                    sArray.add(" fichero_gpx like '%" + fichero_gpx + "%'");
-                }
-                if (!"".equals(lat_min)) {
-                    sArray.add(" lat_min like '%" + lat_min + "%'");
-                }
-                if (!"".equals(lat_max)) {
-                    sArray.add(" lat_max like '%" + lat_max + "%'");
-                }
-                if (!"".equals(long_min)) {
-                    sArray.add(" long_min like '%" + long_min + "%'");
-                }
-                if (!"".equals(long_max)) {
-                    sArray.add(" long_max like '%" + long_max + "%'");
-                }
-                
-                String individualSearch = "";
-                if(sArray.size()==1){
-                    individualSearch = sArray.get(0);
-                }else if(sArray.size() > 1){
-                    for(int i = 0; i < sArray.size() - 1; i++){
-                        individualSearch += sArray.get(i) + " and ";
-                    }
-                    individualSearch += sArray.get(sArray.size()-1);
-                }
-                */
-                if (sStart != null) {
-                    comienzo = Integer.parseInt(sStart);
-                    if (comienzo < 0)
-                        comienzo = 0;
-                }
-                if (sAmount != null) {
-                    cantidad = Integer.parseInt(sAmount);
-                    if (cantidad < 10 || cantidad > 100)
-                        cantidad = 10;
-                }
-                if (draw != null) {
-                    idraw = Integer.parseInt(draw);
-                }
-                if (sCol != null) {
-                    num_atributos = Integer.parseInt(sCol);
-                    if (num_atributos < 0 || num_atributos > (atributos.length - 1))
-                        num_atributos = 0; 
-                }
-                if (sdir != null) {
-                    if (!sdir.equals("asc"))
-                        dir = "desc";
-                }
-                nombreAtributo = atributos[num_atributos];
-                total = 0;
-                
-                try (Connection conn = myDatasource.getConnection()) {
-                    String sql = "SELECT count(*) FROM " + tabla;
-                    PreparedStatement ps = conn.prepareStatement(sql);
-                    ResultSet rs = ps.executeQuery();
-                    if(rs.next()){
-                        total = rs.getInt("count(*)");
-                    }
-                    int totalAfterFilter = total;
-                    String searchSQL = "",
-                            searchTerm = request.getParameter("search[value]"), 
-                            globeSearch = " where (ruta_id like '%" + searchTerm +"%')";
-                            /*+ " or descripcion like '%" + searchTerm +"%'"
-                            + " or distancia like '%" + searchTerm +"%'"
-                            + " or dificultad like '%" + searchTerm +"%'"
-                            + " or fichero_gpx like '%" + searchTerm +"%'"
-                            + " or lat_min like '%" + searchTerm +"%'"
-                            + " or lat_max like '%" + searchTerm +"%'"
-                            + " or long_min like '%" + searchTerm +"%'"
-                            + " or long_max like '%" + searchTerm + "%')";*/
-                    sql = "SELECT * FROM " + tabla;
-                    
-                    /*if(!"".equals(searchTerm) && !"".equals(individualSearch)){
-                        searchSQL = globeSearch + " and " + individualSearch;
-                    }
-                    else if(!"".equals(individualSearch)){
-                        searchSQL = " where " + individualSearch;
-                    }else if(!"".equals(searchTerm)){
-                        searchSQL = globeSearch;
-                    }*/
-                    
-                    if(!"".equals(searchTerm)){
-                        searchSQL = globeSearch;
-                    }
-                    sql += searchSQL;
-                    sql += " order by " + nombreAtributo + " " + dir;
-                    sql += " limit " + comienzo + ", " + cantidad;
-                    System.out.println(sql);
-                    ps = conn.prepareStatement(sql);
-                    rs = ps.executeQuery();
-                    while (rs.next()) {
-                        JsonObject ja = new JsonObject();
-                        for (i = 0; i < atributos.length; i++) {
-                            if (! atributos[i].equals("distancia")) {
-                                ja.add(columnas[i], new JsonPrimitive(rs.getString(atributos[i])));   
-                            }
-                            else {
-                                ja.add(columnas[i], new JsonPrimitive(rs.getString(atributos[i]).replace(".", ",")+" m"));
-                            }
-                        }
-                        ja.add(columnas[atributos.length], new JsonPrimitive("<a href='ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
-                        
-                        permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
-                        if (permiso == true) {
-                            ja.add(columnas[atributos.length + 1], new JsonPrimitive("<a href='editar-ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
-                            ja.add(columnas[atributos.length + 2], new JsonPrimitive("<a href='eliminar-ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>")); 
-                        }
-                        array.add(ja);
-                    }
-                    
-                    String sql2 = "SELECT count(*) FROM " + tabla;
-                    if (searchTerm != null) {
-                        sql2 += searchSQL;
-                        PreparedStatement ps2 = conn.prepareStatement(sql2);
-                        ResultSet rs2 = ps2.executeQuery();
-                        if (rs2.next()) {
-                            totalAfterFilter = rs2.getInt("count(*)");
-                        }
-                    }
-                    resultado.add("draw", new JsonPrimitive(idraw));
-                    resultado.add("recordsTotal", new JsonPrimitive(total));
-                    resultado.add("recordsFiltered", new JsonPrimitive(totalAfterFilter));
-                    resultado.add("data", array);
-                    System.out.println(resultado);
-                    response.setContentType("application/json");
-                    response.setCharacterEncoding("UTF-8");
-                    response.setHeader("Cache-Control", "no-store");
-                    out = response.getWriter();
-                    out.print(resultado);
-                    out.flush();
-                    conn.close();
-                    session.setAttribute("navegacion", new String[]{"rutas.jsp", "Rutas"});
-                    return;
-                } catch (SQLException ex) {
-                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                break;
-            case "/ruta":
-                ruta_id = request.getParameter("ruta_id");
-                ruta = em.find(Ruta.class, ruta_id);
-                if (ruta != null) {
-                    File ficheroGpx = new File(ruta.getFicheroGpx());
-                    parseador = new ParserGPX(ficheroGpx);
-                    JsonArray latlng = parseador.gpxToJson();
-                    request.setAttribute("ruta", ruta);
-                    request.setAttribute("distancia", ruta.getDistancia().toString().replace(".", ","));
-                    request.setAttribute("latlng", latlng);
-                }
-                vista = "ruta.jsp";
-                break;
             case "/editar-ruta":
                 ruta_id = request.getParameter("ruta_id");
                 ruta = em.find(Ruta.class, ruta_id);
@@ -808,6 +826,14 @@ public class ControladorAdministracion extends HttpServlet {
                     System.out.println("La ruta no existe.");
                 }
                 vista = "rutas.jsp";
+                break;
+            case "/Pruebas":
+                navegacion = new ArrayList<>();
+                navegacion.add("Pruebas");
+                navegacion.add("Pruebas");
+                session.setAttribute("navegacion", navegacion);
+                
+                vista = "pruebas.jsp";
                 break;
             case "/pruebas":
                 String[] columnasP = {"Nombre de la prueba", "Descripcion", "Ruta", "Lugar", "Fecha celebracion", "Hora celebracion", "Fecha apertura inscripcion", "Fecha limite inscripcion", "Nº Maximo inscritos", "Inscribirse", "Mostrar", "Editar", "Borrar", "Ver inscripciones"};
@@ -1003,6 +1029,14 @@ public class ControladorAdministracion extends HttpServlet {
                     System.out.println("La prueba no existe.");
                 }
                 vista = "pruebas.jsp";
+                break;
+            case "/Usuarios":
+                navegacion = new ArrayList<>();
+                navegacion.add("Usuarios");
+                navegacion.add("Usuarios");
+                session.setAttribute("navegacion", navegacion);
+                
+                vista = "usuarios.jsp";
                 break;
             case "/usuarios":
                 String[] columnasU = {"Correo", "Contrasena", "Rol", "Nombre", "Apellidos", "DNI", "Direccion", "Fecha Nacimiento", "Telefono", "Sexo", "Club", "Federado", "Mas informacion", "Editar", "Borrar", "Ver inscripciones"};
@@ -1204,6 +1238,14 @@ public class ControladorAdministracion extends HttpServlet {
                     System.out.println("Se ha accedido a una zona restringida");
                     vista = "";
                 }
+                break;
+            case "/SeguimientoPruebas":
+                navegacion = new ArrayList<>();
+                navegacion.add("SeguimientoPruebas");
+                navegacion.add("Seguimiento de pruebas");
+                session.setAttribute("navegacion", navegacion);
+                
+                vista = "seguimientoPruebas.jsp";
                 break;
             case "/seguimientoPruebas":
                 String[] columnasS = {"Nombre de la prueba", "Ver", "Mas informacion"};

@@ -2,22 +2,25 @@
 <div class="breadcrumb container-fluid" style="padding-top: 0.35%; padding-bottom: 0.01%; margin-bottom: 0%">
     <ul class="crumbs">
         <%
-            ArrayList<String> navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-            for (int i = 1; i < navegacion.size(); i++) {
-                String crumb = "";
-                if (i == 1) {
-                    crumb += "<li class='first'>";
+            Object object = session.getAttribute("navegacion");
+            if (object != null) {
+                ArrayList<String> navegacion = (ArrayList<String>) object;
+                for (int i = 1; i < navegacion.size(); i = i + 2) {
+                    String crumb = "";
+                    if (i == 1) {
+                        crumb += "<li class='first'>";
+                    }
+                    else {
+                        crumb += "<li>";
+                    }
+                    if (i == navegacion.size() - 1 ) {
+                        crumb += ("<a id='active' style='z-index:" + (navegacion.size() - i) + ";'><span></span>");
+                    }
+                    else {
+                        crumb += ("<a href='" + navegacion.get(i - 1) + "' style='z-index:" + (navegacion.size() - i) + ";'>");
+                    }
+                    out.print(crumb + navegacion.get(i) + "</a></li>");
                 }
-                else {
-                    crumb += "<li>";
-                }
-                if (i == navegacion.size() - 1 ) {
-                    crumb += ("<a id='active' style='z-index:" + (i - 1) + ";'><span></span>");
-                }
-                else {
-                    crumb += ("<a href='" + navegacion.get(i - 1) + "' style='z-index:" + (i - 1) + ";'>");
-                }
-                out.print(crumb + navegacion.get(i) + "</a></li>");
             }
         %>
     </ul>
