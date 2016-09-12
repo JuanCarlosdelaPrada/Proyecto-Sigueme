@@ -470,13 +470,14 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("latlng", latlng);
                 }
                 
+                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"Usuario", "Crear usuario", "Editar usuario", "Inscripciones", "Editar inscripción"};
+                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
                 for (String enl: enlaces) {
                     if (navegacion.contains(enl)) {
                         i = navegacion.lastIndexOf(enl);
                         navegacion.remove(i);
-                        navegacion.remove(i - 1);
+                        navegacion.remove(i);
                     }
                 }
                 if (!navegacion.contains("ruta?ruta_id=" + ruta_id)) {
@@ -488,13 +489,16 @@ public class ControladorAdministracion extends HttpServlet {
                 vista = "ruta.jsp";
                 break;
             case "/CrearUsuario":
+                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"Usuario", "Editar usuario", "Inscripciones", "Editar inscripción"};
-                for (String enl: enlaces) {
-                    if (navegacion.contains(enl)) {
-                        i = navegacion.lastIndexOf(enl);
-                        navegacion.remove(i);
-                        navegacion.remove(i - 1);
+                if (navegacion.contains("usuario?usuario_id=" + miUsuario) || navegacion.contains("editar-usuario?usuario_id=" + miUsuario) || navegacion.contains("inscripciones?usuario_id=" + miUsuario)) {
+                    enlaces = new String[]{"usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
+                    for (String enl: enlaces) {
+                        if (navegacion.contains(enl)) {
+                            i = navegacion.lastIndexOf(enl);
+                            navegacion.remove(i);
+                            navegacion.remove(i);
+                        }
                     }
                 }
                 if (!navegacion.contains("CrearUsuario")) {
@@ -502,7 +506,6 @@ public class ControladorAdministracion extends HttpServlet {
                     navegacion.add("Crear usuario");
                     session.setAttribute("navegacion", navegacion);
                 }
-                
                 vista = "crearUsuario.jsp";
                 break;
             case "/crearUsuario":
@@ -620,13 +623,14 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 break;
             case "/SubirRuta":
+                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"Usuario", "Crear usuario", "Editar usuario", "Inscripciones", "Editar inscripción"};
+                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
                 for (String enl: enlaces) {
                     if (navegacion.contains(enl)) {
                         i = navegacion.lastIndexOf(enl);
                         navegacion.remove(i);
-                        navegacion.remove(i - 1);
+                        navegacion.remove(i);
                     }
                 }
                 if (!navegacion.contains("SubirRuta")) {
@@ -695,13 +699,14 @@ public class ControladorAdministracion extends HttpServlet {
                 vista = "Rutas";
                 break;
             case "/CrearPrueba":
+                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"Usuario", "Crear usuario", "Editar usuario", "Inscripciones", "Editar inscripción"};
+                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
                 for (String enl: enlaces) {
                     if (navegacion.contains(enl)) {
                         i = navegacion.lastIndexOf(enl);
                         navegacion.remove(i);
-                        navegacion.remove(i - 1);
+                        navegacion.remove(i);
                     }
                 }
                 if (!navegacion.contains("CrearPrueba")) {
@@ -809,13 +814,14 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("ruta", ruta);
                 }
                 
+                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"Usuario", "Crear usuario", "Editar usuario", "Inscripciones", "Editar inscripción"};
+                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
                 for (String enl: enlaces) {
                     if (navegacion.contains(enl)) {
                         i = navegacion.lastIndexOf(enl);
                         navegacion.remove(i);
-                        navegacion.remove(i - 1);
+                        navegacion.remove(i);
                     }
                 }
                 if (!navegacion.contains("editar-ruta?ruta_id=" + ruta_id)) {
@@ -1071,13 +1077,14 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("horaCel", formato.format(prueba.getHoraCel()) + " h");
                 }
                 
+                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"Usuario", "Crear usuario", "Editar usuario", "Inscripciones", "Editar inscripción"};
+                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
                 for (String enl: enlaces) {
                     if (navegacion.contains(enl)) {
                         i = navegacion.lastIndexOf(enl);
                         navegacion.remove(i);
-                        navegacion.remove(i - 1);
+                        navegacion.remove(i);
                     }
                 }
                 if (navegacion.contains("Ruta")) {
@@ -1107,13 +1114,14 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("prueba", prueba);
                 }
                 
+                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"Usuario", "Crear usuario", "Editar usuario", "Inscripciones", "Editar inscripción"};
+                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
                 for (String enl: enlaces) {
                     if (navegacion.contains(enl)) {
                         i = navegacion.lastIndexOf(enl);
                         navegacion.remove(i);
-                        navegacion.remove(i - 1);
+                        navegacion.remove(i);
                     }
                 }
                 if (!navegacion.contains("editar-prueba?prueba_id=" + prueba_id)) {
@@ -1293,13 +1301,16 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("fechaNacimiento", formateador.format(usuario.getFechaNacimiento()));
                     request.setAttribute("usuario", usuario);
                     
+                    miUsuario = (String) session.getAttribute("correo");
                     navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                    enlaces = new String[]{"Crear usuario", "Editar usuario", "Inscripciones", "Editar inscripción"};
-                    for (String enl: enlaces) {
-                        if (navegacion.contains(enl)) {
-                            i = navegacion.lastIndexOf(enl);
-                            navegacion.remove(i);
-                            navegacion.remove(i - 1);
+                    if (navegacion.contains("usuario?usuario_id=" + miUsuario) || navegacion.contains("editar-usuario?usuario_id=" + miUsuario) || navegacion.contains("inscripciones?usuario_id=" + miUsuario)) {
+                        enlaces = new String[]{"usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
+                        for (String enl: enlaces) {
+                            if (navegacion.contains(enl)) {
+                                i = navegacion.lastIndexOf(enl);
+                                navegacion.remove(i);
+                                navegacion.remove(i);
+                            }
                         }
                     }
                     if (!navegacion.contains("usuario?usuario_id=" + usuario_id)) {
@@ -1323,13 +1334,16 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("fechaNacimiento", formateador.format(usuario.getFechaNacimiento()));
                     request.setAttribute("usuario", usuario);
                     
+                    miUsuario = (String) session.getAttribute("correo");
                     navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                    enlaces = new String[]{"Usuario", "Crear usuario", "Inscripciones", "Editar inscripción"};
-                    for (String enl: enlaces) {
-                        if (navegacion.contains(enl)) {
-                            i = navegacion.lastIndexOf(enl);
-                            navegacion.remove(i);
-                            navegacion.remove(i - 1);
+                    if (navegacion.contains("usuario?usuario_id=" + miUsuario) || navegacion.contains("editar-usuario?usuario_id=" + miUsuario) || navegacion.contains("inscripciones?usuario_id=" + miUsuario)) {
+                        enlaces = new String[]{"usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
+                        for (String enl: enlaces) {
+                            if (navegacion.contains(enl)) {
+                                i = navegacion.lastIndexOf(enl);
+                                navegacion.remove(i);
+                                navegacion.remove(i);
+                            }
                         }
                     }
                     if (!navegacion.contains("editar-usuario?usuario_id=" + usuario_id)) {
@@ -1520,13 +1534,14 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("inscritos", inscritos);
                 }
                 
+                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"Usuario", "Crear usuario", "Editar usuario", "Inscripciones", "Editar inscripción"};
+                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
                 for (String enl: enlaces) {
                     if (navegacion.contains(enl)) {
                         i = navegacion.lastIndexOf(enl);
                         navegacion.remove(i);
-                        navegacion.remove(i - 1);
+                        navegacion.remove(i);
                     }
                 }
                 if (!navegacion.contains("seguir-prueba?prueba_id=" + prueba_id)) {
@@ -1672,14 +1687,22 @@ public class ControladorAdministracion extends HttpServlet {
                 request.setAttribute("prueba_id", prueba_id);
                 request.setAttribute("usuario_id", usuario_id);
                 
+                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"Usuario", "Crear usuario", "Editar usuario", "Editar inscripción"};
-                for (String enl: enlaces) {
-                    if (navegacion.contains(enl)) {
-                        i = navegacion.lastIndexOf(enl);
-                        navegacion.remove(i);
-                        navegacion.remove(i - 1);
+                if (navegacion.contains("usuario?usuario_id=" + miUsuario) || navegacion.contains("editar-usuario?usuario_id=" + miUsuario) || navegacion.contains("inscripciones?usuario_id=" + miUsuario)) {
+                    enlaces = new String[]{"usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
+                    for (String enl: enlaces) {
+                        if (navegacion.contains(enl)) {
+                            i = navegacion.lastIndexOf(enl);
+                            navegacion.remove(i);
+                            navegacion.remove(i);
+                        }
                     }
+                }
+                if (navegacion.contains("Editar inscripción") && !navegacion.contains("inscripciones?usuario_id=" + miUsuario)) {
+                    i = navegacion.lastIndexOf("Editar inscripción");
+                    navegacion.remove(i);
+                    navegacion.remove(i - 1);
                 }
                 if (prueba_id == null) {
                     if (!navegacion.contains("inscripciones?usuario_id=" + usuario_id)) {
@@ -1732,13 +1755,16 @@ public class ControladorAdministracion extends HttpServlet {
                         request.setAttribute("inscrito", inscrito);
                         request.setAttribute(identificador, request.getParameter(identificador));
                         
+                        miUsuario = (String) session.getAttribute("correo");
                         navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                        enlaces = new String[]{"Usuario", "Crear usuario", "Editar usuario", "Inscripciones"};
-                        for (String enl: enlaces) {
-                            if (navegacion.contains(enl)) {
-                                i = navegacion.lastIndexOf(enl); 
-                                navegacion.remove(i);
-                                navegacion.remove(i - 1);
+                        if (!usuario_id.equals(miUsuario)) {
+                            enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
+                            for (String enl: enlaces) {
+                                if (navegacion.contains(enl)) {
+                                    i = navegacion.lastIndexOf(enl);
+                                    navegacion.remove(i);
+                                    navegacion.remove(i);
+                                }
                             }
                         }
                         if ("usuario_id".equals(identificador)) {
