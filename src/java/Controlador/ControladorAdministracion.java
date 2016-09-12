@@ -144,6 +144,7 @@ public class ControladorAdministracion extends HttpServlet {
         SimpleDateFormat formato;
         List<Inscrito> inscritos;
         List<Prueba> pruebas;
+        List<String> navegacion;
         JsonObject resultado;
         ParserGPX parseador;
         Inscrito inscrito;
@@ -221,6 +222,12 @@ public class ControladorAdministracion extends HttpServlet {
                     i++;
                 }
                 request.setAttribute("pruebasRecientes", pruebasRecientes);
+                
+                navegacion = new ArrayList<>();
+                navegacion.add("/Sigueme");
+                navegacion.add("Inicio");
+                session.setAttribute("navegacion", navegacion);
+                
                 vista = "inicio.jsp";
                 break;
             case "/login":
@@ -691,6 +698,7 @@ public class ControladorAdministracion extends HttpServlet {
                     out.print(resultado);
                     out.flush();
                     conn.close();
+                    session.setAttribute("navegacion", new String[]{"rutas.jsp", "Rutas"});
                     return;
                 } catch (SQLException ex) {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);

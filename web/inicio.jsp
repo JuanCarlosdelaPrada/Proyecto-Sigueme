@@ -1,14 +1,9 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<% synchronized(session){
-    if(session.isNew()){
-        session.setAttribute("correo", null);
-        session.setAttribute("usuario", null);
-        session.setAttribute("permiso", null);
-    }
-}
-%>
+
+<%@include file="WEB-INF/jspf/sesion.jspf"%>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -22,6 +17,7 @@
         <link href="css/font-awesome.min.css" rel="stylesheet">
         <link href="css/cabecera.css" rel="stylesheet">
         <link href="css/login.css" rel="stylesheet">
+        <link href="css/breadcrumb.css" rel="stylesheet">
     </head>
     <style>
         .carousel-inner > .item > img,
@@ -37,8 +33,21 @@
         <!--Menú-->
         <%@include file="WEB-INF/jspf/menu.jspf"%>
         
+        <!--Breadcrumb-->
+        <%@include file="WEB-INF/jspf/breadcrumb.jspf"%>
+        <!--
+        <div class="breadcrumb container-fluid" style="padding-top: 0.35%; padding-bottom: 0.01%; margin-bottom: 0%">
+            <ul class="crumbs">
+                <li class="first"><a href="#" style="z-index:3;"><span></span>Blog Home</a></li>
+                <li><a id="active" style="z-index:2;">Archives</a></li>
+                <li><a href="#" style="z-index:1;">2011 Writing</a></li>
+                <li><a href="#" style="z-index:0;">Tips for jQuery Development in HTML5</a></li>
+            </ul>
+        </div>
+        -->
+        
         <!--Jumbotron-->
-        <div class="container-fluid" style="margin-top: 0.35%;margin-left:-0.65%; margin-right:-0.85%"> <!-- border-color: purple; border-style: solid-->
+        <div class="container-fluid" style="margin-top: 0.35%; margin-left:-0.65%; margin-right:-0.85%"> <!-- border-color: purple; border-style: solid-->
             <div class="text-justify jumbotron" style="padding-top: 0.25%; padding-bottom: 0.15%;background-color:  violet; color: purple">
                 <h3 style="font-size: 135%"><u><b>Proyecto "Sígueme"</b></u></h3>
                 <p style="font-size: 115%">

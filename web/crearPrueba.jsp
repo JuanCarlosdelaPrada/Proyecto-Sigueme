@@ -6,14 +6,9 @@
 <sql:query var="rutas">
     select * from ruta
 </sql:query>
-<% synchronized(session){
-    if(session.isNew()){
-        session.setAttribute("correo", null);
-        session.setAttribute("usuario", null);
-        session.setAttribute("permiso", null);
-    }
-}
-%>
+
+<%@include file="WEB-INF/jspf/sesion.jspf"%>
+
 <!DOCTYPE html>
 <html>
     <head>
