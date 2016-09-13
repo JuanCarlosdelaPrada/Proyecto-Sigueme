@@ -470,42 +470,15 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("latlng", latlng);
                 }
                 
-                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                for (String enl: enlaces) {
-                    if (navegacion.contains(enl)) {
-                        i = navegacion.lastIndexOf(enl);
-                        navegacion.remove(i);
-                        navegacion.remove(i);
-                    }
-                }
-                if (!navegacion.contains("ruta?ruta_id=" + ruta_id)) {
-                    navegacion.add("ruta?ruta_id=" + ruta_id);
-                    navegacion.add("Ruta");
-                    session.setAttribute("navegacion", navegacion);
-                }
+                request.setAttribute("navegacion", breadcrumb(navegacion, "ruta?ruta_id=" + ruta_id, "Ruta"));
                 
                 vista = "ruta.jsp";
                 break;
             case "/CrearUsuario":
-                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                if (navegacion.contains("usuario?usuario_id=" + miUsuario) || navegacion.contains("editar-usuario?usuario_id=" + miUsuario) || navegacion.contains("inscripciones?usuario_id=" + miUsuario)) {
-                    enlaces = new String[]{"usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                    for (String enl: enlaces) {
-                        if (navegacion.contains(enl)) {
-                            i = navegacion.lastIndexOf(enl);
-                            navegacion.remove(i);
-                            navegacion.remove(i);
-                        }
-                    }
-                }
-                if (!navegacion.contains("CrearUsuario")) {
-                    navegacion.add("CrearUsuario");
-                    navegacion.add("Crear usuario");
-                    session.setAttribute("navegacion", navegacion);
-                }
+                session.setAttribute("navegacion", breadcrumb(navegacion, "CrearUsuario", "Crear usuario"));
+                
                 vista = "crearUsuario.jsp";
                 break;
             case "/crearUsuario":
@@ -623,22 +596,8 @@ public class ControladorAdministracion extends HttpServlet {
                 }
                 break;
             case "/SubirRuta":
-                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                for (String enl: enlaces) {
-                    if (navegacion.contains(enl)) {
-                        i = navegacion.lastIndexOf(enl);
-                        navegacion.remove(i);
-                        navegacion.remove(i);
-                    }
-                }
-                if (!navegacion.contains("SubirRuta")) {
-                    navegacion.add("SubirRuta");
-                    navegacion.add("Subir ruta");
-                    session.setAttribute("navegacion", navegacion);
-                }
-                
+                session.setAttribute("navegacion", breadcrumb(navegacion, "SubirRuta", "Subir ruta"));
                 vista = "subirRuta.jsp";
                 break;
             case "/subirRuta": 
@@ -699,21 +658,8 @@ public class ControladorAdministracion extends HttpServlet {
                 vista = "Rutas";
                 break;
             case "/CrearPrueba":
-                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                for (String enl: enlaces) {
-                    if (navegacion.contains(enl)) {
-                        i = navegacion.lastIndexOf(enl);
-                        navegacion.remove(i);
-                        navegacion.remove(i);
-                    }
-                }
-                if (!navegacion.contains("CrearPrueba")) {
-                    navegacion.add("CrearPrueba");
-                    navegacion.add("Crear prueba");
-                    session.setAttribute("navegacion", navegacion);
-                }
+                session.setAttribute("navegacion", breadcrumb(navegacion, "CrearPrueba", "Crear prueba"));
                 
                 vista = "crearPrueba.jsp";
                 break;
@@ -814,21 +760,8 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("ruta", ruta);
                 }
                 
-                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                for (String enl: enlaces) {
-                    if (navegacion.contains(enl)) {
-                        i = navegacion.lastIndexOf(enl);
-                        navegacion.remove(i);
-                        navegacion.remove(i);
-                    }
-                }
-                if (!navegacion.contains("editar-ruta?ruta_id=" + ruta_id)) {
-                    navegacion.add("editar-ruta?ruta_id=" + ruta_id);
-                    navegacion.add("Editar ruta");
-                    session.setAttribute("navegacion", navegacion);
-                }
+                session.setAttribute("navegacion", breadcrumb(navegacion, "editar-ruta?ruta_id=" + ruta_id, "Editar ruta"));
                 
                 vista = "editarRuta.jsp";
                 break;
@@ -1077,26 +1010,8 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("horaCel", formato.format(prueba.getHoraCel()) + " h");
                 }
                 
-                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                for (String enl: enlaces) {
-                    if (navegacion.contains(enl)) {
-                        i = navegacion.lastIndexOf(enl);
-                        navegacion.remove(i);
-                        navegacion.remove(i);
-                    }
-                }
-                if (navegacion.contains("Ruta")) {
-                    i = navegacion.lastIndexOf("Ruta");
-                    navegacion.remove(i);
-                    navegacion.remove(i - 1);
-                }
-                if (!navegacion.contains("prueba?prueba_id=" + prueba_id)) {
-                    navegacion.add("prueba?prueba_id=" + prueba_id);
-                    navegacion.add("Prueba");
-                    session.setAttribute("navegacion", navegacion);
-                }
+                session.setAttribute("navegacion", breadcrumb(navegacion, "prueba?prueba_id=" + prueba_id, "Prueba"));
                 
                 vista = "prueba.jsp";
                 break;
@@ -1114,21 +1029,8 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("prueba", prueba);
                 }
                 
-                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                for (String enl: enlaces) {
-                    if (navegacion.contains(enl)) {
-                        i = navegacion.lastIndexOf(enl);
-                        navegacion.remove(i);
-                        navegacion.remove(i);
-                    }
-                }
-                if (!navegacion.contains("editar-prueba?prueba_id=" + prueba_id)) {
-                    navegacion.add("editar-prueba?prueba_id=" + prueba_id);
-                    navegacion.add("Editar prueba");
-                    session.setAttribute("navegacion", navegacion);
-                }
+                session.setAttribute("navegacion", breadcrumb(navegacion, "editar-prueba?prueba_id=" + prueba_id, "Editar prueba"));
                 
                 vista = "editarPrueba.jsp";
                 break;
@@ -1244,6 +1146,7 @@ public class ControladorAdministracion extends HttpServlet {
                     rs = ps.executeQuery();
                     permiso = session.getAttribute("permiso") == null ? false : (boolean) session.getAttribute("permiso");
                     while (rs.next()) {
+                        boolean rol = false;
                         JsonObject ja = new JsonObject();
                         for (i = 0; i < atributosU.length; i++) {
                             String u;
@@ -1253,16 +1156,24 @@ public class ControladorAdministracion extends HttpServlet {
                                 u = rs.getString(atributosU[i]).equals("1") ? "Sí" : "No";
                             } else {
                                 u = rs.getString(atributosU[i]).equals("1") ? "Administrador" : "Usuario";
+                                if (u.equals("Administrador")) {
+                                    rol = true;
+                                }
                             }
                             ja.add(columnasU[i], new JsonPrimitive(u != null ? u : ""));
-
                         }
+                        
                         ja.add(columnasU[atributosU.length], new JsonPrimitive("<a href='usuario?" + atributosU[0] + "=" + ja.get(columnasU[0]).getAsString() + "'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
 
                         if (permiso) {
                             ja.add(columnasU[atributosU.length + 1], new JsonPrimitive("<a href='editar-usuario?" + atributosU[0] + "=" + ja.get(columnasU[0]).getAsString() + "'><i class='fa fa-pencil-square-o aria-hidden='true' style='color:#8904B1'></i></a>"));
                             ja.add(columnasU[atributosU.length + 2], new JsonPrimitive("<a href='eliminar-usuario?" + atributosU[0] + "=" + ja.get(columnasU[0]).getAsString() + "'><i class='fa fa-times aria-hidden='true' style='color:#B40404'></i></a>"));
-                            ja.add(columnasU[atributosU.length + 3], new JsonPrimitive("<a href='inscripciones?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                            if(!rol) {
+                                ja.add(columnasU[atributosU.length + 3], new JsonPrimitive("<a href='inscripciones?"+atributosU[0]+"="+ja.get(columnasU[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
+                            }
+                            else {
+                                ja.add(columnasU[atributosU.length + 3], new JsonPrimitive("<font color='red'>No disponible para administradores</font>"));
+                            }
                         }
                         array.add(ja);
                     }
@@ -1301,23 +1212,8 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("fechaNacimiento", formateador.format(usuario.getFechaNacimiento()));
                     request.setAttribute("usuario", usuario);
                     
-                    miUsuario = (String) session.getAttribute("correo");
                     navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                    if (navegacion.contains("usuario?usuario_id=" + miUsuario) || navegacion.contains("editar-usuario?usuario_id=" + miUsuario) || navegacion.contains("inscripciones?usuario_id=" + miUsuario)) {
-                        enlaces = new String[]{"usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                        for (String enl: enlaces) {
-                            if (navegacion.contains(enl)) {
-                                i = navegacion.lastIndexOf(enl);
-                                navegacion.remove(i);
-                                navegacion.remove(i);
-                            }
-                        }
-                    }
-                    if (!navegacion.contains("usuario?usuario_id=" + usuario_id)) {
-                        navegacion.add("usuario?usuario_id=" + usuario_id);
-                        navegacion.add("Usuario");
-                        session.setAttribute("navegacion", navegacion);
-                    }
+                    session.setAttribute("navegacion", breadcrumb(navegacion, "usuario?usuario_id=" + usuario_id, "Usuario"));
                 
                     vista = "usuario.jsp";
                 }
@@ -1334,23 +1230,8 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("fechaNacimiento", formateador.format(usuario.getFechaNacimiento()));
                     request.setAttribute("usuario", usuario);
                     
-                    miUsuario = (String) session.getAttribute("correo");
                     navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                    if (navegacion.contains("usuario?usuario_id=" + miUsuario) || navegacion.contains("editar-usuario?usuario_id=" + miUsuario) || navegacion.contains("inscripciones?usuario_id=" + miUsuario)) {
-                        enlaces = new String[]{"usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                        for (String enl: enlaces) {
-                            if (navegacion.contains(enl)) {
-                                i = navegacion.lastIndexOf(enl);
-                                navegacion.remove(i);
-                                navegacion.remove(i);
-                            }
-                        }
-                    }
-                    if (!navegacion.contains("editar-usuario?usuario_id=" + usuario_id)) {
-                        navegacion.add("editar-usuario?usuario_id=" + usuario_id);
-                        navegacion.add("Editar usuario");
-                        session.setAttribute("navegacion", navegacion);
-                    }
+                    session.setAttribute("navegacion", breadcrumb(navegacion, "editar-usuario?usuario_id=" + usuario_id, "Editar usuario"));
                     
                     vista = "editarUsuario.jsp";
                 }
@@ -1534,21 +1415,8 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("inscritos", inscritos);
                 }
                 
-                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                for (String enl: enlaces) {
-                    if (navegacion.contains(enl)) {
-                        i = navegacion.lastIndexOf(enl);
-                        navegacion.remove(i);
-                        navegacion.remove(i);
-                    }
-                }
-                if (!navegacion.contains("seguir-prueba?prueba_id=" + prueba_id)) {
-                    navegacion.add("seguir-prueba?prueba_id=" + prueba_id);
-                    navegacion.add("Seguir prueba");
-                    session.setAttribute("navegacion", navegacion);
-                }
+                session.setAttribute("navegacion", breadcrumb(navegacion, "seguir-prueba?prueba_id=" + prueba_id, "Seguir prueba"));
                 
                 vista = "seguirPrueba.jsp";
                 break;
@@ -1687,36 +1555,12 @@ public class ControladorAdministracion extends HttpServlet {
                 request.setAttribute("prueba_id", prueba_id);
                 request.setAttribute("usuario_id", usuario_id);
                 
-                miUsuario = (String) session.getAttribute("correo");
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                if (navegacion.contains("usuario?usuario_id=" + miUsuario) || navegacion.contains("editar-usuario?usuario_id=" + miUsuario)) {
-                    enlaces = new String[]{"usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                    for (String enl: enlaces) {
-                        if (navegacion.contains(enl)) {
-                            i = navegacion.lastIndexOf(enl);
-                            navegacion.remove(i);
-                            navegacion.remove(i);
-                        }
-                    }
-                }
-                if (navegacion.contains("Editar inscripción")) {
-                    i = navegacion.lastIndexOf("Editar inscripción");
-                    navegacion.remove(i);
-                    navegacion.remove(i - 1);
-                }
                 if (prueba_id == null) {
-                    if (!navegacion.contains("inscripciones?usuario_id=" + usuario_id)) {
-                        navegacion.add("inscripciones?usuario_id=" + usuario_id);
-                        navegacion.add("Inscripciones");
-                        session.setAttribute("navegacion", navegacion);
-                    } 
+                    session.setAttribute("navegacion", breadcrumb(navegacion, "inscripciones?usuario_id=" + usuario_id, "Inscripciones"));
                 }
                 else {
-                    if (!navegacion.contains("inscripciones?prueba_id=" + prueba_id)) {
-                        navegacion.add("inscripciones?prueba_id=" + prueba_id);
-                        navegacion.add("Inscripciones");
-                        session.setAttribute("navegacion", navegacion);
-                    }
+                    session.setAttribute("navegacion", breadcrumb(navegacion, "inscripciones?prueba_id=" + prueba_id, "Inscripciones"));
                 }
                 
                 vista = "inscripciones.jsp";
@@ -1755,31 +1599,12 @@ public class ControladorAdministracion extends HttpServlet {
                         request.setAttribute("inscrito", inscrito);
                         request.setAttribute(identificador, request.getParameter(identificador));
                         
-                        miUsuario = (String) session.getAttribute("correo");
                         navegacion = (ArrayList<String>) session.getAttribute("navegacion");
-                        if (!usuario_id.equals(miUsuario)) {
-                            enlaces = new String[]{"CrearUsuario", "usuario?usuario_id=" + miUsuario, "editar-usuario?usuario_id=" + miUsuario, "inscripciones?usuario_id=" + miUsuario};
-                            for (String enl: enlaces) {
-                                if (navegacion.contains(enl)) {
-                                    i = navegacion.lastIndexOf(enl);
-                                    navegacion.remove(i);
-                                    navegacion.remove(i);
-                                }
-                            }
-                        }
                         if ("usuario_id".equals(identificador)) {
-                            if (!navegacion.contains("editar-inscripcion?usuario_id=" + usuario_id + "&amp;prueba_id=" + prueba_id)) {
-                                navegacion.add("editar-inscripcion?usuario_id=" + usuario_id + "&amp;prueba_id=" + prueba_id);
-                                navegacion.add("Editar inscripción");
-                                session.setAttribute("navegacion", navegacion);
-                            } 
+                            session.setAttribute("navegacion", breadcrumb(navegacion, "editar-inscripcion?usuario_id=" + usuario_id + "&amp;prueba_id=" + prueba_id, "Editar inscripción"));
                         }
                         else {
-                            if (!navegacion.contains("editar-inscripcion?prueba_id=" + prueba_id + "&amp;usuario_id=" + usuario_id)) {
-                                navegacion.add("editar-inscripcion?prueba_id=" + prueba_id + "&amp;usuario_id=" + usuario_id);
-                                navegacion.add("Editar inscripción");
-                                session.setAttribute("navegacion", navegacion);
-                            }
+                            session.setAttribute("navegacion", breadcrumb(navegacion, "editar-inscripcion?prueba_id=" + prueba_id + "&amp;usuario_id=" + usuario_id, "Editar inscripción"));
                         }
                         
                         vista = "editarInscripcion.jsp";
@@ -1967,7 +1792,21 @@ public class ControladorAdministracion extends HttpServlet {
         RequestDispatcher rd = request.getRequestDispatcher(vista);
         rd.forward(request, response);
     }
-
+    
+    public List<String> breadcrumb(List<String> navegacion, String ruta, String nombre) {
+        if (!navegacion.contains(ruta)) {
+            navegacion.add(ruta);
+            navegacion.add(nombre);
+        }
+        else {
+            int i = navegacion.lastIndexOf(ruta);
+            for (int j = navegacion.size(); j > (i + 2); j--) {
+                navegacion.remove(j - 1);
+            }
+        }
+        return navegacion;
+    }
+    
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
