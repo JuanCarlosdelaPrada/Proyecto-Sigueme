@@ -43,7 +43,7 @@
                                                         <span class="input-group-addon"><i class="fa fa-lock fa-lg" aria-hidden="true"></i></span> 
                                                         <input type="password" id="contrasena_login" name="contrasena_login" class="form-control" placeholder="Contraseña" onkeyUp="validarContrasena()">
                                                     </div>
-                                                    <div class="help-block text-right"><a href="">¿Olvidaste la contraseña?</a></div>
+                                                    <!--<div class="help-block text-right"><a href="">¿Olvidaste la contraseña?</a></div>-->
 
                                                 </div>
                                                 <div class="form-group">
