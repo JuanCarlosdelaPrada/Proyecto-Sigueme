@@ -87,6 +87,7 @@ import org.jdom.output.XMLOutputter;
     "/prueba", 
     "/CrearPrueba",
     "/crearPrueba",
+    "/comprobarPruebaId",
     "/editar-prueba",
     "/editarPrueba",
     "/eliminar-prueba",
@@ -241,14 +242,14 @@ public class ControladorAdministracion extends HttpServlet {
                 vista = "inicio.jsp";
                 break;
             case "/login":
-                try {
-                    String correo_login = request.getParameter("correo_login");
-                    String contrasena_login = request.getParameter("contrasena_login");
-                    
-                    usuario = em.find(Usuario.class, correo_login);
-                    
+                String correo_login = request.getParameter("correo_login");
+                String contrasena_login = request.getParameter("contrasena_login");
+
+                usuario = em.find(Usuario.class, correo_login);
+
+                if (usuario != null) {
                     ivbytes= usuario.getIvbytes();
-                    
+
                     AES.setIvBytes(ivbytes.getIvbytesId());
                     System.out.println(AES.decrypt(new String(usuario.getContrasena())));
                     if (contrasena_login.equals(AES.decrypt(new String(usuario.getContrasena())))) {
@@ -257,21 +258,27 @@ public class ControladorAdministracion extends HttpServlet {
                         session.setAttribute("permiso", usuario.getRol());
                         System.out.println(usuario.getNombre());
                         System.out.println(usuario.getRol());
+                        request.setAttribute("Cabecera", "Bienvenid@ "+ usuario.getNombre());
+                        request.setAttribute("Cuerpo", "Esperamos que disfrute de su experiencia con nuestro portal.");
                     }
                     else {
-                         System.out.println( "<p class='incorrecto'>Contraseña incorrecta, inténtelo de nuevo.</p>");
-                        // request.setAttribute("msg1", msg);
+                        request.setAttribute("Cabecera", "ERROR");
+                        request.setAttribute("Cuerpo", "Lo sentimos, dicha contraseña es incorrecta.");
                     }
                 }
-                catch(Exception ex) {
-                    System.out.println("<p class='incorrecto'>Dicho usuario no existe en nuestro sistema.</p>");
+                else {
+                    request.setAttribute("Cabecera", "ERROR");
+                    request.setAttribute("Cuerpo", "Lo sentimos dicho usuario no existe, compruebe que los datos introducidos sean correctos.");
                 }
                 vista= "";
                 break;
             case "/logout":
+                usuario_id = (String) session.getAttribute("correo");
                 session.setAttribute("correo", null);
                 session.setAttribute("usuario", null);
                 session.setAttribute("permiso", null);
+                request.setAttribute("Cabecera", "Hasta pronto " + usuario_id);
+                request.setAttribute("Cuerpo", "Esperamos que el portal haya sido de su agrado.");
                 vista = "";
                 break;
             case "/Rutas":
@@ -728,24 +735,87 @@ public class ControladorAdministracion extends HttpServlet {
                     Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 int maximo_inscritos_tratada = Integer.parseInt(maximo_inscritos);
-                prueba = new Prueba(prueba_id, lugar, fecha_cel_tratada, hora_cel_tratada, fecha_inscrip_min_tratada, fecha_inscrip_max_tratada, maximo_inscritos_tratada, false, em.createNamedQuery("Prueba.findAll", Prueba.class).getResultList().size());
-                ruta = em.find(JPA_Entidades.Ruta.class, ruta_id);
-                prueba.setRutaId(ruta);
-                prueba.setDescripcion(descripcion);
-                if (em.find(JPA_Entidades.Prueba.class, prueba_id) == null) {
-                    persist(prueba);
+                
+                errores = false;
+                mensajeError = "";
+                if (em.find(Prueba.class, prueba_id) != null) {
+                    mensajeError += "- Ya existe una prueba con dicho nombre.";
+                    errores = true;
                 }
-                try (Connection conn = myDatasource.getConnection()) {
-                    PreparedStatement stm = conn.prepareStatement("CREATE EVENT " + prueba_id + " ON SCHEDULE AT ? DO UPDATE seguimiento_trayectoria.prueba SET activa = 1 WHERE prueba_id = ?");
-                    stm.setString(1, fecha_cel + " " + hora_cel);
-                    stm.setString(2, prueba_id);
-                    System.out.println(stm.toString());
-                    stm.execute();
-                } catch (SQLException ex) {
-                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                if (!fecha_inscrip_min_tratada.before(new Date())) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- La fecha de apertura de inscripciones debe no haber pasado aún.";
+                    errores = true;
                 }
-                vista = "Pruebas";
+                if (fecha_inscrip_min_tratada.after(fecha_inscrip_max_tratada)) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- La fecha de apertura de inscripciones debe ser menor o igual que la fecha de cierre del plazo de inscripciones.";
+                    errores = true;
+                }
+                if (fecha_inscrip_max_tratada.after(fecha_cel_tratada) || fecha_inscrip_max_tratada.equals(fecha_cel_tratada)) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- La fecha de celebración de la prueba debe ser mayor que la fecha de cierre del plazo de inscripciones.";
+                    errores = true;
+                }
+                if (!errores) {
+                    prueba = new Prueba(prueba_id, lugar, fecha_cel_tratada, hora_cel_tratada, fecha_inscrip_min_tratada, fecha_inscrip_max_tratada, maximo_inscritos_tratada, false, em.createNamedQuery("Prueba.findAll", Prueba.class).getResultList().size());
+                    ruta = em.find(JPA_Entidades.Ruta.class, ruta_id);
+                    prueba.setRutaId(ruta);
+                    prueba.setDescripcion(descripcion);
+                    if (em.find(JPA_Entidades.Prueba.class, prueba_id) == null) {
+                        persist(prueba);
+                    }
+                    /*
+                    try (Connection conn = myDatasource.getConnection()) {
+                        PreparedStatement stm = conn.prepareStatement("CREATE EVENT " + prueba_id + " ON SCHEDULE AT ? DO UPDATE seguimiento_trayectoria.prueba SET activa = 1 WHERE prueba_id = ?");
+                        stm.setString(1, fecha_cel + " " + hora_cel);
+                        stm.setString(2, prueba_id);
+                        System.out.println(stm.toString());
+                        stm.execute();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    */
+                    request.setAttribute("mensajeCreacion", "La prueba ha sido <i>creada</i> satisfactoriamente.");
+                    vista = "Pruebas";
+                }
+                else { 
+                    request.setAttribute("prueba_id", prueba_id);
+                    request.setAttribute("ruta_id", ruta_id);
+                    request.setAttribute("descripcion", descripcion);
+                    request.setAttribute("lugar", lugar);
+                    request.setAttribute("fechaCel", fecha_cel);
+                    request.setAttribute("horaCel", hora_cel);
+                    request.setAttribute("fechaInscripMin", fecha_inscrip_min);
+                    request.setAttribute("fechaInscripMax", fecha_inscrip_max);
+                    request.setAttribute("maximoInscritos", maximo_inscritos);
+                    request.setAttribute("mensajeError", mensajeError);
+                    vista = "CrearPrueba";
+                }
                 break;
+            case "/comprobarPruebaId":
+                prueba_id = request.getParameter("prueba_id");
+                resultado = new JsonObject();
+                
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.setHeader("Cache-Control", "no-store");
+                out = response.getWriter();
+                if (em.find(Prueba.class, prueba_id) != null) {
+                    resultado.add("mensajePruebaId", new JsonPrimitive("Dicha prueba ya existe."));
+                }
+                else {
+                    resultado.add("mensajePruebaId", new JsonPrimitive(""));
+                }
+                out.print(resultado);
+                out.flush();
+                return;
             case "/editarPrueba":
                 prueba_id = request.getParameter("prueba_id");
                 prueba = em.find(Prueba.class, prueba_id);
@@ -774,27 +844,66 @@ public class ControladorAdministracion extends HttpServlet {
                 maximo_inscritos = request.getParameter("maximo_inscritos");
                 int maximoInscritos = Integer.parseInt(maximo_inscritos);
                 
-                prueba.setRutaId(ruta);
-                prueba.setDescripcion(descripcion);
-                prueba.setLugar(lugar);
-                prueba.setFechaCel(fecha_cel_tratada);
-                prueba.setFechaInscripMin(fecha_inscrip_min_tratada);
-                prueba.setFechaInscripMax(fecha_inscrip_max_tratada);
-                prueba.setHoraCel(hora_cel_tratada);
-                prueba.setMaximoInscritos(maximoInscritos);
+                boolean activa = request.getParameter("activa").equals("s");
                 
-                merge(prueba);
-                
-                try (Connection conn = myDatasource.getConnection()) {
-                    PreparedStatement stm = conn.prepareStatement("CREATE EVENT " + prueba_id + " ON SCHEDULE AT ? DO UPDATE seguimiento_trayectoria.prueba SET activa = 1 WHERE prueba_id = ?");
-                    stm.setString(1, fecha_cel + " " + hora_cel);
-                    stm.setString(2, prueba_id);
-                    System.out.println(stm.toString());
-                    stm.execute();
-                } catch (SQLException ex) {
-                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                errores = false;
+                mensajeError = "";
+                if (!fecha_inscrip_min_tratada.before(new Date())) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- La fecha de apertura de inscripciones debe no haber pasado aún.";
+                    errores = true;
                 }
-                vista = "Pruebas";
+                if (fecha_inscrip_min_tratada.after(fecha_inscrip_max_tratada)) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- La fecha de apertura de inscripciones debe ser menor o igual que la fecha de cierre del plazo de inscripciones.";
+                    errores = true;
+                }
+                if (fecha_inscrip_max_tratada.after(fecha_cel_tratada) || fecha_inscrip_max_tratada.equals(fecha_cel_tratada)) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- La fecha de celebración de la prueba debe ser mayor que la fecha de cierre del plazo de inscripciones.";
+                    errores = true;
+                }
+                
+                if (maximoInscritos < em.createNamedQuery("Inscrito.findByPruebaId", Inscrito.class).setParameter("pruebaId", prueba_id).getResultList().size()) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- El número de usuarios inscritos es mayor al número máximo de inscripciones admitidas.";
+                    errores = true;
+                }
+                if (!errores) {
+                    prueba.setRutaId(ruta);
+                    prueba.setDescripcion(descripcion);
+                    prueba.setLugar(lugar);
+                    prueba.setFechaCel(fecha_cel_tratada);
+                    prueba.setFechaInscripMin(fecha_inscrip_min_tratada);
+                    prueba.setFechaInscripMax(fecha_inscrip_max_tratada);
+                    prueba.setHoraCel(hora_cel_tratada);
+                    prueba.setMaximoInscritos(maximoInscritos);
+                    prueba.setActiva(activa);
+                    merge(prueba);
+                    request.setAttribute("mensajeCreacion", "La prueba ha sido <i>editada</i> satisfactoriamente.");
+                    vista = "Pruebas";
+                }
+                else {
+                    request.setAttribute("descripcion", descripcion);
+                    request.setAttribute("ruta_id", ruta_id);
+                    request.setAttribute("lugar", lugar);
+                    request.setAttribute("fecha_cel", fecha_cel);
+                    request.setAttribute("hora_cel", hora_cel);
+                    request.setAttribute("fecha_inscrip_min", fecha_inscrip_min);
+                    request.setAttribute("fecha_inscrip_max", fecha_inscrip_max);
+                    request.setAttribute("maximoInscritos", maximo_inscritos);
+                    request.setAttribute("activa", activa);
+                    request.setAttribute("mensajeError", mensajeError);
+                    vista = "editar-prueba?prueba_id=" + prueba_id;
+                }
                 break;
             case "/editar-ruta":
                 ruta_id = request.getParameter("ruta_id");
@@ -1124,11 +1233,13 @@ public class ControladorAdministracion extends HttpServlet {
                         }
                     }
                     delete(prueba);
+                    request.setAttribute("mensajeCreacion", "La prueba ha sido <i>eliminada</i> satisfactoriamente.");
+                    vista = "Pruebas";
                 }
                 else {
                     System.out.println("La prueba no existe.");
+                    vista = "";
                 }
-                vista = "Pruebas";
                 break;
             case "/Usuarios":
                 navegacion = new ArrayList<>();

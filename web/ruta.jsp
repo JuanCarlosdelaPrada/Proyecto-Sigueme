@@ -55,7 +55,7 @@
                         </ul>
                         <div class="text-center">
                             <input class="btn btn-info" id="GPXactual" name="GPXactual" type="button" value="Ver" onclick="window.open('ficherosGPX/${requestScope.ruta.rutaId}.gpx', '_blank')"/>
-                            <a class="btn btn-danger " href="ficherosGPX/${requestScope.ruta.rutaId}.gpx" download>Descargar</a>
+                            <a class="btn btn-danger" href="ficherosGPX/${requestScope.ruta.rutaId}.gpx" download>Descargar</a>
                         </div>
                     </div>
                 </div>

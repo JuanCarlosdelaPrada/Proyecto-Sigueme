@@ -43,6 +43,27 @@
         <!--Breadcrumb-->
         <%@include file="WEB-INF/jspf/breadcrumb.jspf"%>
         
+        <div class="container">
+            <!-- Trigger the modal with a button -->
+            <button type="button" class="btn btn-info btn-lg" id="myBtn" style="display:none"></button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">${requestScope.Cabecera}</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>${requestScope.Cuerpo}</p>
+                        </div>
+                    </div>
+              </div>
+            </div>
+        </div>
+        
         <!--Jumbotron-->
         <div class="container-fluid" style="margin-top: 0.35%; margin-left:-0.65%; margin-right:-0.85%"> <!-- border-color: purple; border-style: solid-->
             <div class="text-justify jumbotron" style="padding-top: 0.25%; padding-bottom: 0.15%;background-color:  violet; color: purple">
@@ -128,19 +149,6 @@
             </a>
         </div>
         
-        <!--
-        <div class="container-fluid" style="margin-top: 0.35%; margin-left:-0.65%; margin-right:-0.85%; margin-bottom: 0%"> 
-            <div class="text-justify jumbotron" style="background-color: chartreuse; border-color: #B40431; color: #FAEDED; padding-top: 0.95%; padding-bottom: 0.1%">
-                <p class="text-center" style="font-size: 115%">
-                    Ya se encuentra disponible nuestra nueva app </br>
-                    <a href="#" class="btn btn-info btn-lg">
-                        <span class="glyphicon glyphicon-download-alt"></span> Descargar
-                    </a>
-                </p>
-            </div>
-        </div>
-        -->
-        
         <!--Noticias-->
         <c:choose>
             <c:when test="${not empty requestScope.pruebasRecientes}">
@@ -170,6 +178,13 @@
         
         <!--Importaciones .js-->
         <script type="text/javascript" src="js/jQuery/jquery-1.12.3.js" charset="utf-8"></script>
+        <script>
+            <c:if test="${not empty requestScope.Cabecera}">
+                $(document).ready(function(){
+                    $("#myModal").modal();
+                });
+            </c:if>
+        </script>
         <script type="text/javascript" src="js/Bootstrap/bootstrap.min.js" charset="utf-8"></script>
         <c:if test="${sessionScope.usuario ne null}">
             <script type="text/javascript" src="js/menuUsuario.js" charset="utf-8"></script>
