@@ -36,6 +36,12 @@
             </div>
         </div>
         <div class="container-fluid">
+            <c:if test="${not empty requestScope.mensajeError}">
+                <div class="alert alert-danger col-sm-offset-1 col-sm-10">
+                    <strong>Se han producido los siguientes errores:</strong></br>
+                    ${requestScope.mensajeError}
+              </div>
+            </c:if>
             <div class="row">
                 <br>
             </div>
@@ -44,77 +50,155 @@
                 <div class="form-group">
                     <label for="descripcion" class="col-lg-offset-1 col-lg-2 control-label">Descripción de la ruta:</label>
                     <div class="col-lg-3">
-                        <textarea id="descripcion" name="descripcion" class="form-control" placeholder="Descripción de la ruta" maxlength="360">${requestScope.ruta.descripcion}</textarea>
+                        <c:choose>
+                            <c:when test="${empty requestScope.descripcion}">
+                                <textarea id="descripcion" name="descripcion" class="form-control" placeholder="Descripción de la ruta" maxlength="360">${requestScope.ruta.descripcion}</textarea>
+                            </c:when>
+                            <c:otherwise>
+                                <textarea id="descripcion" name="descripcion" class="form-control" placeholder="Descripción de la ruta" maxlength="360">${requestScope.descripcion}</textarea>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-lg-offset-1 col-lg-2 control-label">Dificultad:</label>
                     <div class="col-lg-3">
-                        <div class="radio">
-                            <label>
-                                <c:choose>
-                                    <c:when test="${requestScope.ruta.dificultad eq 'fácil'}">
-                                        <input type="radio" name="dificultad" value="fácil" required checked>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <input type="radio" name="dificultad" value="fácil" required>
-                                    </c:otherwise>
-                                </c:choose>
-                                Fácil
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label>
-                                <c:choose>
-                                    <c:when test="${requestScope.ruta.dificultad eq 'moderado'}">
-                                        <input type="radio" name="dificultad" value="moderado" required checked>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <input type="radio" name="dificultad" value="moderado" required>
-                                    </c:otherwise>
-                                </c:choose>
-                                Moderado
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label>
-                                <c:choose>
-                                    <c:when test="${requestScope.ruta.dificultad eq 'difícil'}">
-                                        <input type="radio" name="dificultad" value="difícil" required checked>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <input type="radio" name="dificultad" value="difícil" required>
-                                    </c:otherwise>
-                                </c:choose>
-                                Difícil
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label>
-                                <c:choose>
-                                    <c:when test="${requestScope.ruta.dificultad eq 'muy difícil'}">
-                                        <input type="radio" name="dificultad" value="muy difícil" required checked>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <input type="radio" name="dificultad" value="muy difícil" required>
-                                    </c:otherwise>
-                                </c:choose>
-                                Muy difícil
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label>
-                                <c:choose>
-                                    <c:when test="${requestScope.ruta.dificultad eq 'sólo expertos'}">
-                                        <input type="radio" name="dificultad" value="sólo expertos" required checked>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <input type="radio" name="dificultad" value="sólo expertos" required>
-                                    </c:otherwise>
-                                </c:choose>
-                                Sólo expertos
-                            </label>
-                        </div>
+                        <c:choose>
+                            <c:when test="${empty requestScope.dificultad}">
+                                <div class="radio">
+                                    <label>
+                                        <c:choose>
+                                            <c:when test="${requestScope.ruta.dificultad eq 'fácil'}">
+                                                <input type="radio" name="dificultad" value="fácil" required checked>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="radio" name="dificultad" value="fácil" required>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        Fácil
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <c:choose>
+                                            <c:when test="${requestScope.ruta.dificultad eq 'moderado'}">
+                                                <input type="radio" name="dificultad" value="moderado" required checked>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="radio" name="dificultad" value="moderado" required>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        Moderado
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <c:choose>
+                                            <c:when test="${requestScope.ruta.dificultad eq 'difícil'}">
+                                                <input type="radio" name="dificultad" value="difícil" required checked>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="radio" name="dificultad" value="difícil" required>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        Difícil
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <c:choose>
+                                            <c:when test="${requestScope.ruta.dificultad eq 'muy difícil'}">
+                                                <input type="radio" name="dificultad" value="muy difícil" required checked>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="radio" name="dificultad" value="muy difícil" required>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        Muy difícil
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <c:choose>
+                                            <c:when test="${requestScope.ruta.dificultad eq 'sólo expertos'}">
+                                                <input type="radio" name="dificultad" value="sólo expertos" required checked>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="radio" name="dificultad" value="sólo expertos" required>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        Sólo expertos
+                                    </label>
+                                </div>
+                            </c:when>
+                            <c:otherwise>
+                                <div class="radio">
+                                    <label>
+                                        <c:choose>
+                                            <c:when test="${requestScope.dificultad eq 'fácil'}">
+                                                <input type="radio" name="dificultad" value="fácil" required checked>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="radio" name="dificultad" value="fácil" required>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        Fácil
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <c:choose>
+                                            <c:when test="${requestScope.dificultad eq 'moderado'}">
+                                                <input type="radio" name="dificultad" value="moderado" required checked>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="radio" name="dificultad" value="moderado" required>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        Moderado
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <c:choose>
+                                            <c:when test="${requestScope.dificultad eq 'difícil'}">
+                                                <input type="radio" name="dificultad" value="difícil" required checked>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="radio" name="dificultad" value="difícil" required>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        Difícil
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <c:choose>
+                                            <c:when test="${requestScope.dificultad eq 'muy difícil'}">
+                                                <input type="radio" name="dificultad" value="muy difícil" required checked>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="radio" name="dificultad" value="muy difícil" required>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        Muy difícil
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <c:choose>
+                                            <c:when test="${requestScope.dificultad eq 'sólo expertos'}">
+                                                <input type="radio" name="dificultad" value="sólo expertos" required checked>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="radio" name="dificultad" value="sólo expertos" required>
+                                            </c:otherwise>
+                                        </c:choose>
+                                        Sólo expertos
+                                    </label>
+                                </div>
+                            </c:otherwise>
+                        </c:choose>
                     </div>
                 </div>
                 <div class="form-group">

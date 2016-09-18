@@ -78,6 +78,7 @@ import org.jdom.output.XMLOutputter;
     "/ruta",
     "/SubirRuta",
     "/subirRuta",
+    "/comprobarRutaId",
     "/editar-ruta",
     "/editarRuta",
     "/eliminar-ruta",
@@ -172,7 +173,8 @@ public class ControladorAdministracion extends HttpServlet {
             num_atributos,
             total;
             
-        Boolean permiso;
+        Boolean permiso, 
+                errores;
         
         String usuario_id,
                prueba_id,
@@ -204,7 +206,8 @@ public class ControladorAdministracion extends HttpServlet {
                sexo,
                club,
                federado,
-               miUsuario;
+               miUsuario,
+               mensajeError;
         
         String[] enlaces,
                  enlaces2;
@@ -418,7 +421,7 @@ public class ControladorAdministracion extends HttpServlet {
                                 ja.add(columnas[i], new JsonPrimitive(rs.getString(atributos[i])));   
                             }
                             else {
-                                ja.add(columnas[i], new JsonPrimitive(rs.getString(atributos[i]).replace(".", ",")+" m"));
+                                ja.add(columnas[i], new JsonPrimitive(rs.getString(atributos[i]).replace(".", ",")+" km"));
                             }
                         }
                         ja.add(columnas[atributos.length], new JsonPrimitive("<a href='ruta?"+atributos[0]+"="+ja.get(columnas[0]).getAsString()+"'><i class='fa fa-search aria-hidden='true' style='color:#088A08'></i></a>"));
@@ -606,57 +609,98 @@ public class ControladorAdministracion extends HttpServlet {
                 descripcion = request.getParameter("descripcion");
                 dificultad = request.getParameter("dificultad");
                 ficheroGPX = request.getPart("ficheroGPX");
-                
-               // PrintWriter writer = response.getWriter();
                 destino = new File("C:\\Users\\Je¡ZZ¡\\Documents\\NetBeansProjects\\Sigueme\\web\\ficherosGPX");
                 archivo = new File(destino + File.separator + ruta_id + ".gpx");
-                try {                   
-                    salida = new FileOutputStream(archivo);
-                    contenidoDelFichero = ficheroGPX.getInputStream();
-
-                    int read = 0;
-                    byte[] bytes = new byte[1024];
-
-                    while((read = contenidoDelFichero.read(bytes)) != -1) {
-                        salida.write(bytes, 0, read);
-                    }
-                    //writer.println(ruta_id + ".gpx creado");
-                } catch (FileNotFoundException fne) {
-                    //writer.println("Puede que no especificases el fichero a subir o que "
-                      //      + "estes intentando subir un archivo a una localizacion protegida "
-                        //    + "o inexistente.");
-                    //writer.println("<br> ERROR: " + fne.getMessage());
-                } finally {
-                    if (salida != null) {
-                        salida.close();
-                    }
-                    if (contenidoDelFichero != null) {
-                        contenidoDelFichero.close();
-                    }
-                    //if (writer != null) {
-                      //  writer.close();
-                    //}
-                }         
                 
-                parseador = new ParserGPX(archivo);
-                Vector<Double> latitudes = parseador.getLatitudes();
-                Vector<Double> longitudes = parseador.getLongitudes();
-                double minlatitud = parseador.getMinlat();
-                double minlongitud = parseador.getMinlon();
-                double maxlatitud = parseador.getMaxlat();
-                double maxlongitud = parseador.getMaxlon();
-                
-                double distancia = DistanciaDeHaversine.getDistancia(latitudes, longitudes);
-                
-                //Creo la nueva ruta.
-                ruta = new Ruta(ruta_id, dificultad, new BigDecimal(distancia), destino + File.separator + ruta_id + ".gpx",
-                       new BigDecimal(minlatitud), new BigDecimal(maxlatitud), new BigDecimal(minlongitud), new BigDecimal(maxlongitud));
-                ruta.setDescripcion(descripcion);
-                if(em.find(JPA_Entidades.Ruta.class, ruta_id) == null) {
-                    persist(ruta);
+                errores = false;
+                mensajeError = "";
+                if (em.find(Ruta.class, ruta_id) != null) {
+                    mensajeError = "- Ya existe una ruta con dicho nombre.";
+                    errores = true;
                 }
-                vista = "Rutas";
+                if (!ficheroGPX.getSubmittedFileName().endsWith(".gpx")) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- El fichero subido no tiene la extensión apropiada. Utilice un fichero con extensión <i>.gpx</i>.";
+                    errores = true;
+                }
+                if ((destino + File.separator + ruta_id + ".gpx").length() > 120) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- La longitud del nombre del fichero es demasiado larga o bien el nombre de la ruta es demasiado largo y el archivo a generar por el servidor no puede ser creado.";
+                    errores = true;
+                }
+                
+                if (!errores) {
+                    try {                   
+                        salida = new FileOutputStream(archivo);
+                        contenidoDelFichero = ficheroGPX.getInputStream();
+
+                        int read = 0;
+                        byte[] bytes = new byte[1024];
+
+                        while((read = contenidoDelFichero.read(bytes)) != -1) {
+                            salida.write(bytes, 0, read);
+                        }
+                    } catch (FileNotFoundException fne) {
+                    } finally {
+                        if (salida != null) {
+                            salida.close();
+                        }
+                        if (contenidoDelFichero != null) {
+                            contenidoDelFichero.close();
+                        }
+                    }         
+
+                    parseador = new ParserGPX(archivo);
+                    Vector<Double> latitudes = parseador.getLatitudes();
+                    Vector<Double> longitudes = parseador.getLongitudes();
+                    double minlatitud = parseador.getMinlat();
+                    double minlongitud = parseador.getMinlon();
+                    double maxlatitud = parseador.getMaxlat();
+                    double maxlongitud = parseador.getMaxlon();
+
+                    double distancia = DistanciaDeHaversine.getDistancia(latitudes, longitudes);
+
+                    System.out.println((destino + File.separator + ruta_id + ".gpx").length());
+
+                    //Creo la nueva ruta.
+                    ruta = new Ruta(ruta_id, dificultad, new BigDecimal(distancia), destino + File.separator + ruta_id + ".gpx",
+                           new BigDecimal(minlatitud), new BigDecimal(maxlatitud), new BigDecimal(minlongitud), new BigDecimal(maxlongitud));
+                    ruta.setDescripcion(descripcion);
+                    if(em.find(JPA_Entidades.Ruta.class, ruta_id) == null) {
+                        persist(ruta);
+                    }
+                    request.setAttribute("mensajeCreacion", "La ruta ha sido <i>creada</i> satisfactoriamente.");
+                    vista = "Rutas";
+                }
+                else {
+                    request.setAttribute("track_id", ruta_id);
+                    request.setAttribute("descripcion", descripcion);
+                    request.setAttribute("dificultad", dificultad);
+                    request.setAttribute("mensajeError", mensajeError);
+                    vista = "SubirRuta";
+                }
                 break;
+            case "/comprobarRutaId":
+                ruta_id = request.getParameter("ruta_id");
+                resultado = new JsonObject();
+                
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.setHeader("Cache-Control", "no-store");
+                out = response.getWriter();
+                if (em.find(Ruta.class, ruta_id) != null) {
+                    resultado.add("mensajeRutaId", new JsonPrimitive("Dicha ruta ya existe."));
+                }
+                else {
+                    resultado.add("mensajeRutaId", new JsonPrimitive(""));
+                }
+                out.print(resultado);
+                out.flush();
+                return;
             case "/CrearPrueba":
                 navegacion = (ArrayList<String>) session.getAttribute("navegacion");
                 session.setAttribute("navegacion", breadcrumb(navegacion, "CrearPrueba", "Crear prueba"));
@@ -773,15 +817,33 @@ public class ControladorAdministracion extends HttpServlet {
                 dificultad = request.getParameter("dificultad");
                 ficheroGPX = request.getPart("ficheroGPX");
                 
-                ruta.setDescripcion(descripcion);
-                ruta.setDificultad(dificultad);
-                if (!ficheroGPX.getSubmittedFileName().equals("")) {
+                destino = new File("C:\\Users\\Je¡ZZ¡\\Documents\\NetBeansProjects\\Sigueme\\web\\ficherosGPX");
+                archivo = new File(destino + File.separator + ruta_id + ".gpx");
+                    
+                errores = false;
+                mensajeError = "";
+                if (!ficheroGPX.getSubmittedFileName().endsWith(".gpx")) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- El fichero subido no tiene la extensión apropiada. Utilice un fichero con extensión <i>.gpx</i>.";
+                    errores = true;
+                }
+                if ((destino + File.separator + ruta_id + ".gpx").length() > 120) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- La longitud del nombre del fichero es demasiado larga o bien el nombre de la ruta es demasiado largo y el archivo a generar por el servidor no puede ser creado.";
+                    errores = true;
+                }
+                
+                if (!errores) {
+                    ruta.setDescripcion(descripcion);
+                    ruta.setDificultad(dificultad);
+                
                     File ficheroGpx = new File(ruta.getFicheroGpx());
                     
                     ficheroGpx.delete();
-                    
-                    destino = new File("C:\\Users\\Je¡ZZ¡\\Documents\\NetBeansProjects\\Sigueme\\web\\ficherosGPX");
-                    archivo = new File(destino + File.separator + ruta_id + ".gpx");
                     
                     try {                   
                         salida = new FileOutputStream(archivo);
@@ -809,9 +871,16 @@ public class ControladorAdministracion extends HttpServlet {
                     ruta.setLatMax(new BigDecimal(parseador.getMaxlat()));
                     ruta.setLongMax(new BigDecimal(parseador.getMaxlon()));
                     ruta.setDistancia(new BigDecimal(DistanciaDeHaversine.getDistancia(parseador.getLatitudes(), parseador.getLongitudes())));
+                    merge(ruta);
+                    request.setAttribute("mensajeCreacion", "La ruta ha sido <i>editada</i> satisfactoriamente.");
+                    vista = "Rutas";
                 }
-                merge(ruta);
-                vista = "Rutas";
+                else {
+                    request.setAttribute("descripcion", descripcion);
+                    request.setAttribute("dificultad", dificultad);
+                    request.setAttribute("mensajeError", mensajeError);
+                    vista = "editar-ruta?ruta_id=" + ruta_id;
+                }
                 break;
             case "/eliminar-ruta":
                 ruta_id = request.getParameter("ruta_id");
@@ -842,11 +911,13 @@ public class ControladorAdministracion extends HttpServlet {
                     File ficheroGpx = new File(ruta.getFicheroGpx());
                     ficheroGpx.delete();
                     delete(ruta);
+                    
+                    request.setAttribute("mensajeCreacion", "La ruta ha sido <i>eliminada</i> satisfactoriamente.");
+                    vista = "Rutas";
                 }
                 else {
-                    System.out.println("La ruta no existe.");
+                    vista = "";
                 }
-                vista = "Rutas";
                 break;
             case "/Pruebas":
                 navegacion = new ArrayList<>();

@@ -50,7 +50,7 @@
                     <div class="panel-body">
                         <ul>
                             <li>Pertenece a la <u>dificultad</u>: <mark><b>${requestScope.ruta.dificultad}</b></mark>.</li>
-                            <li>Tiene una <u>distancia</u> aproximada de <mark><b>${requestScope.distancia} m</b></mark>.</li>
+                            <li>Tiene una <u>distancia</u> aproximada de <mark><b>${requestScope.distancia} km</b></mark>.</li>
                             <li><u>Archivo GPX</u>:</li>
                         </ul>
                         <div class="text-center">
