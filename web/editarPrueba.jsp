@@ -173,7 +173,7 @@
                     </div>
                 </div>
                  <div class="form-group">
-                    <label class="col-lg-offset-1 col-lg-2 control-label">¿Desea activar la prueba?${requestScope.prueba.activa}</label>
+                    <label class="col-lg-offset-1 col-lg-2 control-label">¿Desea activar la prueba?</label>
                     <div class="col-lg-3">
                         <c:choose>
                             <c:when test="${empty activa}">

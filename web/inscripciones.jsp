@@ -71,6 +71,11 @@
         </div>
         
         <div class="container-fluid">   <!--table-bordered-->
+            <c:if test="${not empty requestScope.mensajeCreacion}">
+                <div class="alert alert-success col-sm-offset-1 col-sm-10">
+                    <strong>Información:</strong> ${requestScope.mensajeCreacion}
+                </div>
+            </c:if>
             <div class="col-xs-offset-1 col-xs-10">
                 <table id="example" class="table table-striped dt-responsive" cellspacing="0" width="100%">
                     <thead>

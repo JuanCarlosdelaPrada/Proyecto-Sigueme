@@ -36,7 +36,7 @@
               
         <!--Breadcrumb-->
         <%@include file="WEB-INF/jspf/breadcrumb.jspf"%>
-        
+                        
         <div class="page-header">
             <div class="col-xs-offset-1">
                 <h1>Pruebas</h1> 
@@ -164,6 +164,5 @@
             <script type="text/javascript" src="js/menuUsuario.js" charset="utf-8"></script>
         </c:if>
         <script type="text/javascript" src="js/validarLogin.js" charset="utf-8"></script>
-        
     </body>
 </html>

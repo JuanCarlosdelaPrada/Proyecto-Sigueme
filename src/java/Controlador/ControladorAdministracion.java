@@ -656,13 +656,6 @@ public class ControladorAdministracion extends HttpServlet {
                 club = request.getParameter("club");
                 federado = request.getParameter("federado");
                 
-                
-                //Encriptamos la contraseña con AES-256
-                String contrasena_tratada = AES.encrypt(contrasena);
-                ivBytes = AES.getIvBytes();
-                usuario.setContrasena(contrasena_tratada.getBytes());
-                ivbytes = usuario.getIvbytes();
-                
                     
                 formato = new SimpleDateFormat("yyyy-MM-dd");
                 Date fecha_nacimiento_tratada = null;
@@ -692,8 +685,15 @@ public class ControladorAdministracion extends HttpServlet {
                     errores = true;
                 }
                 if (!errores) {
-                    ivbytes.setIvbytesId(ivBytes);
-                    merge(ivbytes);
+                    if(!contrasena.equals("")) {
+                        //Encriptamos la contraseña con AES-256
+                        String contrasena_tratada = AES.encrypt(contrasena);
+                        ivBytes = AES.getIvBytes();
+                        usuario.setContrasena(contrasena_tratada.getBytes());
+                        ivbytes = usuario.getIvbytes();
+                        ivbytes.setIvbytesId(ivBytes);
+                        merge(ivbytes);
+                    }
                     usuario.setNombre(nombre);
                     usuario.setApellidos(apellidos);
                     usuario.setDireccion(direccion);
@@ -1058,55 +1058,59 @@ public class ControladorAdministracion extends HttpServlet {
                     
                 errores = false;
                 mensajeError = "";
-                if (!ficheroGPX.getSubmittedFileName().endsWith(".gpx")) {
-                    if (errores) {
-                        mensajeError += "</br>";
+                System.out.println("MI FICHERO "+ ficheroGPX);
+                if (!ficheroGPX.getSubmittedFileName().equals("")) {
+                    if (!ficheroGPX.getSubmittedFileName().endsWith(".gpx")) {
+                        if (errores) {
+                            mensajeError += "</br>";
+                        }
+                        mensajeError += "- El fichero subido no tiene la extensión apropiada. Utilice un fichero con extensión <i>.gpx</i>.";
+                        errores = true;
                     }
-                    mensajeError += "- El fichero subido no tiene la extensión apropiada. Utilice un fichero con extensión <i>.gpx</i>.";
-                    errores = true;
-                }
-                if ((destino + File.separator + ruta_id + ".gpx").length() > 120) {
-                    if (errores) {
-                        mensajeError += "</br>";
+                    if ((destino + File.separator + ruta_id + ".gpx").length() > 120) {
+                        if (errores) {
+                            mensajeError += "</br>";
+                        }
+                        mensajeError += "- La longitud del nombre del fichero es demasiado larga o bien el nombre de la ruta es demasiado largo y el archivo a generar por el servidor no puede ser creado.";
+                        errores = true;
                     }
-                    mensajeError += "- La longitud del nombre del fichero es demasiado larga o bien el nombre de la ruta es demasiado largo y el archivo a generar por el servidor no puede ser creado.";
-                    errores = true;
                 }
-                
                 if (!errores) {
                     ruta.setDescripcion(descripcion);
                     ruta.setDificultad(dificultad);
-                
-                    File ficheroGpx = new File(ruta.getFicheroGpx());
                     
-                    ficheroGpx.delete();
-                    
-                    try {                   
-                        salida = new FileOutputStream(archivo);
-                        contenidoDelFichero = ficheroGPX.getInputStream();
+                    if (!ficheroGPX.getSubmittedFileName().equals("")) {
+                        File ficheroGpx = new File(ruta.getFicheroGpx());
 
-                        int read = 0;
-                        byte[] bytes = new byte[1024];
+                        ficheroGpx.delete();
 
-                        while((read = contenidoDelFichero.read(bytes)) != -1) {
-                            salida.write(bytes, 0, read);
+                        try {                   
+                            salida = new FileOutputStream(archivo);
+                            contenidoDelFichero = ficheroGPX.getInputStream();
+
+                            int read = 0;
+                            byte[] bytes = new byte[1024];
+
+                            while((read = contenidoDelFichero.read(bytes)) != -1) {
+                                salida.write(bytes, 0, read);
+                            }
+                        } catch (FileNotFoundException fne) {
+                        } finally {
+                            if (salida != null) {
+                                salida.close();
+                            }
+                            if (contenidoDelFichero != null) {
+                                contenidoDelFichero.close();
+                            }
                         }
-                    } catch (FileNotFoundException fne) {
-                    } finally {
-                        if (salida != null) {
-                            salida.close();
-                        }
-                        if (contenidoDelFichero != null) {
-                            contenidoDelFichero.close();
-                        }
+                        parseador = new ParserGPX(archivo);
+
+                        ruta.setLatMin(new BigDecimal(parseador.getMinlat()));
+                        ruta.setLongMin(new BigDecimal(parseador.getMinlon()));
+                        ruta.setLatMax(new BigDecimal(parseador.getMaxlat()));
+                        ruta.setLongMax(new BigDecimal(parseador.getMaxlon()));
+                        ruta.setDistancia(new BigDecimal(DistanciaDeHaversine.getDistancia(parseador.getLatitudes(), parseador.getLongitudes())));
                     }
-                    parseador = new ParserGPX(archivo);
-                    
-                    ruta.setLatMin(new BigDecimal(parseador.getMinlat()));
-                    ruta.setLongMin(new BigDecimal(parseador.getMinlon()));
-                    ruta.setLatMax(new BigDecimal(parseador.getMaxlat()));
-                    ruta.setLongMax(new BigDecimal(parseador.getMaxlon()));
-                    ruta.setDistancia(new BigDecimal(DistanciaDeHaversine.getDistancia(parseador.getLatitudes(), parseador.getLongitudes())));
                     merge(ruta);
                     request.setAttribute("mensajeCreacion", "La ruta ha sido <i>editada</i> satisfactoriamente.");
                     vista = "Rutas";
@@ -1844,18 +1848,32 @@ public class ControladorAdministracion extends HttpServlet {
                             }
                         }
                         persist(inscrito);
+                        
+                        request.setAttribute("Cabecera", "¡Enhorabuena!");
+                        request.setAttribute("Cuerpo", "Se acaba de inscribir en " + prueba_id + ".");
                     }
                     else if (!(fechaActual.compareTo(prueba.getFechaInscripMin()) >= 0 && fechaActual.compareTo(prueba.getFechaInscripMax()) <= 0)) {
                         System.out.println("TIENE QUE CUMPLIR EL PLAZO DE INSCRIPCIONES");
+                        
+                        request.setAttribute("Cabecera", "Error");
+                        request.setAttribute("Cuerpo", "Tiene que cumplir el plazo de inscripciones.");
                     }
                     else {
                         System.out.println("YA ESTÁ EL CUPO DE INSCRITOS CUBIERTO");
+                        
+                        request.setAttribute("Cabecera", "Error");
+                        request.setAttribute("Cuerpo", "El cupo de inscritos ya se encuentra cubierto.");
                     }
                 }
                 else if (prueba == null) {
-                        System.out.println("DICHA PRUEBA NO EXISTE");
+                    System.out.println("DICHA PRUEBA NO EXISTE");
+
+                    request.setAttribute("Cabecera", "Información");
+                    request.setAttribute("Cuerpo", "Dicha prueba no existe.");
                 }
                 else {
+                    request.setAttribute("Cabecera", "Error");
+                    request.setAttribute("Cuerpo", "Ya se encuentra inscrito en dicha prueba.");
                     System.out.println("YA ESTÁ INSCRITO");
                 }
                 break;
@@ -1888,9 +1906,12 @@ public class ControladorAdministracion extends HttpServlet {
                     merge(inscrito);
                     String identificador = request.getParameterNames().nextElement().equals("usuarioId")? "usuario_id": "prueba_id";
                     request.setAttribute(identificador, request.getParameter(request.getParameterNames().nextElement()));
+                    request.setAttribute("mensajeCreacion", "La inscripción ha sido <i>editada</i> satisfactoriamente.");
                     vista = "inscripciones";
                 }
                 else {
+                    request.setAttribute("Cabecera", "Error");
+                    request.setAttribute("Cuerpo", "Ya hay un usuario con dicho dorsal.");
                     vista = "";
                 }
                 break;
@@ -1961,6 +1982,7 @@ public class ControladorAdministracion extends HttpServlet {
                         System.out.println("Se produjo un error, dicha prueba o dicho usuario no existen.");
                     }
                     request.setAttribute(identificador, request.getParameter(identificador));
+                    request.setAttribute("mensajeCreacion", "La inscripción ha sido <i>eliminada</i> satisfactoriamente.");
                     vista = "inscripciones";
                 }
                 else {

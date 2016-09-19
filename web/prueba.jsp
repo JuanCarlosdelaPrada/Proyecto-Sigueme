@@ -28,7 +28,7 @@
         
         <!--Breadcrumb-->
         <%@include file="WEB-INF/jspf/breadcrumb.jspf"%>
-        
+                        
         <div class="page-header">
             <div class="col-sm-offset-1">
                 <h1>${prueba.pruebaId}</h1> 
