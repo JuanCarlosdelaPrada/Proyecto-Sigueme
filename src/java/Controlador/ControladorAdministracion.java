@@ -100,6 +100,8 @@ import org.jdom.output.XMLOutputter;
     "/usuario", 
     "/CrearUsuario",
     "/crearUsuario",
+    "/comprobarUsuarioId",
+    "/comprobarUsuarioDNI",
     "/editar-usuario",
     "/editarUsuario",
     "/eliminar-usuario",
@@ -151,6 +153,7 @@ public class ControladorAdministracion extends HttpServlet {
         TypedQuery<Ruta> consultaRutas;
         Enumeration<String> parametros;
         SimpleDateFormat formato;
+        List<Usuario> usuarios;
         List<Inscrito> inscritos;
         List<Prueba> pruebas;
         List<String> navegacion;
@@ -270,7 +273,7 @@ public class ControladorAdministracion extends HttpServlet {
                     request.setAttribute("Cabecera", "ERROR");
                     request.setAttribute("Cuerpo", "Lo sentimos dicho usuario no existe, compruebe que los datos introducidos sean correctos.");
                 }
-                vista= "";
+                vista = "";
                 break;
             case "/logout":
                 usuario_id = (String) session.getAttribute("correo");
@@ -521,19 +524,82 @@ public class ControladorAdministracion extends HttpServlet {
                     }
                     boolean federado_tratado = federado.equals("s");
                     String _club = club.equals("")? null : club;
-                    usuario = new Usuario(usuario_id, contrasena_tratada.getBytes(), false, nombre, apellidos, dni, direccion, fecha_nacimiento_tratada, telefono, sexo, federado_tratado);
-                    usuario.setClub(_club);
-                    ivbytes = new Ivbytes(usuario_id);
-                    ivbytes.setIvbytesId(ivBytes);
-                    if(em.find(JPA_Entidades.Usuario.class, usuario_id) == null) {
-                        persist(usuario);
-                        persist(ivbytes);
+                    
+                    errores = false;
+                    mensajeError = "";
+                    if (em.find(Usuario.class, usuario_id) != null) {
+                        mensajeError += "- Dicho correo electrónico ya se encuentra vinculado a una cuenta.";
+                        errores = true;
                     }
-                    if (permiso) {
-                        vista = "Usuarios";
+                    if (!telefono.matches("\\d{9}")) {
+                        if (errores) {
+                            mensajeError += "</br>";
+                        }
+                        mensajeError += "- El número de teléfono tiene que respetar el formato y tener 9 dígitos.";
+                        errores = true;
+                    }
+                    if (!contrasena.equals(_contrasena)) {
+                         if (errores) {
+                            mensajeError += "</br>";
+                        }
+                        mensajeError += "- Las contraseñas introducidas no coinciden.";
+                        errores = true;
+                    }
+                    if (!usuario_id.matches("^[a-zA-Z0-9_\\.\\-]+@[a-zA-Z0-9\\-]+\\.[a-zA-Z0-9\\-\\.]+$")) {
+                         if (errores) {
+                            mensajeError += "</br>";
+                        }
+                        mensajeError += "- El correo dado no tiene formato de correo electrónico.";
+                        errores = true;
+                    }
+                    if (!em.createNamedQuery("Usuario.findByDni", Usuario.class).setParameter("dni", dni).getResultList().isEmpty()) {
+                         if (errores) {
+                            mensajeError += "</br>";
+                        }
+                        mensajeError += "- Dicho DNI ya se encuentra asociado a una cuenta.";
+                        errores = true;
+                    }
+                    if (!dni.matches("\\d{8}\\D")) {
+                         if (errores) {
+                            mensajeError += "</br>";
+                        }
+                        mensajeError += "- El DNI no cumple con el formato deseado, es decir, 8 dígitos y una letra.";
+                        errores = true;
+                    }
+                    if (!errores) {
+                        usuario = new Usuario(usuario_id, contrasena_tratada.getBytes(), false, nombre, apellidos, dni, direccion, fecha_nacimiento_tratada, telefono, sexo, federado_tratado);
+                        usuario.setClub(_club);
+                        ivbytes = new Ivbytes(usuario_id);
+                        ivbytes.setIvbytesId(ivBytes);
+                        if (em.find(JPA_Entidades.Usuario.class, usuario_id) == null) {
+                            persist(usuario);
+                            persist(ivbytes);
+                        }
+                        if (permiso) {
+                            request.setAttribute("mensajeCreacion", "El usuario ha sido <i>creado</i> satisfactoriamente.");
+                            vista = "Usuarios";
+                        }
+                        else {
+                            request.setAttribute("Cabecera", "¡Enhorabuena!");
+                            request.setAttribute("Cuerpo", "Su usuario ha sido creado satisfactoriamente.");
+                            vista = "";
+                        }
                     }
                     else {
-                        vista = "";
+                        request.setAttribute("correo", usuario_id);
+                        request.setAttribute("contrasena", contrasena);
+                        request.setAttribute("valida_contrasena", _contrasena);
+                        request.setAttribute("nombre", nombre);
+                        request.setAttribute("apellidos", apellidos);
+                        request.setAttribute("dni", dni);
+                        request.setAttribute("direccion", direccion);
+                        request.setAttribute("fecha_nacimiento", fecha_nacimiento);
+                        request.setAttribute("telefono", telefono);
+                        request.setAttribute("sexo", sexo);
+                        request.setAttribute("club", club);
+                        request.setAttribute("federado", federado);
+                        request.setAttribute("mensajeError", mensajeError);
+                        vista = "CrearUsuario";
                     }
                 }
                 else {
@@ -541,6 +607,40 @@ public class ControladorAdministracion extends HttpServlet {
                     vista = "";
                 }
                 break;
+            case "/comprobarUsuarioId":
+                usuario_id = request.getParameter("usuario_id");
+                resultado = new JsonObject();
+                
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.setHeader("Cache-Control", "no-store");
+                out = response.getWriter();
+                if (em.find(Usuario.class, usuario_id) != null) {
+                    resultado.add("mensajeUsuarioId", new JsonPrimitive("Dicho correo electrónico ya esta siendo usado."));
+                }
+                else {
+                    resultado.add("mensajeUsuarioId", new JsonPrimitive(""));
+                }
+                out.print(resultado);
+                out.flush();
+                return;
+            case "/comprobarUsuarioDNI":
+                dni = request.getParameter("dni");
+                resultado = new JsonObject();
+                
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.setHeader("Cache-Control", "no-store");
+                out = response.getWriter();
+                if (!em.createNamedQuery("Usuario.findByDni", Usuario.class).setParameter("dni", dni).getResultList().isEmpty()) {
+                    resultado.add("mensajeUsuarioDNI", new JsonPrimitive("Dicho DNI ya esta siendo usado."));
+                }
+                else {
+                    resultado.add("mensajeUsuarioDNI", new JsonPrimitive(""));
+                }
+                out.print(resultado);
+                out.flush();
+                return;
             case "/editarUsuario":
                 usuario_id = request.getParameter("correo");
                 usuario = em.find(Usuario.class, usuario_id);
@@ -549,7 +649,6 @@ public class ControladorAdministracion extends HttpServlet {
                 _contrasena = request.getParameter("validatePassword");
                 nombre = request.getParameter("nombre");
                 apellidos = request.getParameter("apellidos");
-                dni = request.getParameter("dni");
                 direccion = request.getParameter("direccion");
                 fecha_nacimiento = request.getParameter("fecha_nacimiento");
                 telefono = request.getParameter("telefono");
@@ -557,52 +656,80 @@ public class ControladorAdministracion extends HttpServlet {
                 club = request.getParameter("club");
                 federado = request.getParameter("federado");
                 
-                if (contrasena.equals(_contrasena)) {
-                    if (!contrasena.equals("")) {
-                        //Encriptamos la contraseña con AES-256
-                        String contrasena_tratada = AES.encrypt(contrasena);
-                        ivBytes = AES.getIvBytes();
-                        usuario.setContrasena(contrasena_tratada.getBytes());
-                        ivbytes = usuario.getIvbytes();
-                        ivbytes.setIvbytesId(ivBytes);
-                        merge(ivbytes);
-                    }
-                    formato = new SimpleDateFormat("yyyy-MM-dd");
-                    Date fecha_nacimiento_tratada = null;
-                    try {
-                        fecha_nacimiento_tratada = formato.parse(fecha_nacimiento);
-                    } catch (ParseException ex) {
-                        Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    boolean federado_tratado = federado.equals("s");
+                
+                //Encriptamos la contraseña con AES-256
+                String contrasena_tratada = AES.encrypt(contrasena);
+                ivBytes = AES.getIvBytes();
+                usuario.setContrasena(contrasena_tratada.getBytes());
+                ivbytes = usuario.getIvbytes();
+                
+                    
+                formato = new SimpleDateFormat("yyyy-MM-dd");
+                Date fecha_nacimiento_tratada = null;
+                try {
+                    fecha_nacimiento_tratada = formato.parse(fecha_nacimiento);
+                } catch (ParseException ex) {
+                    Logger.getLogger(ControladorAdministracion.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                boolean federado_tratado = federado.equals("s");
 
-                    String _club = club.equals("")? null : club;
-
+                String _club = club.equals("")? null : club;
+                
+                errores = false;
+                mensajeError = "";
+                if (!telefono.matches("\\d{9}")) {
+                    if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- El número de teléfono tiene que respetar el formato y tener 9 dígitos.";
+                    errores = true;
+                }
+                if (!contrasena.equals(_contrasena)) {
+                     if (errores) {
+                        mensajeError += "</br>";
+                    }
+                    mensajeError += "- Las contraseñas introducidas no coinciden.";
+                    errores = true;
+                }
+                if (!errores) {
+                    ivbytes.setIvbytesId(ivBytes);
+                    merge(ivbytes);
                     usuario.setNombre(nombre);
                     usuario.setApellidos(apellidos);
-                    usuario.setDni(dni);
                     usuario.setDireccion(direccion);
                     usuario.setFechaNacimiento(fecha_nacimiento_tratada);
                     usuario.setTelefono(telefono);
                     usuario.setSexo(sexo);
                     usuario.setClub(_club);
                     usuario.setFederado(federado_tratado);
-                
                     merge(usuario);
-                    
+
                     permiso = session.getAttribute("permiso") == null? false: (boolean)session.getAttribute("permiso");
-                    
+
                     if (permiso && !session.getAttribute("correo").equals(usuario_id)) {
+                        request.setAttribute("mensajeCreacion", "El usuario ha sido <i>editado</i> satisfactoriamente.");
                         vista = "Usuarios";
                     }
                     else {
                         System.out.println("CAMBIO REALIZADO CON EXITO");
+                        request.setAttribute("Cabecera", "Información");
+                        request.setAttribute("Cuerpo", "Sus cambios se han realizado con éxito.");
                         vista = "";
                     }
                 }
                 else {
-                    System.out.println("ERROR: la contraseña y su validación son distintas.");
-                    vista = "";
+                    request.setAttribute("contrasena", contrasena);
+                    request.setAttribute("contrasena_validada", _contrasena);
+                    request.setAttribute("nombre", nombre);
+                    request.setAttribute("apellidos", apellidos);
+                    request.setAttribute("direccion", direccion);
+                    request.setAttribute("fecha_nacimiento", fecha_nacimiento);
+                    request.setAttribute("telefono", telefono);
+                    request.setAttribute("sexo", sexo);
+                    request.setAttribute("club", club);
+                    request.setAttribute("federado", federado);
+                    request.setAttribute("mensajeError", mensajeError);
+                    vista = "editar-usuario?usuario_id=" + usuario_id;
                 }
                 break;
             case "/SubirRuta":
@@ -1450,6 +1577,7 @@ public class ControladorAdministracion extends HttpServlet {
                             vista = "logout";
                         }
                         else {
+                            request.setAttribute("mensajeCreacion", "El usuario ha sido <i>eliminado</i> satisfactoriamente.");
                             vista = "Usuarios";
                         }
                     }
