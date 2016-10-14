@@ -23,6 +23,6 @@
                 }
             }
         %>
-        <li class="first"><a id="descargaApp" href="#" download><span></span>Descarga nuestra nueva app&nbsp;&nbsp;<p class="glyphicon glyphicon-download-alt" style="margin:0; color: darkorchid"></p></a></li>
+        <li class="first"><a id="descargaApp" href="#" download><span></span>Descarga nuestra app&nbsp;&nbsp;<p class="glyphicon glyphicon-download-alt" style="margin:0; color: darkorchid"></p></a></li>
     </ul>
 </div>
